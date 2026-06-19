@@ -1,0 +1,95 @@
+require('dotenv').config();
+const express = require('express');
+const session = require('express-session');
+const path    = require('path');
+const fs      = require('fs');
+
+const app  = express();
+const PORT = process.env.PORT || 3000;
+const PASSWORD = process.env.BRAND_HUB_PASSWORD || 'fpg2026';
+const SECRET   = process.env.SESSION_SECRET || 'dev-secret-change-me';
+
+// ── Middleware ───────────────────────────────────────────────
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({
+  secret: SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 * 8 } // 8 hours
+}));
+
+// ── Auth guard ───────────────────────────────────────────────
+function requireAuth(req, res, next) {
+  if (req.session && req.session.authenticated) return next();
+  res.redirect('/login');
+}
+
+// ── Serve static assets (only after auth) ───────────────────
+// Public assets are gated — we serve them via a route, not express.static
+app.use('/static', express.static(path.join(__dirname, 'public/static')));
+
+// ── Login routes ─────────────────────────────────────────────
+app.get('/login', (req, res) => {
+  if (req.session.authenticated) return res.redirect('/');
+  res.sendFile(path.join(__dirname, 'public/login.html'));
+});
+
+app.post('/login', (req, res) => {
+  const { password } = req.body;
+  if (password === PASSWORD) {
+    req.session.authenticated = true;
+    res.redirect('/');
+  } else {
+    res.redirect('/login?error=1');
+  }
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/login');
+});
+
+// ── Main app ─────────────────────────────────────────────────
+app.get('/', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
+
+// ── Gated asset downloads ─────────────────────────────────────
+app.get('/download/:category/:filename', requireAuth, (req, res) => {
+  const { category, filename } = req.params;
+
+  // Sanitise — no path traversal
+  const safeCat  = category.replace(/[^a-z0-9_-]/gi, '');
+  const safeFile = path.basename(filename);
+  const filePath = path.join(__dirname, 'public/assets', safeCat, safeFile);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('Asset not found. Please check back later or contact the brand team.');
+  }
+
+  res.download(filePath, safeFile);
+});
+
+// ── Asset manifest API (so the frontend can show what's available) ──
+app.get('/api/assets', requireAuth, (req, res) => {
+  const baseDir = path.join(__dirname, 'public/assets');
+  const manifest = {};
+
+  const categories = ['logos', 'templates', 'social', 'guidelines'];
+  for (const cat of categories) {
+    const catPath = path.join(baseDir, cat);
+    if (fs.existsSync(catPath)) {
+      manifest[cat] = fs.readdirSync(catPath).filter(f => !f.startsWith('.'));
+    } else {
+      manifest[cat] = [];
+    }
+  }
+
+  res.json(manifest);
+});
+
+// ── Start ─────────────────────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`FPG Brand Hub running on port ${PORT}`);
+});

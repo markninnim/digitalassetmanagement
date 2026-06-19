@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FPG Brand Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #003768;
+      --orange:  #fcb034;
+      --accent:  #2e99d5;
+      --grey:    #6b7c8f;
+      --light:   #f5f7fa;
+      --border:  #e8ecf0;
+      --dark:    #1a2a3a;
+      --white:   #ffffff;
+      --success: #007744;
+      --sidebar: 260px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--light);
+      color: var(--dark);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar);
+      background: var(--blue);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    .sidebar-logo .brand-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .sidebar-logo .brand-sub {
+      font-size: 11px;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-top: 3px;
+    }
+
+    .sidebar-logo .logo-bar {
+      width: 32px;
+      height: 3px;
+      background: var(--orange);
+      border-radius: 2px;
+      margin-bottom: 10px;
+    }
+
+    nav { padding: 16px 0; flex: 1; }
+
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      color: rgba(255,255,255,.7);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-left: 3px solid transparent;
+      transition: all .15s;
+    }
+
+    nav a:hover { color: #fff; background: rgba(255,255,255,.07); }
+
+    nav a.active {
+      color: #fff;
+      border-left-color: var(--orange);
+      background: rgba(255,255,255,.1);
+    }
+
+    nav a svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .8; }
+
+    .nav-section-label {
+      padding: 16px 20px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,.35);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,.5);
+      font-size: 12px;
+      text-decoration: none;
+      transition: color .15s;
+    }
+
+    .logout-btn:hover { color: rgba(255,255,255,.9); }
+
+    /* ── MAIN ─────────────────────────────────────────────────── */
+    .main {
+      margin-left: var(--sidebar);
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* ── TOP BAR ──────────────────────────────────────────────── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .topbar-meta {
+      font-size: 12px;
+      color: var(--grey);
+    }
+
+    /* ── SECTIONS ─────────────────────────────────────────────── */
+    .page { padding: 40px; max-width: 1100px; }
+
+    section { margin-bottom: 64px; }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .section-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--orange);
+      background: rgba(252,176,52,.12);
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: .5px;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--grey);
+      margin-bottom: 24px;
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    .rule {
+      width: 40px;
+      height: 3px;
+      background: var(--orange);
+      border-radius: 2px;
+      margin: 8px 0 16px;
+    }
+
+    /* ── HERO BANNER ─────────────────────────────────────────── */
+    .hero {
+      background: var(--blue);
+      border-radius: 12px;
+      padding: 40px 48px;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(46,153,213,.15);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: 80px; bottom: -80px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(252,176,52,.1);
+    }
+
+    .hero-text h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .hero-text p {
+      font-size: 15px;
+      color: rgba(255,255,255,.7);
+      max-width: 440px;
+      line-height: 1.6;
+    }
+
+    .hero-text .orange-rule {
+      width: 40px;
+      height: 3px;
+      background: var(--orange);
+      border-radius: 2px;
+      margin: 12px 0;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat { text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 700; color: var(--orange); }
+    .stat-label { font-size: 11px; color: rgba(255,255,255,.6); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+    /* ── ASSET GRID ──────────────────────────────────────────── */
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .asset-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: box-shadow .15s, border-color .15s;
+    }
+
+    .asset-card:hover {
+      box-shadow: 0 4px 16px rgba(0,55,104,.1);
+      border-color: var(--accent);
+    }
+
+    .asset-card.placeholder {
+      border-style: dashed;
+      opacity: .65;
+    }
+
+    .asset-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+
+    .asset-icon.ai    { background: #ff9a00; color: #fff; }
+    .asset-icon.eps   { background: #007aff; color: #fff; }
+    .asset-icon.svg   { background: #34c759; color: #fff; }
+    .asset-icon.png   { background: var(--grey); color: #fff; }
+    .asset-icon.jpg   { background: #5856d6; color: #fff; }
+    .asset-icon.pptx  { background: #d34829; color: #fff; }
+    .asset-icon.pdf   { background: #d42020; color: #fff; }
+    .asset-icon.zip   { background: var(--blue); color: #fff; }
+    .asset-icon.img   { background: var(--light); color: var(--grey); border: 1px solid var(--border); }
+    .asset-icon.tbd   { background: var(--light); color: var(--grey); border: 1px dashed var(--border); }
+
+    .asset-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1.3;
+    }
+
+    .asset-desc {
+      font-size: 12px;
+      color: var(--grey);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    .asset-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .asset-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .asset-badge.ready  { background: rgba(0,119,68,.12); color: var(--success); }
+    .asset-badge.coming { background: var(--light); color: var(--grey); }
+
+    .dl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .15s;
+    }
+
+    .dl-btn:hover { background: #004a8a; }
+    .dl-btn svg { width: 12px; height: 12px; }
+
+    .dl-btn.disabled {
+      background: var(--light);
+      color: var(--grey);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* ── COLOUR SPECS ────────────────────────────────────────── */
+    .colour-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .swatch-card {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+    }
+
+    .swatch-block { height: 72px; }
+
+    .swatch-info {
+      padding: 12px 14px;
+    }
+
+    .swatch-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .swatch-hex  { font-size: 12px; color: var(--grey); margin-top: 2px; font-family: monospace; }
+    .swatch-vals { font-size: 11px; color: var(--grey); margin-top: 6px; line-height: 1.6; }
+
+    .copy-hex {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0;
+    }
+
+    .copy-hex:hover { text-decoration: underline; }
+
+    /* ── TYPOGRAPHY SPEC ─────────────────────────────────────── */
+    .type-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .type-table th {
+      background: var(--blue);
+      color: #fff;
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .type-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .type-table tr:nth-child(even) td { background: var(--light); }
+
+    .font-specimen {
+      background: var(--blue);
+      border-radius: 10px;
+      padding: 28px 32px;
+      margin-bottom: 16px;
+    }
+
+    .font-specimen .label { font-size: 11px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .font-specimen .sample { font-size: 32px; font-weight: 700; color: var(--orange); line-height: 1.1; }
+    .font-specimen .alpha  { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 8px; font-family: monospace; }
+
+    .font-specimen.light { background: var(--white); border: 1.5px solid var(--border); }
+    .font-specimen.light .label { color: var(--grey); }
+    .font-specimen.light .sample { color: var(--blue); font-weight: 400; }
+    .font-specimen.light .alpha  { color: var(--grey); }
+
+    /* ── SOCIAL EXAMPLES ─────────────────────────────────────── */
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .post-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .post-preview {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.4;
+      position: relative;
+    }
+
+    .post-preview span { position: relative; z-index: 1; }
+
+    .post-meta {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .post-type {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .post-title { font-size: 13px; font-weight: 700; color: var(--dark); margin-top: 4px; }
+    .post-desc  { font-size: 12px; color: var(--grey); margin-top: 4px; line-height: 1.5; }
+
+    .post-tags  { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+    .post-tag   { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: var(--light); color: var(--grey); }
+
+    /* ── VOICE RULES ─────────────────────────────────────────── */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .voice-card {
+      border-radius: 10px;
+      padding: 20px 22px;
+      border-left: 4px solid;
+    }
+
+    .voice-card.do   { background: #f0fff6; border-color: var(--success); }
+    .voice-card.dont { background: #fff0f0; border-color: #cc0000; }
+
+    .voice-card .vc-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 8px;
+    }
+
+    .voice-card.do   .vc-label { color: var(--success); }
+    .voice-card.dont .vc-label { color: #cc0000; }
+
+    .voice-card p {
+      font-size: 14px;
+      font-style: italic;
+      line-height: 1.6;
+      color: var(--dark);
+    }
+
+    /* ── TOAST ───────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--dark);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all .2s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      :root { --sidebar: 0px; }
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .page { padding: 20px; }
+      .hero { padding: 28px 24px; flex-direction: column; }
+      .hero-stats { gap: 20px; }
+      .voice-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-bar"></div>
+    <div class="brand-name">Finance Planning Group</div>
+    <div class="brand-sub">Brand Hub</div>
+  </div>
+
+  <nav id="main-nav">
+    <div class="nav-section-label">Overview</div>
+    <a href="#home" class="active" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </a>
+
+    <div class="nav-section-label">Assets</div>
+    <a href="#logos" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      Logo Files
+    </a>
+    <a href="#templates" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Templates
+    </a>
+    <a href="#social" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/></svg>
+      Social Assets
+    </a>
+    <a href="#guidelines-dl" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Guidelines PDF
+    </a>
+
+    <div class="nav-section-label">Brand Specs</div>
+    <a href="#colours" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="19" cy="13" r="2.5"/><circle cx="6.5" cy="13.5" r="2.5"/><circle cx="12" cy="20" r="2.5"/></svg>
+      Colours
+    </a>
+    <a href="#typography" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+      Typography
+    </a>
+    <a href="#voice" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Brand Voice
+    </a>
+    <a href="#social-examples" onclick="setActive(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      Post Examples
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="/logout" class="logout-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign out
+    </a>
+  </div>
+</aside>
+
+<!-- ── MAIN ─────────────────────────────────────────────────── -->
+<main class="main">
+  <div class="topbar">
+    <span class="topbar-title">FPG Brand Hub</span>
+    <span class="topbar-meta" id="asset-count">Loading assets...</span>
+  </div>
+
+  <div class="page">
+
+    <!-- HOME -->
+    <section id="home">
+      <div class="hero">
+        <div class="hero-text">
+          <div class="orange-rule"></div>
+          <h1>FPG Brand Hub</h1>
+          <p>Your single source for all Finance Planning Group brand assets. Download logos, templates and social files. Reference colour and typography specs. Everything in one place.</p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-num" id="stat-logos">-</div>
+            <div class="stat-label">Logo files</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" id="stat-templates">-</div>
+            <div class="stat-label">Templates</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" id="stat-social">-</div>
+            <div class="stat-label">Social assets</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGOS -->
+    <section id="logos">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2>Logo Files</h2>
+      </div>
+      <div class="rule"></div>
+      <p class="section-desc">All logo variants for every use case. Use the master .AI file for any print production. Use .SVG for web. Use .PNG where vector is not supported.</p>
+      <div class="asset-grid" id="logo-grid">
+
+        <div class="asset-card">
+          <div class="asset-icon ai">AI</div>
+          <div class="asset-name">FPG Logo — Master</div>
+          <div class="asset-desc">Full colour master artwork. Use for all print production and as the source for any derivative files.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/logos/fpg-logo-master.ai" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon eps">EPS</div>
+          <div class="asset-name">FPG Logo — Print EPS</div>
+          <div class="asset-desc">Vector EPS for press and large-format print. Full colour and reversed (white) variants included.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/logos/fpg-logo.eps" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon svg">SVG</div>
+          <div class="asset-name">FPG Logo — Web SVG</div>
+          <div class="asset-desc">Scalable vector for websites, email signatures and digital use. Fully responsive at any size.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/logos/fpg-logo.svg" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon png">PNG</div>
+          <div class="asset-name">FPG Logo — PNG (Transparent)</div>
+          <div class="asset-desc">High-res PNG at 1200px wide with transparent background. For documents, presentations and digital collateral.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/logos/fpg-logo-transparent.png" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon png">PNG</div>
+          <div class="asset-name">FPG Logo — Reversed White</div>
+          <div class="asset-desc">White version for use on dark and Hero Blue backgrounds. PNG with transparency.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/logos/fpg-logo-reversed.png" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon jpg">JPG</div>
+          <div class="asset-name">FPG Logo — Email JPG</div>
+          <div class="asset-desc">JPG on white background for email signatures and environments that do not support transparency.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/logos/fpg-logo-email.jpg" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TEMPLATES -->
+    <section id="templates">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2>Templates</h2>
+      </div>
+      <div class="rule"></div>
+      <p class="section-desc">Production-ready templates. Do not alter fonts, colours or layout proportions without brand team approval.</p>
+      <div class="asset-grid">
+
+        <div class="asset-card">
+          <div class="asset-icon pptx">PPTX</div>
+          <div class="asset-name">FPG PowerPoint Template</div>
+          <div class="asset-desc">Master slide deck template. Includes title, section, content, two-column, quote and closing slide layouts.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/templates/fpg-presentation-template.pptx" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon pdf">PDF</div>
+          <div class="asset-name">FPG Letterhead</div>
+          <div class="asset-desc">Branded letterhead template for client correspondence and formal documentation.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/templates/fpg-letterhead.pdf" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon zip">ZIP</div>
+          <div class="asset-name">Email Signature Kit</div>
+          <div class="asset-desc">HTML email signature templates with setup instructions for Outlook, Gmail and Apple Mail.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/templates/fpg-email-signatures.zip" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SOCIAL ASSETS -->
+    <section id="social">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <h2>Social Media Assets</h2>
+      </div>
+      <div class="rule"></div>
+      <p class="section-desc">Sized and branded assets for every major platform. All files are production-ready at the correct pixel dimensions.</p>
+      <div class="asset-grid">
+
+        <div class="asset-card">
+          <div class="asset-icon img">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="asset-name">LinkedIn Page Header</div>
+          <div class="asset-desc">1584 x 396px. Branded banner for the FPG LinkedIn company page.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/social/fpg-linkedin-header.png" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon img">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="asset-name">Facebook Page Cover</div>
+          <div class="asset-desc">820 x 312px. Branded cover image for the FPG Facebook business page.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/social/fpg-facebook-cover.png" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon img">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="asset-name">Instagram Profile Picture</div>
+          <div class="asset-desc">1000 x 1000px. Branded profile image optimised for Instagram.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/social/fpg-instagram-profile.png" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-icon zip">ZIP</div>
+          <div class="asset-name">Social Post Template Pack</div>
+          <div class="asset-desc">Canva-compatible templates for square, portrait and story posts. Includes all standard post types.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming">Upload pending</span>
+            <a href="/download/social/fpg-social-templates.zip" class="dl-btn disabled">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- GUIDELINES PDF -->
+    <section id="guidelines-dl">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <h2>Brand Guidelines PDF</h2>
+      </div>
+      <div class="rule"></div>
+      <p class="section-desc">The complete FPG brand guidelines document. Share with designers, printers, developers and new team members.</p>
+      <div class="asset-grid">
+        <div class="asset-card">
+          <div class="asset-icon pdf">PDF</div>
+          <div class="asset-name">FPG Brand Guidelines 2026</div>
+          <div class="asset-desc">8-page brand guidelines covering colour palette, typography, logo usage, imagery style and brand voice.</div>
+          <div class="asset-footer">
+            <span class="asset-badge coming" id="guidelines-badge">Upload pending</span>
+            <a href="/download/guidelines/FPG_Brand_Guidelines.pdf" class="dl-btn disabled" id="guidelines-dl-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLOURS -->
+    <section id="colours">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <h2>Colour Palette</h2>
+      </div>
+      <div class="rule"></div>
+      <p class="section-desc">Always use exact values. Do not approximate. Click any hex code to copy it to clipboard.</p>
+
+      <div class="colour-grid">
+        <div class="swatch-card">
+          <div class="swatch-block" style="background:#003768"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Hero Blue</div>
+            <div class="swatch-hex">#003768</div>
+            <div class="swatch-vals">RGB 0, 55, 104<br>CMYK 100, 76, 32, 14</div>
+            <button class="copy-hex" onclick="copyHex('#003768')">Copy hex</button>
+          </div>
+        </div>
+        <div class="swatch-card">
+          <div class="swatch-block" style="background:#fcb034"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Hero Orange</div>
+            <div class="swatch-hex">#FCB034</div>
+            <div class="swatch-vals">RGB 252, 176, 52<br>CMYK 0, 30, 87, 1</div>
+            <button class="copy-hex" onclick="copyHex('#FCB034')">Copy hex</button>
+          </div>
+        </div>
+        <div class="swatch-card">
+          <div class="swatch-block" style="background:#2e99d5"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Accent Blue</div>
+            <div class="swatch-hex">#2E99D5</div>
+            <div class="swatch-vals">RGB 46, 153, 213<br>CMYK 78, 28, 0, 16</div>
+            <button class="copy-hex" onclick="copyHex('#2E99D5')">Copy hex</button>
+          </div>
+        </div>
+        <div class="swatch-card">
+          <div class="swatch-block" style="background:#f5f7fa; border-bottom: 1px solid #e8ecf0"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Off White</div>
+            <div class="swatch-hex">#F5F7FA</div>
+            <div class="swatch-vals">Page backgrounds<br>Card fills</div>
+            <button class="copy-hex" onclick="copyHex('#F5F7FA')">Copy hex</button>
+          </div>
+        </div>
+        <div class="swatch-card">
+          <div class="swatch-block" style="background:#6b7c8f"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Mid Grey</div>
+            <div class="swatch-hex">#6B7C8F</div>
+            <div class="swatch-vals">Body copy<br>Captions</div>
+            <button class="copy-hex" onclick="copyHex('#6B7C8F')">Copy hex</button>
+          </div>
+        </div>
+        <div class="swatch-card">
+          <div class="swatch-block" style="background:#1a2a3a"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Dark Grey</div>
+            <div class="swatch-hex">#1A2A3A</div>
+            <div class="swatch-vals">Headlines on light<br>backgrounds</div>
+            <button class="copy-hex" onclick="copyHex('#1A2A3A')">Copy hex</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:14px 18px; font-size:13px; color:#5a3e00; max-width:640px;">
+        <strong>Usage rule:</strong> Never place Hero Orange text directly on Hero Blue without a white intermediary element. Maintain sufficient contrast at all times for WCAG AA compliance.
+      </div>
+    </section>
+
+    <!-- TYPOGRAPHY -->
+    <section id="typography">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <h2>Typography</h2>
+      </div>
+      <div class="rule"></div>
+      <p class="section-desc">Two typefaces only. Gilroy Bold for all display and heading use. Plus Jakarta Sans for all body copy and UI text.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:28px;">
+        <div class="font-specimen">
+          <div class="label">Primary — Display + Headings</div>
+          <div class="sample">Gilroy Bold</div>
+          <div class="alpha">AaBbCcDd 0123456789 !@#</div>
+        </div>
+        <div class="font-specimen light">
+          <div class="label">Secondary — Body + UI</div>
+          <div class="sample">Plus Jakarta Sans</div>
+          <div class="alpha">AaBbCcDd 0123456789 !@#</div>
+        </div>
+      </div>
+
+      <table class="type-table">
+        <thead>
+          <tr>
+            <th>Style</th>
+            <th>Font</th>
+            <th>Size</th>
+            <th>Leading</th>
+            <th>Usage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Display</td><td>Gilroy Bold</td><td>36pt</td><td>40pt</td><td>Section covers, hero panels</td></tr>
+          <tr><td>H1</td><td>Gilroy Bold</td><td>24pt</td><td>28pt</td><td>Page titles, major headings</td></tr>
+          <tr><td>H2</td><td>Gilroy Bold</td><td>18pt</td><td>22pt</td><td>Sub-headings</td></tr>
+          <tr><td>H3</td><td>Gilroy Bold</td><td>14pt</td><td>18pt</td><td>Card titles, sidebar heads</td></tr>
+          <tr><td>Body</td><td>Plus Jakarta Sans Regular</td><td>10pt</td><td>15pt</td><td>All running body copy</td></tr>
+          <tr><td>Small</td><td>Plus Jakarta Sans Regular</td><td>8pt</td><td>12pt</td><td>Captions, footnotes, labels</td></tr>
+          <tr><td>CTA</td><td>Gilroy Bold</td><td>11pt</td><td>14pt</td><td>Button and call-to-action text</td></tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:12px; color:var(--grey); margin-top:12px;">Gilroy is available at <a href="https://www.myfonts.com/collections/gilroy-font-radomir-tinkov" target="_blank" style="color:var(--accent);">myfonts.com</a> (commercial licence required). Plus Jakarta Sans is free at <a href="https://fonts.google.com/specimen/Plus+Jakarta+Sans" target="_blank" style="color:var(--accent);">fonts.google.com</a>.</p>
+    </section>
+
+    <!-- BRAND VOICE -->
+    <section id="voice">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <h2>Brand Voice</h2>
+      </div>
+      <div class="rule"></div>
+      <p class="section-desc">FPG copy must always feel direct, human and confident. We talk to people, not at them. We say what we mean. We never hide hard truths behind jargon.</p>
+
+      <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:28px;">
+        <div style="background:var(--blue); border-radius:10px; padding:18px 16px; text-align:center;">
+          <div style="font-size:13px; font-weight:700; color:var(--orange); margin-bottom:6px;">Direct</div>
+          <div style="font-size:12px; color:rgba(255,255,255,.7); line-height:1.5;">No jargon, no waffle. Say it plainly.</div>
+        </div>
+        <div style="background:var(--blue); border-radius:10px; padding:18px 16px; text-align:center;">
+          <div style="font-size:13px; font-weight:700; color:var(--orange); margin-bottom:6px;">Human</div>
+          <div style="font-size:12px; color:rgba(255,255,255,.7); line-height:1.5;">Real language, real warmth, real care.</div>
+        </div>
+        <div style="background:var(--blue); border-radius:10px; padding:18px 16px; text-align:center;">
+          <div style="font-size:13px; font-weight:700; color:var(--orange); margin-bottom:6px;">Confident</div>
+          <div style="font-size:12px; color:rgba(255,255,255,.7); line-height:1.5;">We know our subject. We do not hedge.</div>
+        </div>
+        <div style="background:var(--blue); border-radius:10px; padding:18px 16px; text-align:center;">
+          <div style="font-size:13px; font-weight:700; color:var(--orange); margin-bottom:6px;">Responsible</div>
+          <div style="font-size:12px; color:rgba(255,255,255,.7); line-height:1.5;">Hard truths delivered with care.</div>
+        </div>
+      </div>
+
+      <div class="voice-grid">
+        <div class="voice-card do">
+          <div class="vc-label">Write this</div>
+          <p>"If you die tomorrow, your family could lose the house. We can make sure they don't."</p>
+        </div>
+        <div class="voice-card dont">
+          <div class="vc-label">Not this</div>
+          <p>"Our flexible protection solutions offer comprehensive peace-of-mind coverage."</p>
+        </div>
+        <div class="voice-card do">
+          <div class="vc-label">Write this</div>
+          <p>"You've built something worth protecting. Let's talk about how we keep it safe."</p>
+        </div>
+        <div class="voice-card dont">
+          <div class="vc-label">Not this</div>
+          <p>"FPG provides market-leading financial planning services for discerning clients."</p>
+        </div>
+      </div>
+
+      <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:8px; padding:14px 18px; font-size:13px; color:#5a3e00; max-width:640px;">
+        <strong>FCA reminder:</strong> All financial promotions must be fair, clear and not misleading. All public-facing copy must be reviewed against COBS/MCOB requirements and signed off by Compliance before issue.
+      </div>
+    </section>
+
+    <!-- SOCIAL POST EXAMPLES -->
+    <section id="social-examples">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <h2>Social Post Examples</h2>
+      </div>
+      <div class="rule"></div>
+      <p class="section-desc">These show how FPG branding applies to social content. Use as reference when briefing designers or creating posts in Canva.</p>
+
+      <div class="social-grid">
+
+        <div class="post-card">
+          <div class="post-preview" style="background:#003768; color:#fff;">
+            <span>"If you died tomorrow, could your family pay the mortgage?"</span>
+          </div>
+          <div class="post-meta">
+            <div class="post-type">LinkedIn / Facebook</div>
+            <div class="post-title">Confrontational Question Post</div>
+            <div class="post-desc">Hero Blue background. Gilroy Bold headline in white. Orange accent line or stat below. No product name in the visual.</div>
+            <div class="post-tags">
+              <span class="post-tag">Hero Blue BG</span>
+              <span class="post-tag">White headline</span>
+              <span class="post-tag">Outcome-first</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-preview" style="background:#fcb034; color:#003768;">
+            <span>1 in 3 people will develop cancer before 70.</span>
+          </div>
+          <div class="post-meta">
+            <div class="post-type">Instagram / Facebook</div>
+            <div class="post-title">Stat Impact Post</div>
+            <div class="post-desc">Hero Orange background. Hero Blue headline. Stat is large and centred. Supporting body copy below image in caption only.</div>
+            <div class="post-tags">
+              <span class="post-tag">Hero Orange BG</span>
+              <span class="post-tag">Stat-led</span>
+              <span class="post-tag">No product name</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-preview" style="background:#f5f7fa; color:#003768; border-bottom:1px solid #e8ecf0;">
+            <div style="text-align:left; width:100%;">
+              <div style="font-size:11px; color:#fcb034; font-weight:700; margin-bottom:6px;">CLIENT STORY</div>
+              <span style="font-size:14px;">"Dave lost his job after a stroke. His income protection paid out in 30 days."</span>
+            </div>
+          </div>
+          <div class="post-meta">
+            <div class="post-type">LinkedIn</div>
+            <div class="post-title">Scenario / Testimonial Post</div>
+            <div class="post-desc">Light background. Orange label. Narrative headline. Used for character-led content referencing Sarah, Dave, Peter or Tom and Penny scenarios.</div>
+            <div class="post-tags">
+              <span class="post-tag">Scenario-led</span>
+              <span class="post-tag">Off White BG</span>
+              <span class="post-tag">Orange label</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-preview" style="background:linear-gradient(135deg,#003768,#2e99d5); color:#fff;">
+            <span style="font-size:13px; text-align:left; width:100%;">Protect your income.<br>Protect your family.<br>Protect your home.<br><span style="color:#fcb034; font-size:15px; font-weight:700; margin-top:8px; display:block;">One conversation. That's all it takes.</span></span>
+          </div>
+          <div class="post-meta">
+            <div class="post-type">All platforms</div>
+            <div class="post-title">CTA Post</div>
+            <div class="post-desc">Blue to Accent Blue gradient. White stacked list. Orange CTA line at bottom. Always ends with a clear, low-friction action.</div>
+            <div class="post-tags">
+              <span class="post-tag">Gradient BG</span>
+              <span class="post-tag">Orange CTA</span>
+              <span class="post-tag">List format</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-preview" style="background:#fff; color:#003768; border-bottom:1px solid #e8ecf0; flex-direction:column; align-items:flex-start; justify-content:flex-end; padding:16px;">
+            <div style="width:100%; height:60px; background:#e8ecf0; border-radius:6px; margin-bottom:10px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#6b7c8f;">[ Photography ]</div>
+            <div style="font-size:11px; font-weight:700; color:#fcb034;">ADVISER SPOTLIGHT</div>
+            <div style="font-size:13px; font-weight:700; color:#003768; margin-top:2px;">Jonathan Peachey — Mortgage Adviser</div>
+          </div>
+          <div class="post-meta">
+            <div class="post-type">LinkedIn / Instagram</div>
+            <div class="post-title">Adviser Spotlight Post</div>
+            <div class="post-desc">Photography-led. Orange label. Hero Blue name in Gilroy Bold. White background. Human, approachable tone in caption.</div>
+            <div class="post-tags">
+              <span class="post-tag">Photo-led</span>
+              <span class="post-tag">White BG</span>
+              <span class="post-tag">Adviser profile</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="post-card">
+          <div class="post-preview" style="background:#003768; color:#fff; flex-direction:column; justify-content:space-between;">
+            <div style="font-size:11px; color:rgba(255,255,255,.5); width:100%;">Did you know?</div>
+            <span style="font-size:22px; font-weight:700; color:#fcb034; line-height:1.1;">83%</span>
+            <div style="font-size:12px; color:rgba(255,255,255,.8); width:100%;">of UK adults have no critical illness cover.</div>
+          </div>
+          <div class="post-meta">
+            <div class="post-type">Instagram / Stories</div>
+            <div class="post-title">Large Stat / Awareness Post</div>
+            <div class="post-desc">Hero Blue background. Oversized orange stat. Supporting context in small white text. "Did you know?" label in muted white.</div>
+            <div class="post-tags">
+              <span class="post-tag">Oversized stat</span>
+              <span class="post-tag">Orange number</span>
+              <span class="post-tag">Awareness</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /page -->
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Active nav ─────────────────────────────────────────────
+  function setActive(el) {
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Scroll spy
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }, { passive: true });
+
+  // ── Copy hex ───────────────────────────────────────────────
+  function copyHex(hex) {
+    navigator.clipboard.writeText(hex).then(() => showToast(`Copied ${hex}`));
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // ── Load asset manifest ────────────────────────────────────
+  async function loadAssets() {
+    try {
+      const res  = await fetch('/api/assets');
+      const data = await res.json();
+
+      // Update stats
+      document.getElementById('stat-logos').textContent     = data.logos?.length     || 0;
+      document.getElementById('stat-templates').textContent = data.templates?.length || 0;
+      document.getElementById('stat-social').textContent    = data.social?.length    || 0;
+
+      const total = Object.values(data).flat().length;
+      document.getElementById('asset-count').textContent = `${total} asset${total !== 1 ? 's' : ''} available`;
+
+      // Enable download buttons for files that exist
+      enableAvailableDownloads(data);
+
+    } catch(e) {
+      document.getElementById('asset-count').textContent = 'Asset count unavailable';
+    }
+  }
+
+  function enableAvailableDownloads(manifest) {
+    // Loop all download buttons and check if the file is in the manifest
+    document.querySelectorAll('.dl-btn').forEach(btn => {
+      const href = btn.getAttribute('href');
+      if (!href) return;
+      const parts = href.split('/download/')[1]?.split('/');
+      if (!parts || parts.length < 2) return;
+      const [cat, file] = parts;
+      if (manifest[cat] && manifest[cat].includes(file)) {
+        btn.classList.remove('disabled');
+        const badge = btn.closest('.asset-card')?.querySelector('.asset-badge');
+        if (badge) {
+          badge.textContent = 'Ready';
+          badge.classList.replace('coming', 'ready');
+        }
+      }
+    });
+  }
+
+  loadAssets();
+</script>
+
+</body>
+</html>
