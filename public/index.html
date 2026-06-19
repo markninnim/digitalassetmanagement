@@ -150,11 +150,15 @@ function copy(hex) {
 }
 fetch('/api/assets').then(r => r.json()).then(function(data) {
   var cats = {logos: ['fpg-logo-master.ai','fpg-logo.eps','fpg-logo.svg','fpg-logo-transparent.png'], guidelines: ['FPG_Brand_Guidelines.pdf']};
-  if (data.logos && data.logos.includes('fpg-logo-master.ai')) {
-    document.getElementById('badge-ai').textContent = 'Ready';
-    document.getElementById('badge-ai').className = 'badge ready';
-    document.getElementById('btn-ai').className = 'btn';
-  }
+  var logoMap = {'fpg-logo-master.ai':'ai','fpg-logo.eps':'eps','fpg-logo.svg':'svg','fpg-logo-transparent.png':'png'};
+  Object.keys(logoMap).forEach(function(f) {
+    if (data.logos && data.logos.includes(f)) {
+      var id = logoMap[f];
+      document.getElementById('badge-'+id).textContent = 'Ready';
+      document.getElementById('badge-'+id).className = 'badge ready';
+      document.getElementById('btn-'+id).className = 'btn';
+    }
+  });
   if (data.guidelines && data.guidelines.includes('FPG_Brand_Guidelines.pdf')) {
     document.getElementById('badge-pdf').textContent = 'Ready';
     document.getElementById('badge-pdf').className = 'badge ready';
