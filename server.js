@@ -22,8 +22,7 @@ app.use(session({
 
 // ── Auth guard ───────────────────────────────────────────────
 function requireAuth(req, res, next) {
-  if (req.session && req.session.authenticated) return next();
-  res.redirect('/login');
+  return next(); // auth disabled temporarily
 }
 
 // ── Serve static assets (only after auth) ───────────────────
