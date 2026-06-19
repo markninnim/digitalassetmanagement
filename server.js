@@ -12,10 +12,11 @@ const SECRET   = process.env.SESSION_SECRET || 'dev-secret-change-me';
 // ── Middleware ───────────────────────────────────────────────
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.set('trust proxy', 1);
 app.use(session({
   secret: SECRET,
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
   cookie: { maxAge: 1000 * 60 * 60 * 8, secure: false } // 8 hours
 }));
 
