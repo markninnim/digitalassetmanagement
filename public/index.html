@@ -245,9 +245,11 @@ var SIZE_LABELS = {
   '1080 x 1920 - tik.jpg':      { label: 'TikTok / Story', size: '1080 × 1920' },
   '1200 x 1200 - ig fb li.jpg': { label: 'Square',         size: '1200 × 1200' }
 };
-function makeSocialCard(postName, file) {
+function makeSocialCard(postName, fileObj) {
+  var file = fileObj.name || fileObj;
   var info = SIZE_LABELS[file] || { label: file, size: '' };
   var url  = '/download-post/' + encodeURIComponent(postName) + '/' + encodeURIComponent(file);
+  var dateStr = fileObj.created ? new Date(fileObj.created).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) : '';
 
   var card  = document.createElement('div'); card.className = 'card'; card.dataset.label = info.label;
   var thumb = document.createElement('div'); thumb.className = 'thumb';
@@ -259,6 +261,7 @@ function makeSocialCard(postName, file) {
 
   var h3 = document.createElement('h3'); h3.textContent = info.label;
   var p  = document.createElement('p');  p.textContent  = info.size + 'px';
+  var dateEl = document.createElement('p'); dateEl.textContent = dateStr; dateEl.style.cssText = 'color:#aaa;font-size:11px;margin-top:2px;';
   var br = document.createElement('br');
   var badge = document.createElement('span'); badge.className = 'badge ready'; badge.textContent = 'Ready';
   var br2 = document.createElement('br');
@@ -266,7 +269,7 @@ function makeSocialCard(postName, file) {
   var vw  = document.createElement('a'); vw.className = 'btn-view'; vw.href = url; vw.textContent = 'View';
   vw.onclick = function(e) { openPreview(e, vw); };
 
-  card.appendChild(thumb); card.appendChild(h3); card.appendChild(p);
+  card.appendChild(thumb); card.appendChild(h3); card.appendChild(p); card.appendChild(dateEl);
   card.appendChild(br); card.appendChild(badge); card.appendChild(br2);
   card.appendChild(dl); card.appendChild(vw);
   return card;

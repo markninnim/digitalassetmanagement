@@ -80,7 +80,12 @@ app.get('/api/social-content', requireAuth, (req, res) => {
     .sort()
     .map(name => ({
       name,
-      files: fs.readdirSync(path.join(baseDir, name)).filter(f => !f.startsWith('.') && !f.toLowerCase().endsWith('.psd'))
+      files: fs.readdirSync(path.join(baseDir, name))
+        .filter(f => !f.startsWith('.') && !f.toLowerCase().endsWith('.psd'))
+        .map(f => {
+          const stat = fs.statSync(path.join(baseDir, name, f));
+          return { name: f, created: stat.birthtime || stat.mtime };
+        })
     }));
   res.json(posts);
 });
