@@ -194,12 +194,12 @@ app.get('/personalise-brochure', requireAuth, async (req, res) => {
     const { height } = page.getSize();
 
     const fontSize   = 11;
-    const x          = 155;
+    const x          = 71;
     const lineHeight = 20;
     // Place just below the subtitle — adjust yStart if needed
     const yStart = height - 570;
 
-    const darkBlue = rgb(0.1, 0.16, 0.23);
+    const darkBlue = rgb(2/255, 19/255, 70/255); // Hero Dark Blue CMYK 98.54/84.53/43.58/51.15
 
     if (customerName) {
       page.drawText('Prepared for: ' + customerName, { x, y: yStart, size: fontSize, font, color: darkBlue });
