@@ -405,14 +405,14 @@ function loadSocialContent() {
 
       var storageKey = 'post-wording-' + post.name;
       var wrapDiv = document.createElement('div');
-      wrapDiv.style.cssText = 'margin:12px 0 32px;';
+      wrapDiv.style.cssText = 'margin:12px 0 32px;width:100%;box-sizing:border-box;';
       var label = document.createElement('div');
       label.textContent = 'Approved Post Wording';
       label.style.cssText = 'font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;';
       var ta = document.createElement('textarea');
       ta.placeholder = 'Add post copy, captions or notes here…';
       ta.value = localStorage.getItem(storageKey) || '';
-      ta.style.cssText = 'width:100%;box-sizing:border-box;min-height:80px;padding:12px;border:1px solid #e8ecf0;border-radius:8px;font-size:13px;font-family:sans-serif;color:#1a2a3a;background:#fff;resize:vertical;outline:none;';
+      ta.style.cssText = 'display:block;width:100%;box-sizing:border-box;min-height:80px;padding:12px;border:1px solid #e8ecf0;border-radius:8px;font-size:13px;font-family:sans-serif;color:#1a2a3a;background:#fff;resize:vertical;outline:none;';
       ta.addEventListener('input', function(){ localStorage.setItem(storageKey, ta.value); });
       ta.addEventListener('focus', function(){ ta.style.borderColor = '#003768'; });
       ta.addEventListener('blur',  function(){ ta.style.borderColor = '#e8ecf0'; });
