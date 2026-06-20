@@ -200,7 +200,7 @@ app.get('/personalise-brochure', requireAuth, async (req, res) => {
     const x          = 71;
     const lineHeight = 17;
     // Place just below the subtitle — adjust yStart if needed
-    const yStart = height - 570;
+    const yStart = height - 655; // moved down 3cm (~85pts)
 
     const darkBlue = rgb(2/255, 19/255, 70/255); // Hero Dark Blue CMYK 98.54/84.53/43.58/51.15
 
