@@ -238,7 +238,7 @@ app.get('/personalise-brochure', requireAuth, async (req, res) => {
         const factSize = 36;
         const mmToPt = 2.835;
         const fx = Math.round(22.5 * mmToPt);                                          // 22.5mm from left = 64pt
-        const fy = fph - Math.round(141.737 * mmToPt) - Math.round(factSize * 0.72);  // 141.737mm from top to cap height
+        const fy = fph - Math.round(143.737 * mmToPt) - Math.round(factSize * 0.72);  // 143.737mm from top to cap height
         factp.drawRectangle({ x: fx - 2, y: fy - 6, width: 420, height: factSize + 14, color: bgColour });
         factp.drawText(`${firstName}, it’s a fact...`, { x: fx, y: fy, size: factSize, font, color: orange });
       }
