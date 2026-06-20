@@ -317,6 +317,11 @@ var CP_PLATFORMS = [
   { name: 'Facebook',   file: '630 x 1200 - fb.jpg',         size: '630 × 1200',   url: 'https://www.facebook.com/' },
   { name: 'LinkedIn',   file: '627 x 1200 - li.jpg',         size: '627 × 1200',   url: 'https://www.linkedin.com/feed/' }
 ];
+// Maps folder names → section group headings for Video Content
+var VIDEO_SECTION_MAP = {
+  'hero movies': 'Adobe Licenced Stock Footage'
+};
+
 function loadVideoContent() {
   fetch('/api/video-content').then(function(r){ return r.json(); }).then(function(posts) {
     var container = document.getElementById('video-content-body');
@@ -325,11 +330,23 @@ function loadVideoContent() {
       container.innerHTML = '<p style="color:#6b7c8f;">No videos yet — drop folders into public/assets/video-content/</p>';
       return;
     }
+    var currentSection = null;
     posts.forEach(function(post) {
+      var sectionLabel = VIDEO_SECTION_MAP[post.name.toLowerCase()] || null;
+      if (sectionLabel && sectionLabel !== currentSection) {
+        currentSection = sectionLabel;
+        var sectionHeader = document.createElement('div');
+        sectionHeader.style.cssText = 'margin:32px 0 20px;';
+        var sectionH2 = document.createElement('h2');
+        sectionH2.textContent = sectionLabel;
+        sectionH2.style.cssText = 'color:#003768;font-size:16px;font-weight:700;margin:0 0 0;padding-bottom:8px;border-bottom:3px solid #fcb034;display:inline-block;';
+        sectionHeader.appendChild(sectionH2);
+        container.appendChild(sectionHeader);
+      }
       var title = post.name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
       var h3 = document.createElement('h3');
       h3.textContent = title;
-      h3.style.cssText = 'color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:24px 0 12px;padding-bottom:6px;border-bottom:2px solid #fcb034;';
+      h3.style.cssText = 'color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;padding-bottom:6px;border-bottom:2px solid #e8ecf0;';
       container.appendChild(h3);
       var grid = document.createElement('div'); grid.className = 'grid';
       post.files.forEach(function(fileObj) {
