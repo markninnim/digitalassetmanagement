@@ -211,6 +211,24 @@ app.get('/personalise-brochure', requireAuth, async (req, res) => {
       page.drawText('By: ' + brokerName, { x, y: yStart - lineHeight, size: fontSize, font, color: darkBlue });
     }
 
+    // Add first name before "What if..." on inner pages
+    const firstName = customerName ? customerName.split(' ')[0] : '';
+    if (firstName) {
+      const bgColour = rgb(0.941, 0.949, 0.969); // light blue-grey page background
+      const whatIfSize = 18;
+      const pages = pdfDoc.getPages();
+      for (let i = 1; i < pages.length; i++) {
+        const p = pages[i];
+        const { height: ph } = p.getSize();
+        const wy = ph - 98; // "What if..." y position — adjust if needed
+        const wx = 71;
+        // Cover existing "What if..." text with background rectangle
+        p.drawRectangle({ x: wx, y: wy - 4, width: 200, height: whatIfSize + 8, color: bgColour });
+        // Redraw as "FirstName, what if..."
+        p.drawText(firstName + ', what if...', { x: wx, y: wy, size: whatIfSize, font, color: darkBlue });
+      }
+    }
+
     const modifiedBytes = await pdfDoc.save();
     const filename = 'FPG-Protection-Brochure' + (customerName ? '-' + customerName.replace(/[^a-z0-9]/gi, '-') : '') + '.pdf';
     res.setHeader('Content-Type', 'application/pdf');
