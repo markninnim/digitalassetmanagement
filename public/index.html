@@ -54,7 +54,7 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
   <a href="#" onclick="show('templates',this)">Templates</a>
   <a href="#" onclick="show('social',this)">Social Assets</a>
   <!-- <a href="#" onclick="show('guidelines',this)">Guidelines PDF</a> -->
-  <a href="#" onclick="show('social-content',this)">Social Content</a>
+  <a href="#" onclick="show('social-content',this);loadSocialContent()">Social Content</a>
   <a href="#" onclick="show('brochures',this)">Brochures</a>
   <h2 style="margin-top: 16px;">Brand Specs</h2>
   <a href="#" onclick="show('colours',this)">Colours</a>
@@ -109,9 +109,7 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
   </div>
   <div id="social-content" class="section">
     <h2 style="color: #003768; margin-bottom: 16px;">Social Content</h2>
-    <div class="grid">
-      <div class="card"><div class="thumb"><div class="type-badge" style="background:#6b7c8f;">—</div></div><h3>No content yet</h3><p>Social content will appear here once uploaded.</p></div>
-    </div>
+    <div id="social-content-body"><p style="color:#6b7c8f;">Loading...</p></div>
   </div>
   <div id="brochures" class="section">
     <h2 style="color: #003768; margin-bottom: 16px;">Brochures</h2>
@@ -228,6 +226,39 @@ function closePreview() {
   document.getElementById('preview-body').innerHTML = '';
 }
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePreview(); });
+var SIZE_LABELS = {
+  '627 x 1200 - li.jpg':       { label: 'LinkedIn',         size: '627 × 1200' },
+  '630 x 1200 - fb.jpg':       { label: 'Facebook',         size: '630 × 1200' },
+  '1080 x 1350 - ig.jpg':      { label: 'Instagram',        size: '1080 × 1350' },
+  '1080 x 1920 - tik.jpg':     { label: 'TikTok / Story',   size: '1080 × 1920' },
+  '1200 x 1200 - ig fb li.jpg':{ label: 'Square',           size: '1200 × 1200' }
+};
+function loadSocialContent() {
+  fetch('/api/social-content').then(r => r.json()).then(function(posts) {
+    var container = document.getElementById('social-content-body');
+    if (!posts.length) { container.innerHTML = '<p style="color:#6b7c8f;">No posts uploaded yet. Add folders to public/assets/social-content/</p>'; return; }
+    var html = '';
+    posts.forEach(function(post) {
+      var title = post.name.replace(/\b\w/g, c => c.toUpperCase());
+      html += '<h3 style="color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:24px 0 12px;padding-bottom:6px;border-bottom:2px solid #fcb034;">' + title + '</h3>';
+      html += '<div class="grid">';
+      post.files.forEach(function(file) {
+        var info = SIZE_LABELS[file] || { label: file, size: '' };
+        var url = '/download-post/' + encodeURIComponent(post.name) + '/' + encodeURIComponent(file);
+        html += '<div class="card">'
+          + '<div class="thumb"><img src="' + url + '" onerror="this.parentNode.innerHTML=\'<div class=\\\"type-badge\\\" style=\\\"background:#6b7c8f;\\\">IMG</div>\'" style="max-height:104px;max-width:100%;object-fit:contain;"></div>'
+          + '<h3>' + info.label + '</h3>'
+          + '<p>' + info.size + 'px</p><br>'
+          + '<span class="badge ready">Ready</span><br>'
+          + '<a href="' + url + '" class="btn" download>Download</a>'
+          + '<a href="' + url + '" class="btn-view" onclick="openPreview(event,this)">View</a>'
+          + '</div>';
+      });
+      html += '</div>';
+    });
+    container.innerHTML = html;
+  }).catch(function(){ document.getElementById('social-content-body').innerHTML = '<p style="color:#cc0000;">Could not load social content.</p>'; });
+}
 function renderPdfThumb(url, container) {
   pdfjsLib.getDocument(url).promise.then(function(pdf) {
     pdf.getPage(1).then(function(page) {
