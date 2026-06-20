@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>FPG Brand Hub</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 <style>
 body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
 .topbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #fff; border-bottom: 1px solid #e8ecf0; display: flex; align-items: center; padding: 0 24px; z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
@@ -36,6 +38,10 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
 #preview-body img { max-width:100%; max-height:100%; object-fit:contain; border-radius:6px; }
 .section { display: none; }
 .section.active { display: block; }
+.thumb { background:#f5f7fa; border:1px solid #e8ecf0; border-radius:7px; padding:8px; margin-bottom:4px; text-align:center; min-height:64px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.thumb img { max-height:64px; max-width:100%; object-fit:contain; }
+.thumb canvas { max-height:64px; max-width:100%; object-fit:contain; }
+.thumb .type-badge { color:#fff; width:40px; height:40px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
 </style>
 </head>
 <body>
@@ -72,25 +78,25 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
   <div id="templates" class="section">
     <h2 style="color: #003768; margin-bottom: 16px;">Templates</h2>
     <div class="grid">
-      <div class="card"><div style="background:#d34829;color:#fff;width:40px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">PPT</div><h3>PowerPoint Template</h3><p>Master deck with all slide layouts.</p><br><span class="badge">Upload pending</span><br><a href="/download/templates/fpg-presentation-template.pptx" class="btn off">Download</a><a href="/download/templates/fpg-presentation-template.pptx" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
-      <div class="card"><div style="background:#d42020;color:#fff;width:40px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">PDF</div><h3>FPG Letterhead</h3><p>Branded letterhead for correspondence.</p><br><span class="badge">Upload pending</span><br><a href="/download/templates/fpg-letterhead.pdf" class="btn off">Download</a><a href="/download/templates/fpg-letterhead.pdf" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb"><div class="type-badge" style="background:#d34829;">PPT</div></div><h3>PowerPoint Template</h3><p>Master deck with all slide layouts.</p><br><span class="badge">Upload pending</span><br><a href="/download/templates/fpg-presentation-template.pptx" class="btn off">Download</a><a href="/download/templates/fpg-presentation-template.pptx" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-pdf="/download/templates/fpg-letterhead.pdf"></div><h3>FPG Letterhead</h3><p>Branded letterhead for correspondence.</p><br><span class="badge">Upload pending</span><br><a href="/download/templates/fpg-letterhead.pdf" class="btn off">Download</a><a href="/download/templates/fpg-letterhead.pdf" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
 <div class="card"><div style="background:#f5f7fa;border:1px solid #e8ecf0;border-radius:7px;padding:8px;margin-bottom:4px;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center;"><img src="/download/templates/fpg-email-footer.gif" style="max-height:48px;max-width:100%;object-fit:contain;"></div><h3>Email Footer Graphic</h3><p>Branded GIF footer for use in all email communications.</p><br><span class="badge ready">Ready</span><br><a href="/download/templates/fpg-email-footer.gif" class="btn">Download</a><a href="/download/templates/fpg-email-footer.gif" class="btn-view" onclick="openPreview(event,this)">View</a></div>
     </div>
   </div>
   <div id="social" class="section">
     <h2 style="color: #003768; margin-bottom: 16px;">Social Media Assets</h2>
     <div class="grid">
-      <div class="card"><h3>LinkedIn Header</h3><p>1584 x 396px branded banner.</p><br><span class="badge">Upload pending</span><br><a href="/download/social/fpg-linkedin-header.png" class="btn off">Download</a><a href="/download/social/fpg-linkedin-header.png" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
-      <div class="card"><h3>Facebook Cover</h3><p>820 x 312px branded cover.</p><br><span class="badge">Upload pending</span><br><a href="/download/social/fpg-facebook-cover.png" class="btn off">Download</a><a href="/download/social/fpg-facebook-cover.png" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
-      <div class="card"><h3>Instagram Profile</h3><p>1000 x 1000px profile image.</p><br><span class="badge">Upload pending</span><br><a href="/download/social/fpg-instagram-profile.png" class="btn off">Download</a><a href="/download/social/fpg-instagram-profile.png" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
-      <div class="card"><h3>Profile Image</h3><p>Branded profile image for use across all social platforms.</p><br><span class="badge" id="badge-profile">Upload pending</span><br><a href="/download/social/fpg-profile-image.png" class="btn off" id="btn-profile">Download</a><a href="/download/social/fpg-profile-image.png" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-img="/download/social/fpg-linkedin-header.png"></div><h3>LinkedIn Header</h3><p>1584 x 396px branded banner.</p><br><span class="badge">Upload pending</span><br><a href="/download/social/fpg-linkedin-header.png" class="btn off">Download</a><a href="/download/social/fpg-linkedin-header.png" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-img="/download/social/fpg-facebook-cover.png"></div><h3>Facebook Cover</h3><p>820 x 312px branded cover.</p><br><span class="badge">Upload pending</span><br><a href="/download/social/fpg-facebook-cover.png" class="btn off">Download</a><a href="/download/social/fpg-facebook-cover.png" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-img="/download/social/fpg-instagram-profile.png"></div><h3>Instagram Profile</h3><p>1000 x 1000px profile image.</p><br><span class="badge">Upload pending</span><br><a href="/download/social/fpg-instagram-profile.png" class="btn off">Download</a><a href="/download/social/fpg-instagram-profile.png" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-img="/download/social/fpg-profile-image.png"></div><h3>Profile Image</h3><p>Branded profile image for use across all social platforms.</p><br><span class="badge" id="badge-profile">Upload pending</span><br><a href="/download/social/fpg-profile-image.png" class="btn off" id="btn-profile">Download</a><a href="/download/social/fpg-profile-image.png" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
       <div class="card"><h3>Social Template Pack</h3><p>Canva templates for all post types.</p><br><span class="badge">Upload pending</span><br><a href="/download/social/fpg-social-templates.zip" class="btn off">Download</a><a href="/download/social/fpg-social-templates.zip" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
     </div>
   </div>
   <div id="guidelines" class="section">
     <h2 style="color: #003768; margin-bottom: 16px;">Brand Guidelines PDF</h2>
     <div class="grid">
-      <div class="card"><div style="background:#d42020;color:#fff;width:40px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">PDF</div><h3>FPG Brand Guidelines 2026</h3><p>8-page guide covering colour, typography, logo, imagery and voice.</p><br><span class="badge" id="badge-pdf">Upload pending</span><br><a href="/download/guidelines/FPG_Brand_Guidelines.pdf" class="btn off" id="btn-pdf">Download</a><a href="/download/guidelines/FPG_Brand_Guidelines.pdf" class="btn-view off" id="view-pdf" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-pdf="/download/guidelines/FPG_Brand_Guidelines.pdf"></div><h3>FPG Brand Guidelines 2026</h3><p>8-page guide covering colour, typography, logo, imagery and voice.</p><br><span class="badge" id="badge-pdf">Upload pending</span><br><a href="/download/guidelines/FPG_Brand_Guidelines.pdf" class="btn off" id="btn-pdf">Download</a><a href="/download/guidelines/FPG_Brand_Guidelines.pdf" class="btn-view off" id="view-pdf" onclick="openPreview(event,this)">View</a></div>
     </div>
   </div>
   <div id="brochures" class="section">
@@ -98,7 +104,7 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
 
     <h3 style="color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:24px 0 12px;padding-bottom:6px;border-bottom:2px solid #fcb034;">Protection</h3>
     <div class="grid">
-      <div class="card"><div style="background:#d42020;color:#fff;width:40px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">PDF</div><h3>2026 Protection Brochure</h3><p>FPG protection product brochure for 2026.</p><br><span class="badge">Upload pending</span><br><a href="/download/brochures/fpg-protection-brochure-2026.pdf" class="btn off">Download</a><a href="/download/brochures/fpg-protection-brochure-2026.pdf" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-pdf="/download/brochures/fpg-protection-brochure-2026.pdf"></div><h3>2026 Protection Brochure</h3><p>FPG protection product brochure for 2026.</p><br><span class="badge">Upload pending</span><br><a href="/download/brochures/fpg-protection-brochure-2026.pdf" class="btn off">Download</a><a href="/download/brochures/fpg-protection-brochure-2026.pdf" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
     </div>
 
     <h3 style="color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:32px 0 12px;padding-bottom:6px;border-bottom:2px solid #fcb034;">Mortgage</h3>
@@ -108,8 +114,8 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
 
     <h3 style="color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:32px 0 12px;padding-bottom:6px;border-bottom:2px solid #fcb034;">LeadGEN</h3>
     <div class="grid">
-      <div class="card"><div style="background:#d42020;color:#fff;width:40px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">PDF</div><h3>Staff Buy — Employer</h3><p>Staff buy brochure for employers.</p><br><span class="badge">Upload pending</span><br><a href="/download/brochures/fpg-staff-buy-employer.pdf" class="btn off">Download</a><a href="/download/brochures/fpg-staff-buy-employer.pdf" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
-      <div class="card"><div style="background:#d42020;color:#fff;width:40px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">PDF</div><h3>Staff Buy — Employee</h3><p>Staff buy brochure for employees.</p><br><span class="badge">Upload pending</span><br><a href="/download/brochures/fpg-staff-buy-employee.pdf" class="btn off">Download</a><a href="/download/brochures/fpg-staff-buy-employee.pdf" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-pdf="/download/brochures/fpg-staff-buy-employer.pdf"></div><h3>Staff Buy — Employer</h3><p>Staff buy brochure for employers.</p><br><span class="badge">Upload pending</span><br><a href="/download/brochures/fpg-staff-buy-employer.pdf" class="btn off">Download</a><a href="/download/brochures/fpg-staff-buy-employer.pdf" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-pdf="/download/brochures/fpg-staff-buy-employee.pdf"></div><h3>Staff Buy — Employee</h3><p>Staff buy brochure for employees.</p><br><span class="badge">Upload pending</span><br><a href="/download/brochures/fpg-staff-buy-employee.pdf" class="btn off">Download</a><a href="/download/brochures/fpg-staff-buy-employee.pdf" class="btn-view off" onclick="openPreview(event,this)">View</a></div>
     </div>
   </div>
   <div id="colours" class="section">
@@ -208,6 +214,38 @@ function closePreview() {
   document.getElementById('preview-body').innerHTML = '';
 }
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') closePreview(); });
+function renderPdfThumb(url, container) {
+  pdfjsLib.getDocument(url).promise.then(function(pdf) {
+    pdf.getPage(1).then(function(page) {
+      var scale = 0.4;
+      var viewport = page.getViewport({scale: scale});
+      var canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.style.maxHeight = '80px';
+      canvas.style.maxWidth = '100%';
+      canvas.style.borderRadius = '4px';
+      container.innerHTML = '';
+      container.appendChild(canvas);
+      page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
+    });
+  }).catch(function(){});
+}
+function renderImgThumb(url, container) {
+  var img = document.createElement('img');
+  img.src = url;
+  img.onerror = function(){ container.innerHTML = '<div class="type-badge" style="background:#6b7c8f;">IMG</div>'; };
+  container.innerHTML = '';
+  container.appendChild(img);
+}
+function renderThumbs() {
+  document.querySelectorAll('.thumb[data-pdf]').forEach(function(el) {
+    renderPdfThumb(el.getAttribute('data-pdf'), el);
+  });
+  document.querySelectorAll('.thumb[data-img]').forEach(function(el) {
+    renderImgThumb(el.getAttribute('data-img'), el);
+  });
+}
 function copy(hex) {
   navigator.clipboard.writeText(hex);
   var t = document.getElementById('toast');
@@ -247,6 +285,7 @@ fetch('/api/assets').then(r => r.json()).then(function(data) {
     var viewPdf = document.getElementById('view-pdf');
     if (viewPdf) viewPdf.className = 'btn-view';
   }
+  renderThumbs();
 }).catch(function(){});
 </script>
 </body>
