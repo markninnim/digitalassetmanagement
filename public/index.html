@@ -417,8 +417,8 @@ function loadSocialContent() {
       ta.addEventListener('focus', function(){ ta.style.borderColor = '#003768'; });
       ta.addEventListener('blur',  function(){ ta.style.borderColor = '#e8ecf0'; });
       var createBtn = document.createElement('button');
-      createBtn.textContent = '⬡ Create Post';
-      createBtn.style.cssText = 'margin-top:10px;background:#fcb034;color:#003768;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;';
+      createBtn.textContent = 'Create Post';
+      createBtn.style.cssText = 'margin-top:10px;background:#003768;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;';
       (function(pn, t){ createBtn.onclick = function(){ openCp(pn, t.value); }; })(post.name, ta);
       wrapDiv.appendChild(label);
       wrapDiv.appendChild(ta);
