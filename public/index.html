@@ -5,11 +5,13 @@
 <title>FPG Brand Hub</title>
 <style>
 body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
-.sidebar { width: 220px; background: #003768; height: 100vh; position: fixed; padding: 24px 0; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #fff; border-bottom: 1px solid #e8ecf0; display: flex; align-items: center; padding: 0 24px; z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.topbar img { height: 36px; object-fit: contain; }
+.sidebar { width: 220px; background: #003768; position: fixed; top: 60px; bottom: 0; padding: 24px 0; overflow-y: auto; }
 .sidebar h2 { color: #fcb034; font-size: 11px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
 .sidebar a { display: block; color: rgba(255,255,255,.7); text-decoration: none; padding: 9px 20px; font-size: 13px; }
 .sidebar a:hover, .sidebar a.active { color: #fff; background: rgba(255,255,255,.1); border-left: 3px solid #fcb034; }
-.main { margin-left: 220px; padding: 40px; }
+.main { margin-left: 220px; margin-top: 60px; padding: 40px; }
 .hero { background: #003768; color: #fff; padding: 40px; border-radius: 10px; margin-bottom: 32px; }
 .hero h1 { font-size: 28px; margin: 8px 0; }
 .hero p { color: rgba(255,255,255,.7); }
@@ -37,13 +39,11 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
 </style>
 </head>
 <body>
+<div class="topbar">
+  <img src="/public-logo" alt="Finance Planning Group">
+</div>
 <div class="sidebar">
-  <div style="padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 12px;">
-    <div style="width: 28px; height: 3px; background: #fcb034; border-radius: 2px; margin-bottom: 8px;"></div>
-    <div style="color: #fff; font-size: 13px; font-weight: 700;">Finance Planning Group</div>
-    <div style="color: #fcb034; font-size: 10px; text-transform: uppercase; letter-spacing: 1px;">Brand Hub</div>
-  </div>
-  <h2>Assets</h2>
+  <h2 style="margin-top: 8px;">Assets</h2>
   <a href="#" onclick="show('logos',this)" class="active">Logo Files</a>
   <a href="#" onclick="show('templates',this)">Templates</a>
   <a href="#" onclick="show('social',this)">Social Assets</a>
@@ -53,9 +53,6 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
   <a href="#" onclick="show('colours',this)">Colours</a>
   <a href="#" onclick="show('typography',this)">Typography</a>
   <a href="#" onclick="show('voice',this)">Brand Voice</a>
-  <div style="position: absolute; bottom: 20px; padding: 0 20px;">
-    <a href="/logout" style="color: rgba(255,255,255,.5); font-size: 12px; text-decoration: none;">Sign out</a>
-  </div>
 </div>
 <div class="main">
   <div id="logos" class="section active">
