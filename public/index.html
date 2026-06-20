@@ -38,6 +38,9 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
 #preview-body img { max-width:100%; max-height:100%; object-fit:contain; border-radius:6px; }
 .section { display: none; }
 .section.active { display: block; }
+.sc-filter { background:#f5f7fa; border:1px solid #e8ecf0; color:#6b7c8f; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; }
+.sc-filter.active { background:#003768; border-color:#003768; color:#fff; }
+.sc-filter:hover:not(.active) { border-color:#003768; color:#003768; }
 .thumb { background:#f5f7fa; border:1px solid #e8ecf0; border-radius:7px; padding:8px; margin-bottom:4px; text-align:center; height:120px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
 .thumb img { max-height:104px; max-width:100%; object-fit:contain; }
 .thumb canvas { max-height:104px; max-width:100%; }
@@ -108,7 +111,15 @@ body { font-family: sans-serif; margin: 0; background: #f5f7fa; }
     </div>
   </div>
   <div id="social-content" class="section">
-    <h2 style="color: #003768; margin-bottom: 16px;">Social Content</h2>
+    <h2 style="color: #003768; margin-bottom: 12px;">Social Content</h2>
+    <div id="sc-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+      <button class="sc-filter active" onclick="filterSocial('all',this)">All</button>
+      <button class="sc-filter" onclick="filterSocial('LinkedIn',this)">LinkedIn</button>
+      <button class="sc-filter" onclick="filterSocial('Facebook',this)">Facebook</button>
+      <button class="sc-filter" onclick="filterSocial('Instagram',this)">Instagram</button>
+      <button class="sc-filter" onclick="filterSocial('TikTok / Story',this)">TikTok / Story</button>
+      <button class="sc-filter" onclick="filterSocial('Square',this)">Square</button>
+    </div>
     <div id="social-content-body"><p style="color:#6b7c8f;">Loading...</p></div>
   </div>
   <div id="brochures" class="section">
@@ -237,7 +248,7 @@ function makeSocialCard(postName, file) {
   var info = SIZE_LABELS[file] || { label: file, size: '' };
   var url  = '/download-post/' + encodeURIComponent(postName) + '/' + encodeURIComponent(file);
 
-  var card  = document.createElement('div'); card.className = 'card';
+  var card  = document.createElement('div'); card.className = 'card'; card.dataset.label = info.label;
   var thumb = document.createElement('div'); thumb.className = 'thumb';
   var img   = document.createElement('img');
   img.style.cssText = 'max-height:104px;max-width:100%;object-fit:contain;';
@@ -258,6 +269,21 @@ function makeSocialCard(postName, file) {
   card.appendChild(br); card.appendChild(badge); card.appendChild(br2);
   card.appendChild(dl); card.appendChild(vw);
   return card;
+}
+function filterSocial(type, btn) {
+  document.querySelectorAll('.sc-filter').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var body = document.getElementById('social-content-body');
+  body.querySelectorAll('.card').forEach(function(card) {
+    card.style.display = (type === 'all' || card.dataset.label === type) ? '' : 'none';
+  });
+  // Hide/show row headers if all cards in that grid are hidden
+  body.querySelectorAll('.grid').forEach(function(grid) {
+    var anyVisible = Array.from(grid.querySelectorAll('.card')).some(function(c){ return c.style.display !== 'none'; });
+    var h3 = grid.previousElementSibling;
+    if (h3 && h3.tagName === 'H3') h3.style.display = anyVisible ? '' : 'none';
+    grid.style.display = anyVisible ? '' : 'none';
+  });
 }
 function loadSocialContent() {
   fetch('/api/social-content').then(function(r) { return r.json(); }).then(function(posts) {
