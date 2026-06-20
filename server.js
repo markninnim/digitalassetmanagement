@@ -63,6 +63,15 @@ app.get('/', requireAuth, (req, res) => {
 });
 
 // ── Video content download ────────────────────────────────────
+// Supports both /download-video/folder/file and /download-video/folder/subfolder/file
+app.get('/download-video/:post/:sub/:filename', requireAuth, (req, res) => {
+  const safePost = req.params.post.replace(/\.\./g, '');
+  const safeSub  = req.params.sub.replace(/\.\./g, '');
+  const safeFile = path.basename(req.params.filename);
+  const filePath = path.join(__dirname, 'public/assets/video-content', safePost, safeSub, safeFile);
+  if (!fs.existsSync(filePath)) return res.status(404).send('Not found');
+  res.download(filePath, safeFile);
+});
 app.get('/download-video/:post/:filename', requireAuth, (req, res) => {
   const safePost = req.params.post.replace(/\.\./g, '');
   const safeFile = path.basename(req.params.filename);
@@ -75,18 +84,34 @@ app.get('/download-video/:post/:filename', requireAuth, (req, res) => {
 app.get('/api/video-content', requireAuth, (req, res) => {
   const baseDir = path.join(__dirname, 'public/assets/video-content');
   if (!fs.existsSync(baseDir)) return res.json([]);
+
+  function getFiles(dir) {
+    return fs.readdirSync(dir)
+      .filter(f => !f.startsWith('.') && fs.statSync(path.join(dir, f)).isFile())
+      .map(f => {
+        const stat = fs.statSync(path.join(dir, f));
+        return { name: f, created: stat.birthtime || stat.mtime };
+      });
+  }
+
   const posts = fs.readdirSync(baseDir)
     .filter(f => !f.startsWith('.') && fs.statSync(path.join(baseDir, f)).isDirectory())
     .sort()
-    .map(name => ({
-      name,
-      files: fs.readdirSync(path.join(baseDir, name))
-        .filter(f => !f.startsWith('.') && fs.statSync(path.join(baseDir, name, f)).isFile())
-        .map(f => {
-          const stat = fs.statSync(path.join(baseDir, name, f));
-          return { name: f, created: stat.birthtime || stat.mtime };
-        })
-    }));
+    .map(name => {
+      const folderPath = path.join(baseDir, name);
+      const subfolders = fs.readdirSync(folderPath)
+        .filter(f => !f.startsWith('.') && fs.statSync(path.join(folderPath, f)).isDirectory())
+        .sort()
+        .map(sub => ({
+          name: sub,
+          files: getFiles(path.join(folderPath, sub))
+        }));
+      return {
+        name,
+        files: getFiles(folderPath),
+        subfolders
+      };
+    });
   res.json(posts);
 });
 

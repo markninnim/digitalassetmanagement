@@ -320,8 +320,45 @@ var CP_PLATFORMS = [
 // Maps folder names → section group headings for Video Content
 var VIDEO_SECTION_MAP = {
   'hero movies':      'Adobe Licenced Stock Footage',
-  'first time buyer': 'Adobe Licenced Stock Footage'
+  'first time buyer': 'Adobe Licenced Stock Footage',
+  'reels':            'Reels'
 };
+
+function makeVideoCard(file, url) {
+  var ext  = file.split('.').pop().toLowerCase();
+  var card = document.createElement('div'); card.className = 'card';
+  var thumb = document.createElement('div'); thumb.className = 'thumb';
+  if (['mp4','mov','webm'].includes(ext)) {
+    var vid = document.createElement('video');
+    vid.src = url; vid.muted = true; vid.style.cssText = 'max-height:104px;max-width:100%;border-radius:4px;';
+    thumb.appendChild(vid);
+  } else {
+    var img = document.createElement('img');
+    img.src = url; img.style.cssText = 'max-height:104px;max-width:100%;object-fit:contain;';
+    img.onerror = function(){ thumb.innerHTML = '<div class="type-badge" style="background:#6b7c8f;">VID</div>'; };
+    thumb.appendChild(img);
+  }
+  var h = document.createElement('h3'); h.textContent = file.replace(/\.[^.]+$/, '');
+  var badge = document.createElement('span'); badge.className = 'badge ready'; badge.textContent = 'Approved';
+  var br = document.createElement('br');
+  var dl = document.createElement('a'); dl.className = 'btn'; dl.href = url; dl.download = file; dl.innerHTML = '&#8659; Download';
+  card.appendChild(thumb); card.appendChild(h); card.appendChild(br); card.appendChild(badge); card.appendChild(br); card.appendChild(dl);
+  return card;
+}
+
+function makeWordingBox(storageKey) {
+  var wrapDiv = document.createElement('div'); wrapDiv.style.cssText = 'margin:12px 0 32px;width:100%;box-sizing:border-box;';
+  var label = document.createElement('div'); label.textContent = 'Approved Post Wording'; label.style.cssText = 'font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;';
+  var ta = document.createElement('textarea');
+  ta.placeholder = 'Add post copy, captions or notes here…';
+  ta.value = localStorage.getItem(storageKey) || '';
+  ta.style.cssText = 'display:block;width:100%;box-sizing:border-box;min-height:80px;padding:12px;border:1px solid #e8ecf0;border-radius:8px;font-size:13px;font-family:sans-serif;color:#1a2a3a;background:#fff;resize:vertical;outline:none;';
+  ta.addEventListener('input', function(){ localStorage.setItem(storageKey, ta.value); });
+  ta.addEventListener('focus', function(){ ta.style.borderColor='#003768'; });
+  ta.addEventListener('blur',  function(){ ta.style.borderColor='#e8ecf0'; });
+  wrapDiv.appendChild(label); wrapDiv.appendChild(ta);
+  return wrapDiv;
+}
 
 function loadVideoContent() {
   fetch('/api/video-content').then(function(r){ return r.json(); }).then(function(posts) {
@@ -340,54 +377,49 @@ function loadVideoContent() {
         sectionHeader.style.cssText = 'margin:32px 0 20px;';
         var sectionH2 = document.createElement('h2');
         sectionH2.textContent = sectionLabel;
-        sectionH2.style.cssText = 'color:#003768;font-size:16px;font-weight:700;margin:0 0 0;padding-bottom:8px;border-bottom:3px solid #fcb034;display:inline-block;';
+        sectionH2.style.cssText = 'color:#003768;font-size:16px;font-weight:700;margin:0;padding-bottom:8px;border-bottom:3px solid #fcb034;display:inline-block;';
         sectionHeader.appendChild(sectionH2);
         container.appendChild(sectionHeader);
       }
+
+      // Top-level folder heading
       var title = post.name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
       var h3 = document.createElement('h3');
       h3.textContent = title;
       h3.style.cssText = 'color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;padding-bottom:6px;border-bottom:2px solid #e8ecf0;';
       container.appendChild(h3);
-      var grid = document.createElement('div'); grid.className = 'grid';
-      post.files.forEach(function(fileObj) {
-        var file = fileObj.name || fileObj;
-        var url  = '/download-video/' + encodeURIComponent(post.name) + '/' + encodeURIComponent(file);
-        var ext  = file.split('.').pop().toLowerCase();
-        var card = document.createElement('div'); card.className = 'card';
-        var thumb = document.createElement('div'); thumb.className = 'thumb';
-        if (['mp4','mov','webm'].includes(ext)) {
-          var vid = document.createElement('video');
-          vid.src = url; vid.muted = true; vid.style.cssText = 'max-height:104px;max-width:100%;border-radius:4px;';
-          thumb.appendChild(vid);
-        } else {
-          var img = document.createElement('img');
-          img.src = url; img.style.cssText = 'max-height:104px;max-width:100%;object-fit:contain;';
-          img.onerror = function(){ thumb.innerHTML = '<div class="type-badge" style="background:#6b7c8f;">VID</div>'; };
-          thumb.appendChild(img);
-        }
-        var h = document.createElement('h3'); h.textContent = file.replace(/\.[^.]+$/, '');
-        var badge = document.createElement('span'); badge.className = 'badge ready'; badge.textContent = 'Approved';
-        var br = document.createElement('br');
-        var dl = document.createElement('a'); dl.className = 'btn'; dl.href = url; dl.download = file; dl.innerHTML = '&#8659; Download';
-        card.appendChild(thumb); card.appendChild(h); card.appendChild(br); card.appendChild(badge); card.appendChild(br); card.appendChild(dl);
-        grid.appendChild(card);
-      });
-      container.appendChild(grid);
 
-      // Wording box
-      var storageKey = 'video-wording-' + post.name;
-      var wrapDiv = document.createElement('div'); wrapDiv.style.cssText = 'margin:12px 0 32px;width:100%;box-sizing:border-box;';
-      var label = document.createElement('div'); label.textContent = 'Approved Post Wording'; label.style.cssText = 'font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;';
-      var ta = document.createElement('textarea');
-      ta.placeholder = 'Add post copy, captions or notes here…';
-      ta.value = localStorage.getItem(storageKey) || '';
-      ta.style.cssText = 'display:block;width:100%;box-sizing:border-box;min-height:80px;padding:12px;border:1px solid #e8ecf0;border-radius:8px;font-size:13px;font-family:sans-serif;color:#1a2a3a;background:#fff;resize:vertical;outline:none;';
-      ta.addEventListener('input', function(){ localStorage.setItem(storageKey, ta.value); });
-      ta.addEventListener('focus', function(){ ta.style.borderColor='#003768'; });
-      ta.addEventListener('blur',  function(){ ta.style.borderColor='#e8ecf0'; });
-      wrapDiv.appendChild(label); wrapDiv.appendChild(ta);
-      container.appendChild(wrapDiv);
+      // Direct files in this folder
+      if (post.files && post.files.length) {
+        var grid = document.createElement('div'); grid.className = 'grid';
+        post.files.forEach(function(fileObj) {
+          var file = fileObj.name || fileObj;
+          var url  = '/download-video/' + encodeURIComponent(post.name) + '/' + encodeURIComponent(file);
+          grid.appendChild(makeVideoCard(file, url));
+        });
+        container.appendChild(grid);
+        container.appendChild(makeWordingBox('video-wording-' + post.name));
+      }
+
+      // Subfolders (sub-categories)
+      if (post.subfolders && post.subfolders.length) {
+        post.subfolders.forEach(function(sub) {
+          if (!sub.files || !sub.files.length) return;
+          var subTitle = sub.name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+          var subH4 = document.createElement('h4');
+          subH4.textContent = subTitle;
+          subH4.style.cssText = 'color:#003768;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:18px 0 10px;padding-bottom:4px;border-bottom:1px solid #e8ecf0;';
+          container.appendChild(subH4);
+          var subGrid = document.createElement('div'); subGrid.className = 'grid';
+          sub.files.forEach(function(fileObj) {
+            var file = fileObj.name || fileObj;
+            var url  = '/download-video/' + encodeURIComponent(post.name) + '/' + encodeURIComponent(sub.name) + '/' + encodeURIComponent(file);
+            subGrid.appendChild(makeVideoCard(file, url));
+          });
+          container.appendChild(subGrid);
+          container.appendChild(makeWordingBox('video-wording-' + post.name + '-' + sub.name));
+        });
+      }
     });
   }).catch(function(){ document.getElementById('video-content-body').innerHTML = '<p style="color:#cc0000;">Could not load video content.</p>'; });
 }
