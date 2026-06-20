@@ -81,7 +81,7 @@ app.get('/api/video-content', requireAuth, (req, res) => {
     .map(name => ({
       name,
       files: fs.readdirSync(path.join(baseDir, name))
-        .filter(f => !f.startsWith('.'))
+        .filter(f => !f.startsWith('.') && fs.statSync(path.join(baseDir, name, f)).isFile())
         .map(f => {
           const stat = fs.statSync(path.join(baseDir, name, f));
           return { name: f, created: stat.birthtime || stat.mtime };
