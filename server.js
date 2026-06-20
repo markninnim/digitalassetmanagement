@@ -220,7 +220,7 @@ app.get('/personalise-brochure', requireAuth, async (req, res) => {
       for (let i = 1; i < pages.length; i++) {
         const p = pages[i];
         const { height: ph } = p.getSize();
-        const wy = ph - 62; // "What if..." y position
+        const wy = ph - 71; // "What if..." y position
         const wx = 55;
         // Cover existing "What if..." text with background rectangle
         p.drawRectangle({ x: wx - 2, y: wy - 6, width: 300, height: whatIfSize + 14, color: bgColour });
