@@ -216,18 +216,29 @@ app.get('/personalise-brochure', requireAuth, async (req, res) => {
     if (firstName) {
       const bgColour = rgb(245/255, 247/255, 251/255); // #f5f7fb exact page background
       const whatIfSize = 22;
+      const orange = rgb(252/255, 176/255, 52/255); // FPG orange #fcb034
       const pages = pdfDoc.getPages();
-      const whatIfPages = [4, 6, 8, 10]; // pages 5, 7, 9, 11 (0-indexed)
+
+      // "What if..." pages — 5, 7, 9, 11 (0-indexed: 4, 6, 8, 10)
+      const whatIfPages = [4, 6, 8, 10];
       for (let i = 0; i < pages.length; i++) {
         if (!whatIfPages.includes(i)) continue;
         const p = pages[i];
         const { height: ph } = p.getSize();
-        const wy = ph - 71; // "What if..." y position
+        const wy = ph - 71;
         const wx = 55;
-        // Cover existing "What if..." text with background rectangle
         p.drawRectangle({ x: wx - 2, y: wy - 6, width: 300, height: whatIfSize + 14, color: bgColour });
-        // Redraw as "FirstName, what if..."
         p.drawText(firstName + ', what if...', { x: wx, y: wy, size: whatIfSize, font, color: darkBlue });
+      }
+
+      // "It's a fact..." — page 2 (0-indexed: 1)
+      const factp = pages[1];
+      if (factp) {
+        const { height: fph } = factp.getSize();
+        const fy = fph - 71; // adjust if needed
+        const fx = 55;
+        factp.drawRectangle({ x: fx - 2, y: fy - 6, width: 320, height: whatIfSize + 14, color: bgColour });
+        factp.drawText(`${firstName}, it’s a fact...`, { x: fx, y: fy, size: whatIfSize, font, color: orange });
       }
     }
 
