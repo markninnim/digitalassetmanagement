@@ -353,10 +353,12 @@ app.post('/generate-business-card', requireAuth, async (req, res) => {
     const templatePath = path.join(__dirname, 'public/assets/stationery/fpg-business-card-template.pdf');
     const pdfBytes = fs.readFileSync(templatePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
+    pdfDoc.registerFontkit(fontkit);
 
-    // Embed Helvetica standard fonts (no file needed)
-    const fontBold = await pdfDoc.embedFont('Helvetica-Bold');
-    const fontReg  = await pdfDoc.embedFont('Helvetica');
+    const varFontBytes = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-VariableFont_wght.ttf'));
+    // Embed at ExtraBold (wght 800) for name, Medium (wght 500) for everything else
+    const fontBold = await pdfDoc.embedFont(varFontBytes, { features: { wght: 800 } });
+    const fontMed  = await pdfDoc.embedFont(varFontBytes, { features: { wght: 500 } });
 
     const page = pdfDoc.getPages()[0];
 
@@ -368,14 +370,14 @@ app.post('/generate-business-card', requireAuth, async (req, res) => {
     // White out existing text areas (name baseline ~78 + 15pt cap height, down to phone ~33)
     page.drawRectangle({ x: 34, y: 30, width: 230, height: 68, color: rgb(1,1,1) });
 
-    // Draw name
+    // Draw name — Plus Jakarta Sans ExtraBold 15pt
     page.drawText(name, { x: 36.9, y: 78.1, size: 15, font: fontBold, color: darkBlue });
-    // Draw title
-    page.drawText(title, { x: 36.9, y: 66.7, size: 7.5, font: fontReg, color: accentBlue });
-    // Draw email
-    page.drawText(email, { x: 36.9, y: 50.6, size: 8.5, font: fontReg, color: darkGrey });
-    // Draw phone
-    page.drawText(phone, { x: 36.9, y: 37.7, size: 8.5, font: fontReg, color: darkGrey });
+    // Draw title — Plus Jakarta Sans Medium 9pt uppercase
+    page.drawText(title, { x: 36.9, y: 66.7, size: 9, font: fontMed, color: accentBlue });
+    // Draw email — Plus Jakarta Sans Medium 9pt
+    page.drawText(email, { x: 36.9, y: 50.6, size: 9, font: fontMed, color: darkGrey });
+    // Draw phone — Plus Jakarta Sans Medium 9pt
+    page.drawText(phone, { x: 36.9, y: 37.7, size: 9, font: fontMed, color: darkGrey });
 
     const modifiedBytes = await pdfDoc.save();
     const safeName = (name || 'business-card').replace(/[^a-z0-9]/gi, '-').toLowerCase();
