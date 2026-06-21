@@ -3,7 +3,7 @@ const express  = require('express');
 const session  = require('express-session');
 const path     = require('path');
 const fs       = require('fs');
-const { PDFDocument, rgb, pushGraphicsState, popGraphicsState, moveTo, curveTo, closePath, clip, endPath } = require('pdf-lib');
+const { PDFDocument, rgb, pushGraphicsState, popGraphicsState, moveTo, appendBezierCurve, closePath, clip, endPath } = require('pdf-lib');
 const fontkit = require('@pdf-lib/fontkit');
 
 const app  = express();
@@ -267,10 +267,10 @@ app.post('/personalise-brochure', requireAuth, async (req, res) => {
         page.pushOperators(pushGraphicsState());
         page.pushOperators(
           moveTo(cx, cy + r),
-          curveTo(cx + K, cy + r, cx + r, cy + K, cx + r, cy),
-          curveTo(cx + r, cy - K, cx + K, cy - r, cx, cy - r),
-          curveTo(cx - K, cy - r, cx - r, cy - K, cx - r, cy),
-          curveTo(cx - r, cy + K, cx - K, cy + r, cx, cy + r),
+          appendBezierCurve(cx + K, cy + r, cx + r, cy + K, cx + r, cy),
+          appendBezierCurve(cx + r, cy - K, cx + K, cy - r, cx, cy - r),
+          appendBezierCurve(cx - K, cy - r, cx - r, cy - K, cx - r, cy),
+          appendBezierCurve(cx - r, cy + K, cx - K, cy + r, cx, cy + r),
           closePath(),
           clip(),
           endPath()
