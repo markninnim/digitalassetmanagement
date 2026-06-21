@@ -159,29 +159,36 @@ app.get('/download-graphic/*', requireAuth, (req, res) => {
   res.download(filePath, path.basename(filePath));
 });
 
-// ── Gated asset viewer (inline, no attachment header) ─────────
+// ── Gated asset viewer — wildcard (inline) ────────────────────
+app.get('/view-asset/*', requireAuth, (req, res) => {
+  const parts = req.params[0].split('/').map(p => decodeURIComponent(p).replace(/\.\./g, ''));
+  const filePath = path.join(__dirname, 'public/assets', ...parts);
+  if (!fs.existsSync(filePath)) return res.status(404).send('Asset not found.');
+  res.sendFile(filePath);
+});
+
+// ── Gated asset download — wildcard ───────────────────────────
+app.get('/download-asset/*', requireAuth, (req, res) => {
+  const parts = req.params[0].split('/').map(p => decodeURIComponent(p).replace(/\.\./g, ''));
+  const filePath = path.join(__dirname, 'public/assets', ...parts);
+  if (!fs.existsSync(filePath)) return res.status(404).send('Asset not found. Please check back later or contact the brand team.');
+  res.download(filePath, path.basename(filePath));
+});
+
+// ── Legacy routes (logos, templates, social, stationery) ──────
 app.get('/view/:category/:filename', requireAuth, (req, res) => {
-  const { category, filename } = req.params;
-  const safeCat  = category.replace(/[^a-z0-9_-]/gi, '');
-  const safeFile = path.basename(filename);
+  const safeCat  = req.params.category.replace(/[^a-z0-9_-]/gi, '');
+  const safeFile = path.basename(req.params.filename);
   const filePath = path.join(__dirname, 'public/assets', safeCat, safeFile);
   if (!fs.existsSync(filePath)) return res.status(404).send('Asset not found.');
   res.sendFile(filePath);
 });
 
-// ── Gated asset downloads ─────────────────────────────────────
 app.get('/download/:category/:filename', requireAuth, (req, res) => {
-  const { category, filename } = req.params;
-
-  // Sanitise — no path traversal
-  const safeCat  = category.replace(/[^a-z0-9_-]/gi, '');
-  const safeFile = path.basename(filename);
+  const safeCat  = req.params.category.replace(/[^a-z0-9_-]/gi, '');
+  const safeFile = path.basename(req.params.filename);
   const filePath = path.join(__dirname, 'public/assets', safeCat, safeFile);
-
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send('Asset not found. Please check back later or contact the brand team.');
-  }
-
+  if (!fs.existsSync(filePath)) return res.status(404).send('Asset not found. Please check back later or contact the brand team.');
   res.download(filePath, safeFile);
 });
 
@@ -190,18 +197,35 @@ app.get('/api/assets', requireAuth, (req, res) => {
   const baseDir = path.join(__dirname, 'public/assets');
   const manifest = {};
 
-  const categories = ['logos', 'templates', 'social', 'guidelines', 'brochures'];
+  const categories = ['logos', 'templates', 'social', 'guidelines', 'stationery'];
   for (const cat of categories) {
     const catPath = path.join(baseDir, cat);
     if (fs.existsSync(catPath)) {
       manifest[cat] = fs.readdirSync(catPath)
-        .filter(f => !f.startsWith('.'))
+        .filter(f => !f.startsWith('.') && fs.statSync(path.join(catPath, f)).isFile())
         .map(f => {
           const stat = fs.statSync(path.join(catPath, f));
           return { name: f, created: stat.birthtime || stat.mtime };
         });
     } else {
       manifest[cat] = [];
+    }
+  }
+
+  // Brochures are now in subfolders
+  const brochureSubfolders = ['protection', 'leadgen', 'general'];
+  manifest.brochures = {};
+  for (const sub of brochureSubfolders) {
+    const subPath = path.join(baseDir, 'brochures', sub);
+    if (fs.existsSync(subPath)) {
+      manifest.brochures[sub] = fs.readdirSync(subPath)
+        .filter(f => !f.startsWith('.') && fs.statSync(path.join(subPath, f)).isFile())
+        .map(f => {
+          const stat = fs.statSync(path.join(subPath, f));
+          return { name: f, created: stat.birthtime || stat.mtime };
+        });
+    } else {
+      manifest.brochures[sub] = [];
     }
   }
 
@@ -215,7 +239,7 @@ app.post('/personalise-brochure', requireAuth, async (req, res) => {
     const brokerName     = (req.body.broker      || '').trim().slice(0, 80);
     const brokerImageB64 = req.body.brokerImage  || null;
 
-    const pdfPath  = path.join(__dirname, 'public/assets/brochures/fpg-protection-brochure-2026.pdf');
+    const pdfPath  = path.join(__dirname, 'public/assets/brochures/protection/fpg-protection-brochure-2026.pdf');
     const pdfBytes = fs.readFileSync(pdfPath);
 
     const fontBytes = fs.readFileSync(path.join(__dirname, 'node_modules/dejavu-fonts-ttf/ttf/DejaVuSerif-Bold.ttf'));
