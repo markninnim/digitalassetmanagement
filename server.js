@@ -159,6 +159,16 @@ app.get('/download-graphic/*', requireAuth, (req, res) => {
   res.download(filePath, path.basename(filePath));
 });
 
+// ── Gated asset viewer (inline, no attachment header) ─────────
+app.get('/view/:category/:filename', requireAuth, (req, res) => {
+  const { category, filename } = req.params;
+  const safeCat  = category.replace(/[^a-z0-9_-]/gi, '');
+  const safeFile = path.basename(filename);
+  const filePath = path.join(__dirname, 'public/assets', safeCat, safeFile);
+  if (!fs.existsSync(filePath)) return res.status(404).send('Asset not found.');
+  res.sendFile(filePath);
+});
+
 // ── Gated asset downloads ─────────────────────────────────────
 app.get('/download/:category/:filename', requireAuth, (req, res) => {
   const { category, filename } = req.params;
