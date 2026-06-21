@@ -145,6 +145,20 @@ app.get('/api/social-content', requireAuth, (req, res) => {
   res.json(posts);
 });
 
+// ── Graphics folder (nested paths) ───────────────────────────
+app.get('/view-graphic/*', requireAuth, (req, res) => {
+  const parts = req.params[0].split('/').map(p => decodeURIComponent(p).replace(/\.\./g, ''));
+  const filePath = path.join(__dirname, 'public/assets/graphics', ...parts);
+  if (!fs.existsSync(filePath)) return res.status(404).send('Not found');
+  res.sendFile(filePath);
+});
+app.get('/download-graphic/*', requireAuth, (req, res) => {
+  const parts = req.params[0].split('/').map(p => decodeURIComponent(p).replace(/\.\./g, ''));
+  const filePath = path.join(__dirname, 'public/assets/graphics', ...parts);
+  if (!fs.existsSync(filePath)) return res.status(404).send('Not found');
+  res.download(filePath, path.basename(filePath));
+});
+
 // ── Gated asset downloads ─────────────────────────────────────
 app.get('/download/:category/:filename', requireAuth, (req, res) => {
   const { category, filename } = req.params;
