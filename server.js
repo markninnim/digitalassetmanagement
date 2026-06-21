@@ -19,12 +19,13 @@ app.use(session({
   secret: SECRET,
   resave: true,
   saveUninitialized: true,
-  cookie: { maxAge: 1000 * 60 * 60 * 8, secure: false } // 8 hours
+  cookie: { maxAge: 1000 * 60 * 60 * 8, secure: process.env.NODE_ENV === 'production' } // 8 hours
 }));
 
 // ── Auth guard ───────────────────────────────────────────────
 function requireAuth(req, res, next) {
-  return next(); // auth disabled temporarily
+  if (req.session.authenticated) return next();
+  res.redirect('/login');
 }
 
 // ── Serve static assets (only after auth) ───────────────────
