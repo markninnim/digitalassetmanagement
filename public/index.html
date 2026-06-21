@@ -987,7 +987,7 @@ async function generateCard() {
   const name  = document.getElementById('bc-name').value.trim();
   const title = document.getElementById('bc-title').value.trim();
   const email = document.getElementById('bc-email').value.trim();
-  const phone = document.getElementById('bc-phone').value.trim();
+  const phone = document.getElementById('bc-phone').value.trim().replace(/(\d{5})(\d{3})(\d{3})/, '$1 $2 $3');
   const msg   = document.getElementById('bc-msg');
   if (!name) { msg.style.display='block'; msg.textContent='Please enter your name.'; return; }
   msg.style.display='block'; msg.textContent='Generating your card...';
