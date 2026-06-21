@@ -342,6 +342,52 @@ app.post('/personalise-brochure', requireAuth, async (req, res) => {
   }
 });
 
+// ── Business card generator ───────────────────────────────────
+app.post('/generate-business-card', requireAuth, async (req, res) => {
+  try {
+    const name     = (req.body.name     || '').trim().slice(0, 60);
+    const title    = (req.body.title    || '').trim().slice(0, 80).toUpperCase();
+    const email    = (req.body.email    || '').trim().slice(0, 80);
+    const phone    = (req.body.phone    || '').trim().slice(0, 30);
+
+    const templatePath = path.join(__dirname, 'public/assets/stationery/fpg-business-card-template.pdf');
+    const pdfBytes = fs.readFileSync(templatePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    // Embed Helvetica standard fonts (no file needed)
+    const fontBold = await pdfDoc.embedFont('Helvetica-Bold');
+    const fontReg  = await pdfDoc.embedFont('Helvetica');
+
+    const page = pdfDoc.getPages()[0];
+
+    // Colours
+    const darkBlue   = rgb(0/255, 55/255, 104/255);   // #003768
+    const accentBlue = rgb(46/255, 153/255, 213/255);  // #2e99d5
+    const darkGrey   = rgb(26/255, 42/255, 58/255);    // #1a2a3a
+
+    // White out existing text areas
+    page.drawRectangle({ x: 34, y: 33, width: 210, height: 52, color: rgb(1,1,1) });
+
+    // Draw name
+    page.drawText(name, { x: 36.9, y: 78.1, size: 15, font: fontBold, color: darkBlue });
+    // Draw title
+    page.drawText(title, { x: 36.9, y: 66.7, size: 7.5, font: fontReg, color: accentBlue });
+    // Draw email
+    page.drawText(email, { x: 36.9, y: 50.6, size: 8.5, font: fontReg, color: darkGrey });
+    // Draw phone
+    page.drawText(phone, { x: 36.9, y: 37.7, size: 8.5, font: fontReg, color: darkGrey });
+
+    const modifiedBytes = await pdfDoc.save();
+    const safeName = (name || 'business-card').replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="FPG-Business-Card-${safeName}.pdf"`);
+    res.send(Buffer.from(modifiedBytes));
+  } catch (err) {
+    console.error('Business card error:', err);
+    res.status(500).send('Could not generate business card: ' + err.message);
+  }
+});
+
 // ── Start ─────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`FPG Digital Asset Management Tool running on port ${PORT}`);

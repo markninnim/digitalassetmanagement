@@ -560,7 +560,7 @@ html { height: 100%; }
     <h2 style="color: #003768; margin-bottom: 16px;">Stationery</h2>
     <div class="grid">
       <div class="card"><div class="thumb" data-pdf="/view-asset/stationery/fpg-letterhead.pdf"></div><h3>FPG Letterhead</h3><p>Branded letterhead for correspondence.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="fpg-letterhead.pdf" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download-asset/stationery/fpg-letterhead.pdf" class="btn">Download</a><a href="/view-asset/stationery/fpg-letterhead.pdf" class="btn-view" onclick="openPreview(event,this)">View</a></div>
-      <div class="card"><div class="thumb" data-pdf="/view-asset/stationery/fpg-business-card.pdf"></div><h3>FPG Business Card</h3><p>Branded business card artwork for print production.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="fpg-business-card.pdf" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download-asset/stationery/fpg-business-card.pdf" class="btn">Download</a><a href="/view-asset/stationery/fpg-business-card.pdf" class="btn-view" onclick="openPreview(event,this)">View</a></div>
+      <div class="card"><div class="thumb" data-pdf="/view-asset/stationery/fpg-business-card.pdf"></div><h3>FPG Business Card</h3><p>Branded business card artwork for print production.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="fpg-business-card.pdf" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download-asset/stationery/fpg-business-card.pdf" class="btn">Download</a><a href="/view-asset/stationery/fpg-business-card.pdf" class="btn-view" onclick="openPreview(event,this)">View</a><br><button onclick="openCardModal()" style="margin-top:10px;width:100%;padding:8px;background:#fcb034;color:#003768;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">✏️ Make My Card</button></div>
       <div class="card"><div class="thumb"><img src="/view-asset/stationery/folder-tumb.png" style="max-height:104px;max-width:100%;object-fit:contain;"></div><h3>FPG Folder</h3><p>Branded presentation folder with 5mm capacity for documents. Business card holder on inner flap.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="folder-bleed.pdf" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download-asset/stationery/folder-bleed.pdf" class="btn">Download</a><a href="/view-asset/stationery/folder-bleed.pdf" class="btn-view" onclick="openPreview(event,this)">View</a></div>
     </div>
   </div>
@@ -583,6 +583,22 @@ html { height: 100%; }
     </div>
   </div>
 </div>
+<div id="card-modal" onclick="if(event.target===this)closeCardModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:36px 40px;width:100%;max-width:440px;box-shadow:0 16px 48px rgba(0,0,0,.2);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <h2 style="color:#003768;font-size:18px;margin:0;">Make My Business Card</h2>
+      <button onclick="closeCardModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7c8f;line-height:1;">&#x2715;</button>
+    </div>
+    <p style="font-size:13px;color:#6b7c8f;margin:0 0 20px;">Fill in your details and download a print-ready PDF. Send to Mark to order.</p>
+    <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Full Name</label><input id="bc-name" type="text" placeholder="e.g. Jane Smith" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
+    <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Job Title</label><input id="bc-title" type="text" placeholder="e.g. Mortgage Adviser" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
+    <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Email</label><input id="bc-email" type="email" placeholder="e.g. jane@financeplanning.co.uk" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
+    <div style="margin-bottom:24px;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Phone</label><input id="bc-phone" type="text" placeholder="e.g. 07700 900 123" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
+    <button onclick="generateCard()" style="width:100%;padding:12px;background:#003768;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Download My Card PDF</button>
+    <div id="bc-msg" style="margin-top:12px;font-size:12px;color:#6b7c8f;text-align:center;display:none;"></div>
+  </div>
+</div>
+
 <div id="preview-modal" onclick="if(event.target===this)closePreview()">
   <div id="preview-box">
     <div id="preview-header">
@@ -960,6 +976,36 @@ function openCp(postName, wording) {
 }
 function closeCp() {
   document.getElementById('cp-modal').classList.remove('open');
+}
+function openCardModal() {
+  document.getElementById('card-modal').style.display = 'flex';
+}
+function closeCardModal() {
+  document.getElementById('card-modal').style.display = 'none';
+}
+async function generateCard() {
+  const name  = document.getElementById('bc-name').value.trim();
+  const title = document.getElementById('bc-title').value.trim();
+  const email = document.getElementById('bc-email').value.trim();
+  const phone = document.getElementById('bc-phone').value.trim();
+  const msg   = document.getElementById('bc-msg');
+  if (!name) { msg.style.display='block'; msg.textContent='Please enter your name.'; return; }
+  msg.style.display='block'; msg.textContent='Generating your card...';
+  try {
+    const resp = await fetch('/generate-business-card', {
+      method: 'POST',
+      headers: {'Content-Type':'application/x-www-form-urlencoded'},
+      body: new URLSearchParams({name, title, email, phone})
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    const blob = await resp.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'FPG-Business-Card.pdf'; a.click();
+    msg.textContent = 'Downloaded! Send the PDF to Mark to order printing.';
+  } catch(e) {
+    msg.textContent = 'Error: ' + e.message;
+  }
 }
 function filterSocial(type, btn) {
   document.querySelectorAll('.sc-filter').forEach(function(b){ b.classList.remove('active'); });
