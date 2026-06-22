@@ -1045,7 +1045,7 @@ function loadSocialContent() {
     if (msg) {
       var newPostsByThen = weeks * 7 * 2;
       var extraWeeks = Math.floor(newPostsByThen / 3);
-      msg.innerHTML = 'The library currently contains <strong style="color:#003768;">' + posts.length + ' posts</strong>, giving you enough content to cover the next <strong style="color:#003768;">' + weeks + ' week' + (weeks !== 1 ? 's' : '') + '</strong> at the recommended 3 posts per week. We upload 2 new posts every day, so by the time you reach this point there will be a further <strong style="color:#003768;">' + extraWeeks + ' weeks</strong> of fresh content ready for you to use.';
+      msg.innerHTML = 'The library currently contains <strong style="color:#003768;">' + posts.length + ' posts</strong> (each with 5 platform variations), giving you enough content to cover the next <strong style="color:#003768;">' + weeks + ' week' + (weeks !== 1 ? 's' : '') + '</strong> at the recommended 3 posts per week. We upload 2 new posts every day, so by the time you reach this point there will be a further <strong style="color:#003768;">' + extraWeeks + ' weeks</strong> of fresh content ready for you to use.';
       msg.style.display = 'block';
     }
     posts.forEach(function(post) {
