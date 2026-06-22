@@ -193,6 +193,7 @@ html { height: 100%; }
 
     <p style="font-size:13px;color:#4a5a6a;line-height:1.75;margin:0 0 10px;">This library contains pre-approved social content ready to post across your channels. Before creating anything yourself, <strong style="color:#003768;">browse here first</strong> -if what you need already exists, it has been signed off and is good to go.</p>
     <p style="font-size:13px;color:#4a5a6a;line-height:1.75;margin:0 0 10px;">If you do choose to create your own content, <strong style="color:#003768;">it must be submitted for approval before being posted</strong>. This protects the brand and ensures everything going out under the FPG name is consistent and compliant. Please also be mindful of image rights -only use images you have permission to use. If a licenced image is detected online, you will be liable for a fine for unauthorised use. When in doubt, stick to approved assets in this library, your own photography, or images from a platform you hold an active licence for. Any questions -speak to <strong style="color:#003768;">Mark Ninnim</strong> -<a href="mailto:mark.ninnim@financeplanning.co.uk" style="color:#003768;text-decoration:none;">mark.ninnim@financeplanning.co.uk</a> or <a href="tel:07525932299" style="color:#003768;text-decoration:none;">07525 932 299</a></p>
+    <p id="social-coverage-msg" style="display:none;font-size:13px;color:#4a5a6a;line-height:1.75;margin:0 0 10px;"></p>
     <div style="border-bottom:1px solid #e8ecf0;margin-bottom:24px;"></div>
 
     <div id="sc-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
@@ -1039,6 +1040,12 @@ function loadSocialContent() {
     }
     var badge = document.getElementById('social-count-badge');
     if (badge) { badge.textContent = posts.length; badge.style.display = 'inline'; }
+    var weeks = Math.floor(posts.length / 3);
+    var msg = document.getElementById('social-coverage-msg');
+    if (msg) {
+      msg.innerHTML = 'The library currently contains <strong style="color:#003768;">' + posts.length + ' posts</strong>, giving you enough content to cover <strong style="color:#003768;">' + weeks + ' week' + (weeks !== 1 ? 's' : '') + '</strong> at the recommended 3 posts per week.';
+      msg.style.display = 'block';
+    }
     posts.forEach(function(post) {
       var title = post.name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
       var h3 = document.createElement('h3');
