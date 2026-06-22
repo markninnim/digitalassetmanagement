@@ -86,7 +86,7 @@ html { height: 100%; }
   <a href="#" onclick="show('templates',this);loadTemplatesDates()">Templates</a>
   <a href="#" onclick="show('social',this);loadSocialAssetDates()">Social Assets</a>
   <!-- <a href="#" onclick="show('guidelines',this)">Guidelines PDF</a> -->
-  <a href="#" onclick="show('social-content',this);loadSocialContent()">Static Social Content</a>
+  <a href="#" onclick="show('social-content',this);loadSocialContent()">Static Social Content <span id="social-count-badge" style="display:none;background:#fcb034;color:#003768;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px;"></span></a>
   <a href="#" onclick="show('video-content',this);loadVideoContent()">Video Social Content</a>
   <a href="#" onclick="show('brochures',this);loadBrochureDates()">Brochures</a>
   <a href="#" onclick="show('graphics',this)">Graphics</a>
@@ -1037,6 +1037,8 @@ function loadSocialContent() {
       container.innerHTML = '<p style="color:#6b7c8f;">No posts yet -drop folders into public/assets/social-content/</p>';
       return;
     }
+    var badge = document.getElementById('social-count-badge');
+    if (badge) { badge.textContent = posts.length; badge.style.display = 'inline'; }
     posts.forEach(function(post) {
       var title = post.name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
       var h3 = document.createElement('h3');
