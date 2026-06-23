@@ -174,7 +174,7 @@ html { height: 100%; }
 
     <h3 style="color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:32px 0 12px;padding-bottom:6px;border-bottom:2px solid #fcb034;">Review Platform Post</h3>
     <div class="grid">
-      <div class="card"><div class="thumb"><img src="/download/social/review-template-thumb.png" style="max-height:104px;max-width:100%;object-fit:contain;"></div><h3>Review Platform Post</h3><p>Photoshop template for building trust and publishing Feefo reviews. Requires a licenced version of Adobe Photoshop.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="review template.psd" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download/social/review%20template.psd" class="btn">Download</a></div>
+      <div class="card"><div class="thumb"><img src="/download/social/review-template-thumb.png" style="max-height:104px;max-width:100%;object-fit:contain;"></div><h3>Review Platform Post</h3><p>Photoshop template for building trust and publishing Feefo reviews. Requires a licenced version of Adobe Photoshop.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="fpg-review-template.psd" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download/social/fpg-review-template.psd" class="btn">Download</a></div>
       <div class="card"><div class="thumb" data-img="/download/social/fpg-review-627x1200-linkedin.jpg"></div><h3>LinkedIn Post</h3><p>627 × 1200px — LinkedIn.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="fpg-review-627x1200-linkedin.jpg" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download/social/fpg-review-627x1200-linkedin.jpg" class="btn">Download</a><a href="/download/social/fpg-review-627x1200-linkedin.jpg" class="btn-view" onclick="openPreview(event,this)">View</a></div>
       <div class="card"><div class="thumb" data-img="/download/social/fpg-review-630x1200-facebook.jpg"></div><h3>Facebook Post</h3><p>630 × 1200px — Facebook.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="fpg-review-630x1200-facebook.jpg" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download/social/fpg-review-630x1200-facebook.jpg" class="btn">Download</a><a href="/download/social/fpg-review-630x1200-facebook.jpg" class="btn-view" onclick="openPreview(event,this)">View</a></div>
       <div class="card"><div class="thumb" data-img="/download/social/fpg-review-1080x1350-instagram.jpg"></div><h3>Instagram Portrait</h3><p>1080 × 1350px — Instagram.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="fpg-review-1080x1350-instagram.jpg" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download/social/fpg-review-1080x1350-instagram.jpg" class="btn">Download</a><a href="/download/social/fpg-review-1080x1350-instagram.jpg" class="btn-view" onclick="openPreview(event,this)">View</a></div>
@@ -766,11 +766,11 @@ function closeVideoPlayer() {
 }
 document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closePreview(); closeVideoPlayer(); } });
 var SIZE_LABELS = {
-  '627 x 1200 - li.jpg':        { label: 'LinkedIn',       size: '627 × 1200' },
-  '630 x 1200 - fb.jpg':        { label: 'Facebook',       size: '630 × 1200' },
-  '1080 x 1350 - ig.jpg':       { label: 'Instagram',      size: '1080 × 1350' },
-  '1080 x 1920 - tik.jpg':      { label: 'TikTok / Story', size: '1080 × 1920' },
-  '1200 x 1200 - ig fb li.jpg': { label: 'Square',         size: '1200 × 1200' }
+  'fpg-linkedin-627x1200.jpg':   { label: 'LinkedIn',       size: '627 × 1200' },
+  'fpg-facebook-630x1200.jpg':   { label: 'Facebook',       size: '630 × 1200' },
+  'fpg-instagram-1080x1350.jpg': { label: 'Instagram',      size: '1080 × 1350' },
+  'fpg-tiktok-1080x1920.jpg':    { label: 'TikTok / Story', size: '1080 × 1920' },
+  'fpg-square-1200x1200.jpg':    { label: 'Square',         size: '1200 × 1200' }
 };
 function makeSocialCard(postName, fileObj) {
   var file = fileObj.name || fileObj;
@@ -807,10 +807,10 @@ function makeSocialCard(postName, fileObj) {
   return card;
 }
 var CP_PLATFORMS = [
-  { name: 'Instagram',  file: '1080 x 1350 - ig.jpg',       size: '1080 × 1350',  url: 'https://www.instagram.com/' },
-  { name: 'TikTok',     file: '1080 x 1920 - tik.jpg',      size: '1080 × 1920',  url: 'https://www.tiktok.com/upload' },
-  { name: 'Facebook',   file: '630 x 1200 - fb.jpg',         size: '630 × 1200',   url: 'https://www.facebook.com/' },
-  { name: 'LinkedIn',   file: '627 x 1200 - li.jpg',         size: '627 × 1200',   url: 'https://www.linkedin.com/feed/' }
+  { name: 'Instagram',  file: 'fpg-instagram-1080x1350.jpg', size: '1080 × 1350',  url: 'https://www.instagram.com/' },
+  { name: 'TikTok',     file: 'fpg-tiktok-1080x1920.jpg',    size: '1080 × 1920',  url: 'https://www.tiktok.com/upload' },
+  { name: 'Facebook',   file: 'fpg-facebook-630x1200.jpg',   size: '630 × 1200',   url: 'https://www.facebook.com/' },
+  { name: 'LinkedIn',   file: 'fpg-linkedin-627x1200.jpg',   size: '627 × 1200',   url: 'https://www.linkedin.com/feed/' }
 ];
 // Maps folder names → section group headings for Video Content
 var VIDEO_SECTION_MAP = {
