@@ -424,6 +424,77 @@ app.post('/generate-business-card', requireAuth, async (req, res) => {
   }
 });
 
+// ── Moving card personaliser ──────────────────────────────────
+app.post('/generate-moving-card', requireAuth, async (req, res) => {
+  try {
+    const salutation = (req.body.salutation || 'Mr').trim();
+    const firstName  = (req.body.firstName  || '').trim().slice(0, 40);
+    const lastName   = (req.body.lastName   || '').trim().slice(0, 40);
+    const fullName   = `${firstName} ${lastName}`.trim();
+    const title      = (req.body.title || '').trim().slice(0, 80).toUpperCase();
+    const email      = (req.body.email || '').trim().slice(0, 80);
+    const phone      = (req.body.phone || '').trim().slice(0, 30);
+
+    const templatePath = path.join(__dirname, 'public/assets/marketing/FPG-Moving-Card.pdf');
+    const pdfBytes = fs.readFileSync(templatePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    pdfDoc.registerFontkit(fontkit);
+
+    const fontBoldBytes = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-ExtraBold.ttf'));
+    const fontMedBytes  = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-Medium.ttf'));
+    const fontBold = await pdfDoc.embedFont(fontBoldBytes);
+    const fontMed  = await pdfDoc.embedFont(fontMedBytes);
+
+    const page = pdfDoc.getPages()[0];
+    const darkBlue   = rgb(0/255, 55/255, 104/255);
+    const accentBlue = rgb(46/255, 153/255, 213/255);
+    const darkGrey   = rgb(26/255, 42/255, 58/255);
+
+    // White out original business card text block
+    page.drawRectangle({ x: 48, y: 48, width: 230, height: 70, color: rgb(1,1,1) });
+
+    // Draw personalised text at extracted Tm positions
+    page.drawText(fullName, { x: 56.85, y: 104.16, size: 12, font: fontBold, color: darkBlue });
+    page.drawText(title,    { x: 56.85, y: 91.96,  size: 8,  font: fontMed,  color: accentBlue });
+    page.drawText(email,    { x: 56.85, y: 81.24,  size: 8,  font: fontMed,  color: darkGrey });
+    page.drawText(phone,    { x: 56.85, y: 69.05,  size: 8,  font: fontMed,  color: darkGrey });
+
+    // Generate vCard QR
+    const vcard = [
+      'BEGIN:VCARD', 'VERSION:3.0',
+      `N:${lastName};${firstName};;;${salutation}`,
+      `FN:${salutation} ${fullName}`,
+      'ORG:Finance Planning Group',
+      `TITLE:${title}`,
+      `TEL;TYPE=CELL:${phone}`,
+      'TEL;TYPE=WORK:01444 449400',
+      email ? `EMAIL:${email}` : '',
+      'ADR;TYPE=WORK:;;Hurstwood Grange;West Sussex;;RH17 8QX;UK',
+      'URL:https://financeplanning.co.uk/',
+      'END:VCARD'
+    ].filter(Boolean).join('\r\n');
+
+    const qrPngBuffer = await QRCode.toBuffer(vcard, {
+      errorCorrectionLevel: 'M', margin: 1, width: 200,
+      color: { dark: '#003768', light: '#ffffff' }
+    });
+    const qrImage = await pdfDoc.embedPng(qrPngBuffer);
+    const qrSize = 70;
+    // Place QR to the right of the text block in the inner left panel
+    page.drawRectangle({ x: 290, y: 50, width: qrSize, height: qrSize, color: rgb(232/255, 244/255, 251/255) });
+    page.drawImage(qrImage, { x: 290, y: 50, width: qrSize, height: qrSize });
+
+    const modifiedBytes = await pdfDoc.save();
+    const safeName = fullName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="FPG-Moving-Card-${safeName}.pdf"`);
+    res.send(Buffer.from(modifiedBytes));
+  } catch (err) {
+    console.error('Moving card error:', err);
+    res.status(500).send('Could not generate moving card: ' + err.message);
+  }
+});
+
 // ── Start ─────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`FPG Digital Asset Management Tool running on port ${PORT}`);
