@@ -572,7 +572,23 @@ html { height: 100%; }
     <h2 style="color: #003768; margin-bottom: 16px;">Marketing Materials</h2>
     <p style="font-size:13px;color:#4a5a6a;line-height:1.75;margin:0 0 16px;">Marketing assets for print and digital use. All materials are brand-approved and ready to use.</p>
     <div class="grid">
-      <div class="card"><div class="thumb"><img src="/view-asset/marketing/FPG-Moving-Card-thumb.png" style="max-height:104px;max-width:100%;object-fit:contain;"></div><h3>Moving Card</h3><p>Branded card to send to clients when they move home.</p><br><span class="badge ready">Approved</span><br><a href="/download-asset/marketing/FPG-Moving-Card.pdf" class="btn">Download</a><a href="/view-asset/marketing/FPG-Moving-Card.pdf" class="btn-view" onclick="openPreview(event,this)">View</a><br><button onclick="openMcModal()" style="margin-top:8px;display:inline-block;background:#003768;color:#fff;padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;">Personalise My Card</button><br><button onclick="openPriceModal('Moving Card',[{qty:30,total:40.40},{qty:50,total:47.00},{qty:75,total:55.19},{qty:100,total:63.66},{qty:200,total:94.20},{qty:500,total:166.49}])" style="margin-top:8px;display:inline-block;background:transparent;color:#003768;border:1.5px solid #003768;padding:5px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">View Pricing</button></div>
+      <div class="card">
+        <div class="thumb" style="position:relative;cursor:pointer;" onclick="document.querySelector('#marketing .card a.btn-view').click()">
+          <img src="/view-asset/marketing/FPG-Moving-Card-thumb.png" style="max-height:104px;max-width:100%;object-fit:contain;">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;background:rgba(0,55,104,.08);border-radius:4px;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+        </div>
+        <h3>Moving Card</h3>
+        <p>Branded card to send to clients when they move home.</p><br>
+        <span class="badge ready">Approved</span><br>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <a href="/download-asset/marketing/FPG-Moving-Card.pdf" class="btn" style="flex:1;text-align:center;">&#8659; Download</a>
+          <button onclick="openPriceModal('Moving Card',[{qty:30,total:40.40},{qty:50,total:47.00},{qty:75,total:55.19},{qty:100,total:63.66},{qty:200,total:94.20},{qty:500,total:166.49}])" style="flex:1;background:transparent;color:#003768;border:1.5px solid #003768;padding:6px 8px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">£ Pricing</button>
+        </div>
+        <button onclick="openMcModal()" style="display:block;width:100%;margin-top:6px;background:#003768;color:#fff;padding:7px 14px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Personalise My Card</button>
+        <a href="/view-asset/marketing/FPG-Moving-Card.pdf" class="btn-view" onclick="openPreview(event,this)" style="display:block;text-align:center;margin-top:6px;">View</a>
+      </div>
     </div>
   </div>
 
