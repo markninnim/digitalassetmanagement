@@ -574,6 +574,22 @@ html { height: 100%; }
     <div class="grid">
       <div class="card"><div class="thumb"><img src="/view-asset/marketing/FPG-Moving-Card-thumb.png" style="max-height:104px;max-width:100%;object-fit:contain;"></div><h3>Moving Card</h3><p>Branded card to send to clients when they move home.</p><br><span class="badge ready">Approved</span><br><a href="/download-asset/marketing/FPG-Moving-Card.pdf" class="btn">Download</a><a href="/view-asset/marketing/FPG-Moving-Card.pdf" class="btn-view" onclick="openPreview(event,this)">View</a><br><button onclick="openMcModal()" style="margin-top:8px;display:inline-block;background:#003768;color:#fff;padding:6px 14px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;">Personalise My Card</button></div>
     </div>
+
+    <div style="margin-top:32px;">
+      <h3 style="color:#003768;font-size:15px;margin:0 0 6px;">Print Pricing</h3>
+      <p style="font-size:13px;color:#6b7c8f;margin:0 0 16px;">Select a quantity to see the total cost and price per card.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;" id="mc-price-tiles">
+        <!-- tiles rendered by JS -->
+      </div>
+      <div id="mc-price-result" style="display:none;margin-top:20px;background:#f0f6fb;border:1.5px solid #2e99d5;border-radius:10px;padding:18px 24px;">
+        <div style="font-size:13px;color:#6b7c8f;margin-bottom:4px;">Selected quantity</div>
+        <div style="font-size:28px;font-weight:800;color:#003768;" id="mc-price-qty"></div>
+        <div style="display:flex;gap:32px;margin-top:12px;">
+          <div><div style="font-size:11px;color:#6b7c8f;text-transform:uppercase;letter-spacing:.5px;">Total price</div><div style="font-size:22px;font-weight:700;color:#003768;" id="mc-price-total"></div></div>
+          <div><div style="font-size:11px;color:#6b7c8f;text-transform:uppercase;letter-spacing:.5px;">Per card</div><div style="font-size:22px;font-weight:700;color:#2e99d5;" id="mc-price-each"></div></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="stationery" class="section">
@@ -1208,6 +1224,38 @@ function copy(hex) {
   t.style.opacity = 1;
   setTimeout(function(){ t.style.opacity = 0; }, 2000);
 }
+// ── Moving card price calculator ─────────────────────────────
+(function() {
+  var tiers = [
+    { qty: 30,  total: 40.40 },
+    { qty: 50,  total: 47.00 },
+    { qty: 75,  total: 55.19 },
+    { qty: 100, total: 63.66 },
+    { qty: 200, total: 94.20 },
+    { qty: 500, total: 166.49 }
+  ];
+  var container = document.getElementById('mc-price-tiles');
+  if (!container) return;
+  tiers.forEach(function(t) {
+    var each = (t.total / t.qty).toFixed(2);
+    var btn = document.createElement('button');
+    btn.setAttribute('data-qty', t.qty);
+    btn.style.cssText = 'padding:10px 18px;border:1.5px solid #d0dae4;border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;text-align:center;min-width:72px;transition:border-color .15s,background .15s;';
+    btn.innerHTML = '<div style="font-size:16px;font-weight:700;color:#003768;">' + t.qty + '</div><div style="font-size:11px;color:#6b7c8f;margin-top:2px;">£' + each + ' ea</div>';
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#mc-price-tiles button').forEach(function(b) {
+        b.style.background = '#fff'; b.style.borderColor = '#d0dae4';
+      });
+      btn.style.background = '#e8f4fb'; btn.style.borderColor = '#2e99d5';
+      document.getElementById('mc-price-qty').textContent = t.qty + ' cards';
+      document.getElementById('mc-price-total').textContent = '£' + t.total.toFixed(2);
+      document.getElementById('mc-price-each').textContent = '£' + each;
+      document.getElementById('mc-price-result').style.display = 'block';
+    });
+    container.appendChild(btn);
+  });
+})();
+
 loadLogosDates();
 
 fetch('/api/assets').then(r => r.json()).then(function(data) {
