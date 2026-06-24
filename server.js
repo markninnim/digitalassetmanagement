@@ -445,7 +445,7 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
     const fontBold = await pdfDoc.embedFont(fontBoldBytes);
     const fontMed  = await pdfDoc.embedFont(fontMedBytes);
 
-    const page = pdfDoc.getPages()[0];
+    const page = pdfDoc.getPages()[1];
     const darkBlue   = rgb(0/255, 55/255, 104/255);
     const accentBlue = rgb(46/255, 153/255, 213/255);
     const darkGrey   = rgb(26/255, 42/255, 58/255);
