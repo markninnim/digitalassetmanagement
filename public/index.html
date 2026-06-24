@@ -638,7 +638,11 @@ html { height: 100%; }
     </div>
     <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Job Title</label><input id="mc-title" type="text" placeholder="e.g. Mortgage &amp; Protection Adviser" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
     <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Email</label><input id="mc-email" type="email" placeholder="e.g. mark.ninnim@financeplanning.co.uk" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
-    <div style="margin-bottom:24px;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Mobile</label><input id="mc-phone" type="text" placeholder="e.g. 07525 932 299" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <div style="flex:1;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Mobile</label><input id="mc-phone" type="text" placeholder="e.g. 07525 932 299" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
+      <div style="flex:1;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Landline <span style="font-weight:400;color:#6b7c8f;">(optional)</span></label><input id="mc-landline" type="text" placeholder="e.g. 01444 449400" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
+    </div>
+    <div style="margin-bottom:24px;"><label style="display:block;font-size:12px;font-weight:600;color:#003768;margin-bottom:5px;">Personal Website <span style="font-weight:400;color:#6b7c8f;">(optional)</span></label><input id="mc-url" type="url" placeholder="e.g. https://financeplanning.co.uk/broker-name" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;"></div>
     <button onclick="generateMovingCard()" style="width:100%;padding:12px;background:#003768;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Download My Moving Card PDF</button>
     <div id="mc-msg" style="margin-top:12px;font-size:12px;color:#6b7c8f;text-align:center;display:none;"></div>
   </div>
@@ -1067,6 +1071,8 @@ async function generateMovingCard() {
   const title      = document.getElementById('mc-title').value.trim();
   const email      = document.getElementById('mc-email').value.trim();
   const phone      = document.getElementById('mc-phone').value.trim().replace(/(\d{5})(\d{3})(\d{3})/, '$1 $2 $3');
+  const landline   = document.getElementById('mc-landline').value.trim();
+  const url        = document.getElementById('mc-url').value.trim();
   const msg        = document.getElementById('mc-msg');
   if (!firstName || !lastName) { msg.style.display='block'; msg.textContent='Please enter your name.'; return; }
   msg.style.display='block'; msg.textContent='Generating your card...';
@@ -1074,13 +1080,13 @@ async function generateMovingCard() {
     const resp = await fetch('/generate-moving-card', {
       method: 'POST',
       headers: {'Content-Type':'application/x-www-form-urlencoded'},
-      body: new URLSearchParams({salutation, firstName, lastName, title, email, phone})
+      body: new URLSearchParams({salutation, firstName, lastName, title, email, phone, landline, url})
     });
     if (!resp.ok) throw new Error(await resp.text());
     const blob = await resp.blob();
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = 'FPG-Moving-Card.pdf'; a.click();
+    const objUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objUrl; a.download = 'FPG-Moving-Card.pdf'; a.click();
     msg.textContent = 'Downloaded!';
   } catch(e) {
     msg.textContent = 'Error: ' + e.message;

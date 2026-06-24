@@ -434,6 +434,8 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
     const title      = (req.body.title || '').trim().slice(0, 80).toUpperCase();
     const email      = (req.body.email || '').trim().slice(0, 80);
     const phone      = (req.body.phone || '').trim().slice(0, 30);
+    const landline   = (req.body.landline || '').trim().slice(0, 30);
+    const url        = (req.body.url || '').trim().slice(0, 120);
 
     const templatePath = path.join(__dirname, 'public/assets/marketing/FPG-Moving-Card.pdf');
     const pdfBytes = fs.readFileSync(templatePath);
@@ -450,7 +452,7 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
     const accentBlue = rgb(46/255, 153/255, 213/255);
     const darkGrey   = rgb(26/255, 42/255, 58/255);
 
-    // White out original business card text block
+    // White out original business card text block (name through second phone line)
     page.drawRectangle({ x: 48, y: 48, width: 230, height: 70, color: rgb(1,1,1) });
 
     // Draw personalised text at extracted Tm positions
@@ -458,6 +460,9 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
     page.drawText(title,    { x: 56.85, y: 91.96,  size: 8,  font: fontMed,  color: accentBlue });
     page.drawText(email,    { x: 56.85, y: 81.24,  size: 8,  font: fontMed,  color: darkGrey });
     page.drawText(phone,    { x: 56.85, y: 69.05,  size: 8,  font: fontMed,  color: darkGrey });
+    if (landline) {
+      page.drawText(landline, { x: 56.85, y: 57.71, size: 8, font: fontMed, color: darkGrey });
+    }
 
     // Cover the existing QR placeholder area to the right of the business card on page 1
     page.drawRectangle({ x: 285, y: 40, width: 160, height: 130, color: rgb(1,1,1) });
@@ -470,10 +475,10 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
       'ORG:Finance Planning Group',
       `TITLE:${title}`,
       `TEL;TYPE=CELL:${phone}`,
-      'TEL;TYPE=WORK:01444 449400',
+      landline ? `TEL;TYPE=WORK:${landline}` : 'TEL;TYPE=WORK:01444 449400',
       email ? `EMAIL:${email}` : '',
       'ADR;TYPE=WORK:;;Hurstwood Grange;West Sussex;;RH17 8QX;UK',
-      'URL:https://financeplanning.co.uk/',
+      url ? `URL:${url}` : 'URL:https://financeplanning.co.uk/',
       'END:VCARD'
     ].filter(Boolean).join('\r\n');
 
@@ -483,13 +488,14 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
     });
     const qrImage = await pdfDoc.embedPng(qrPngBuffer);
 
-    // Place QR on page 3 (index 3) — the back of the business card, centred in the light blue rectangle
-    // Light blue rect is approx x=42, y=42, width=230, height=155
-    const backPage = pdfDoc.getPages()[3];
-    const qrSize = 110;
-    const qrX = 42 + (230 - qrSize) / 2;  // centred horizontally in the rect
-    const qrY = 42 + (155 - qrSize) / 2;  // centred vertically in the rect
-    backPage.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
+    // Place QR on page 0 (index 0) — under "Scan for more great mortgage and protection advice."
+    // Text ends at y≈307. Cover existing FPG QR then draw personalised one centred in left panel.
+    const scanPage = pdfDoc.getPages()[0];
+    const qrSize = 130;
+    const qrX = (420 - qrSize) / 2;   // centred in left half (~420pt wide)
+    const qrY = 145;
+    scanPage.drawRectangle({ x: 55, y: 130, width: 210, height: 175, color: rgb(1,1,1) });
+    scanPage.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
 
     const modifiedBytes = await pdfDoc.save();
     const safeName = fullName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
