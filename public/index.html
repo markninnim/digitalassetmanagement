@@ -85,7 +85,7 @@ html { height: 100%; }
   <a href="#" onclick="show('brochures',this);loadBrochureDates()">Brochures</a>
   <a href="#" onclick="show('graphics',this)">Graphics</a>
   <a href="#" onclick="show('logos',this);loadLogosDates()">Logo Files</a>
-  <a href="#" onclick="show('marketing',this)">Marketing Materials</a>
+  <a href="#" onclick="show('marketing',this);loadMarketingDates()">Marketing Materials</a>
   <a href="#" onclick="show('social',this);loadSocialAssetDates()">Social Assets</a>
   <a href="#" onclick="show('social-content',this);loadSocialContent()">Static Social Content <span id="social-count-badge" style="display:none;background:#fcb034;color:#003768;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px;"></span></a>
   <a href="#" onclick="show('stationery',this)">Stationery</a>
@@ -584,10 +584,10 @@ html { height: 100%; }
         </div>
         <h3>Moving Card</h3>
         <p>Branded card to send to clients when they move home.</p><br>
-        <span class="badge ready">Approved</span><br>
+        <span class="badge ready">Approved</span> <span class="file-date" data-file="FPG-Moving-Card.pdf" style="font-size:11px;color:#6b7c8f;"></span><br>
         <div style="display:flex;gap:6px;margin-top:8px;">
-          <a href="/download-asset/marketing/FPG-Moving-Card.pdf" class="btn" style="flex:1;text-align:center;padding:7px 8px;box-sizing:border-box;">Download</a>
-          <button onclick="openPriceModal('Moving Card',[{qty:30,total:40.40},{qty:50,total:47.00},{qty:75,total:55.19},{qty:100,total:63.66},{qty:200,total:94.20},{qty:500,total:166.49}])" style="flex:1;background:transparent;color:#003768;border:1.5px solid #003768;padding:7px 8px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Pricing</button>
+          <a href="/download-asset/marketing/FPG-Moving-Card.pdf" style="flex:1;text-align:center;display:block;background:#003768;color:#fff;padding:7px 8px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;box-sizing:border-box;">Download</a>
+          <button onclick="openPriceModal('Moving Card',[{qty:30,total:40.40},{qty:50,total:47.00},{qty:75,total:55.19},{qty:100,total:63.66},{qty:200,total:94.20},{qty:500,total:166.49}])" style="flex:1;background:transparent;color:#003768;border:1.5px solid #003768;padding:7px 8px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;box-sizing:border-box;">Pricing</button>
         </div>
         <button onclick="openMcModal()" style="display:block;width:100%;margin-top:6px;background:#003768;color:#fff;padding:7px 14px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;box-sizing:border-box;">Personalise My Card</button>
       </div>
@@ -724,7 +724,7 @@ function openPreviewDirect(href, title) {
     body.appendChild(frame);
   }
   document.getElementById('preview-title').textContent = title;
-  document.getElementById('preview-modal').classList.add('active');
+  document.getElementById('preview-modal').classList.add('open');
 }
 function openPreview(e, el) {
   e.preventDefault();
@@ -1323,6 +1323,17 @@ function loadLogosDates() {
   });
 }
 
+function loadMarketingDates() {
+  fetch('/api/assets').then(function(r){ return r.json(); }).then(function(manifest) {
+    var fmt = function(d){ return d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}); };
+    var dateMap = {};
+    (manifest.marketing || []).forEach(function(f){ dateMap[f.name] = f.created; });
+    document.querySelectorAll('#marketing .file-date[data-file]').forEach(function(el) {
+      var d = dateMap[el.getAttribute('data-file')];
+      if (d) el.textContent = fmt(new Date(d));
+    });
+  });
+}
 function loadTemplatesDates() {
   fetch('/api/assets').then(function(r){ return r.json(); }).then(function(manifest) {
     var fmt = function(d){ return d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}); };

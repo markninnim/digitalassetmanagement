@@ -199,7 +199,7 @@ app.get('/api/assets', requireAuth, (req, res) => {
   const baseDir = path.join(__dirname, 'public/assets');
   const manifest = {};
 
-  const categories = ['logos', 'templates', 'social', 'guidelines', 'stationery'];
+  const categories = ['logos', 'templates', 'social', 'guidelines', 'stationery', 'marketing'];
   for (const cat of categories) {
     const catPath = path.join(baseDir, cat);
     if (fs.existsSync(catPath)) {
