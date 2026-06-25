@@ -357,6 +357,7 @@ const CPD_CATEGORY = 'fldX8oYvUMtCdsXSD';
 const CPD_SOURCE   = 'fldSjdFlkizyQVNzP';
 const CPD_VTITLE   = 'fldXmHRWv246Wb5FF';
 const CPD_TYPE     = 'fldRi9wWzALjvvzu1';
+const CPD_LEARNED  = 'flduS7f67tF3W64ZA';
 // Per-product CPD targets in minutes: Investment 35hrs, Mortgage 15hrs, Protection 15hrs
 const CPD_TARGETS  = { Investment: 2100, Mortgage: 900, Protection: 900 };
 
@@ -382,7 +383,8 @@ function cpdRecordToEntry(record) {
     category:   f[CPD_CATEGORY]  || '',
     source:     f[CPD_SOURCE]    || '',
     videoTitle: f[CPD_VTITLE]    || '',
-    cpdType:    f[CPD_TYPE]      || ''
+    cpdType:    f[CPD_TYPE]      || '',
+    learned:    f[CPD_LEARNED]   || ''
   };
 }
 
@@ -410,7 +412,7 @@ app.get('/api/cpd', requireAuth, async (req, res) => {
 
 // POST /api/cpd — manual entry
 app.post('/api/cpd', requireAuth, async (req, res) => {
-  const { activity, date, minutes, category, cpdType } = req.body;
+  const { activity, date, minutes, category, cpdType, learned } = req.body;
   if (!activity || !date || !minutes) return res.status(400).json({ error: 'Activity, date and minutes required' });
   try {
     const data = await cpdFetch('', {
@@ -422,7 +424,8 @@ app.post('/api/cpd', requireAuth, async (req, res) => {
         [CPD_MINUTES]:  parseInt(minutes, 10),
         [CPD_CATEGORY]: category || 'Other',
         [CPD_SOURCE]:   'Manual',
-        [CPD_TYPE]:     cpdType || 'Mortgage'
+        [CPD_TYPE]:     cpdType || 'Mortgage',
+        ...(learned ? { [CPD_LEARNED]: learned } : {})
       }}], returnFieldsByFieldId: true })
     });
     res.json(cpdRecordToEntry(data.records[0]));
@@ -465,6 +468,151 @@ app.delete('/api/cpd/:id', requireAuth, async (req, res) => {
     await cpdFetch(`/${req.params.id}`, { method: 'DELETE' });
     res.json({ ok: true });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/cpd/pdf — download CPD report as PDF
+app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
+  const email  = req.session.user.email;
+  const period = req.query.period || 'year'; // month | quarter | year
+  try {
+    // Fetch all entries for user
+    const formula = encodeURIComponent(`{User Email}="${email}"`);
+    const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=100`);
+    const allEntries = (data.records || []).map(cpdRecordToEntry);
+
+    // Filter by period
+    const now = new Date();
+    const entries = allEntries.filter(e => {
+      if (!e.date) return false;
+      const d = new Date(e.date);
+      if (period === 'month')   return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+      if (period === 'quarter') { const q = Math.floor(now.getMonth()/3); return d.getFullYear() === now.getFullYear() && Math.floor(d.getMonth()/3) === q; }
+      return d.getFullYear() === now.getFullYear();
+    });
+
+    const byType = { Mortgage: 0, Protection: 0 };
+    entries.forEach(e => { if (e.cpdType && byType[e.cpdType] !== undefined) byType[e.cpdType] += e.minutes || 0; });
+    const targets = CPD_TARGETS;
+
+    // Load fonts
+    const fontBoldBytes = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-ExtraBold.ttf'));
+    const fontMedBytes  = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-Medium.ttf'));
+
+    const pdfDoc = await PDFDocument.create();
+    pdfDoc.registerFontkit(fontkit);
+    const fontBold = await pdfDoc.embedFont(fontBoldBytes);
+    const fontMed  = await pdfDoc.embedFont(fontMedBytes);
+
+    const W = 595.28, H = 841.89; // A4
+    const page = pdfDoc.addPage([W, H]);
+    const darkBlue   = rgb(0/255,   55/255,  104/255);
+    const accentBlue = rgb(46/255,  153/255, 213/255);
+    const amber      = rgb(252/255, 176/255, 52/255);
+    const green      = rgb(34/255,  197/255, 94/255);
+    const grey       = rgb(107/255, 124/255, 143/255);
+    const lightGrey  = rgb(240/255, 244/255, 248/255);
+    const white      = rgb(1,1,1);
+
+    const fmtMin = m => { const h = Math.floor(m/60), mn = m%60; return h > 0 ? (h + 'h' + (mn > 0 ? ' ' + mn + 'm' : '')) : (mn + 'm'); };
+    const periodLabel = period === 'month' ? 'This Month' : period === 'quarter' ? 'This Quarter' : 'This Year';
+    const user = req.session.user;
+    const userName = ((user.firstName || '') + ' ' + (user.lastName || '')).trim() || email;
+
+    // ── Header bar ─────────────────────────────────────────────
+    page.drawRectangle({ x: 0, y: H-60, width: W, height: 60, color: darkBlue });
+    page.drawText('CPD Report — ' + periodLabel, { x: 32, y: H-38, size: 16, font: fontBold, color: white });
+    const dateStr = now.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    page.drawText(userName + '  |  ' + dateStr, { x: 32, y: H-54, size: 9, font: fontMed, color: rgb(0.7,0.8,0.9) });
+
+    let y = H - 85;
+
+    // ── Progress bars ──────────────────────────────────────────
+    page.drawText('CPD Progress', { x: 32, y, size: 12, font: fontBold, color: darkBlue });
+    y -= 18;
+
+    const barX = 32, barW = W - 200, barH = 10;
+    const drawBar = (label, mins, target, color) => {
+      const pct = target > 0 ? Math.min(1, mins / target) : 0;
+      const done = pct >= 1;
+      const barColor = done ? green : color;
+      // label
+      page.drawText(label, { x: barX, y: y+1, size: 10, font: fontBold, color: darkBlue });
+      page.drawText(fmtMin(mins) + ' / ' + fmtMin(target), { x: barX + barW + 12, y: y+1, size: 9, font: fontMed, color: grey });
+      y -= 14;
+      // track
+      page.drawRectangle({ x: barX, y, width: barW, height: barH, color: lightGrey, borderRadius: 5 });
+      if (pct > 0) page.drawRectangle({ x: barX, y, width: barW * pct, height: barH, color: barColor, borderRadius: 5 });
+      y -= 14;
+      const pctText = Math.round(pct*100) + '% — ' + (done ? 'Target met ✓' : fmtMin(Math.max(0, target - mins)) + ' remaining');
+      page.drawText(pctText, { x: barX, y, size: 8, font: fontMed, color: done ? green : grey });
+      y -= 20;
+    };
+
+    drawBar('Mortgage CPD',   byType.Mortgage,   targets.Mortgage,   accentBlue);
+    drawBar('Protection CPD', byType.Protection, targets.Protection, amber);
+
+    const combMins   = byType.Mortgage + byType.Protection;
+    const combTarget = targets.Mortgage + targets.Protection;
+    const combPct    = combTarget > 0 ? Math.min(1, combMins / combTarget) : 0;
+    const combDone   = combPct >= 1;
+    y -= 4;
+    page.drawLine({ start:{x:barX, y:y+16}, end:{x:W-32, y:y+16}, thickness:0.5, color: lightGrey });
+    y -= 4;
+    drawBar('Combined Total', combMins, combTarget, darkBlue);
+
+    y -= 8;
+
+    // ── Entries table ─────────────────────────────────────────
+    page.drawText('Entries (' + entries.length + ')', { x: 32, y, size: 12, font: fontBold, color: darkBlue });
+    y -= 16;
+
+    // Table header
+    const cols = [{ x:32, w:70, label:'Date' }, { x:110, w:190, label:'Activity' }, { x:308, w:80, label:'Type' }, { x:396, w:110, label:'Category' }, { x:514, w:50, label:'Time' }];
+    page.drawRectangle({ x: 28, y: y-4, width: W-56, height: 18, color: lightGrey });
+    cols.forEach(c => page.drawText(c.label, { x: c.x, y: y+1, size: 8, font: fontBold, color: grey }));
+    y -= 20;
+
+    const truncate = (s, max) => s && s.length > max ? s.slice(0, max-1) + '…' : (s || '');
+    entries.forEach((e, i) => {
+      // New page if needed
+      if (y < 60) {
+        const np = pdfDoc.addPage([W, H]);
+        // carry over header stripe
+        np.drawRectangle({ x: 0, y: H-60, width: W, height: 60, color: darkBlue });
+        np.drawText('CPD Report — continued', { x: 32, y: H-38, size: 14, font: fontBold, color: white });
+        y = H - 80;
+      }
+      if (i % 2 === 0) page.drawRectangle({ x: 28, y: y-5, width: W-56, height: 16, color: rgb(0.975,0.98,0.99) });
+      const d = e.date ? new Date(e.date).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '—';
+      page.drawText(d,                                  { x: cols[0].x, y, size: 8, font: fontMed,  color: grey });
+      page.drawText(truncate(e.activity, 30),           { x: cols[1].x, y, size: 8, font: fontBold, color: darkBlue });
+      page.drawText(truncate(e.cpdType, 12),            { x: cols[2].x, y, size: 8, font: fontMed,  color: grey });
+      page.drawText(truncate(e.category, 18),           { x: cols[3].x, y, size: 8, font: fontMed,  color: grey });
+      page.drawText(fmtMin(e.minutes),                  { x: cols[4].x, y, size: 8, font: fontBold, color: darkBlue });
+      if (e.learned) {
+        y -= 12;
+        page.drawText('  ' + truncate(e.learned, 80),  { x: cols[1].x, y, size: 7, font: fontMed,  color: grey });
+      }
+      y -= 16;
+    });
+
+    // ── Footer ────────────────────────────────────────────────
+    const pages = pdfDoc.getPages();
+    pages.forEach((pg, idx) => {
+      pg.drawText('Generated by FPG DAM  |  Page ' + (idx+1) + ' of ' + pages.length, {
+        x: 32, y: 20, size: 7, font: fontMed, color: grey
+      });
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    const filename = 'CPD-Report-' + periodLabel.replace(/ /g,'-') + '-' + userName.replace(/[^a-z0-9]/gi,'-') + '.pdf';
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(Buffer.from(pdfBytes));
+  } catch (err) {
+    console.error('CPD PDF error:', err);
     res.status(500).json({ error: err.message });
   }
 });

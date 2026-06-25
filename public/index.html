@@ -702,9 +702,20 @@ html { height: 100%; }
 
       <!-- Progress card -->
       <div id="cpd-progress-card" style="background:#fff;border-radius:12px;padding:24px 28px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.07);">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div style="font-size:13px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;">CPD Progress — Year to Date</div>
-          <div id="cpd-total-display" style="font-size:12px;font-weight:600;color:#6b7c8f;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;">CPD Progress</div>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <button id="cpd-period-month"   onclick="setCpdPeriod('month')"   style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;">Month</button>
+            <button id="cpd-period-quarter" onclick="setCpdPeriod('quarter')" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;">Quarter</button>
+            <button id="cpd-period-year"    onclick="setCpdPeriod('year')"    style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #003768;background:#003768;color:#fff;">Year</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div id="cpd-total-display" style="font-size:12px;font-weight:600;color:#6b7c8f;"></div>
+            <button onclick="downloadCpdPdf()" style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#003768;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Save as PDF
+            </button>
+          </div>
         </div>
         <div id="cpd-progress-bars"><div style="font-size:13px;color:#6b7c8f;padding:8px 0;">Loading…</div></div>
       </div>
@@ -713,9 +724,19 @@ html { height: 100%; }
       <div id="cpd-form" style="display:none;background:#fff;border-radius:12px;padding:24px 28px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.07);">
         <h3 style="color:#003768;font-size:15px;margin:0 0 18px;">Add CPD Entry</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-          <div style="grid-column:1/-1;">
+          <div>
             <label style="display:block;font-size:12px;font-weight:600;color:#1a2a3a;margin-bottom:5px;">Activity *</label>
-            <input id="cpdf-activity" type="text" placeholder="e.g. Mortgage Market Update — Halifax" style="width:100%;padding:9px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+            <select id="cpdf-activity" style="width:100%;padding:9px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;background:#fff;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+              <option value="">Select activity…</option>
+              <option value="Watched webinar">Watched webinar</option>
+              <option value="Attended BDM meeting">Attended BDM meeting</option>
+              <option value="Read documentation">Read documentation</option>
+              <option value="Attended sales meeting">Attended sales meeting</option>
+            </select>
+          </div>
+          <div style="grid-column:1/-1;">
+            <label style="display:block;font-size:12px;font-weight:600;color:#1a2a3a;margin-bottom:5px;">What did you learn?</label>
+            <textarea id="cpdf-learned" rows="3" placeholder="Briefly describe the key things you took away from this activity…" style="width:100%;padding:9px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;resize:vertical;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'"></textarea>
           </div>
           <div>
             <label style="display:block;font-size:12px;font-weight:600;color:#1a2a3a;margin-bottom:5px;">Date *</label>
@@ -2603,13 +2624,59 @@ function showCpdSection(e) {
   if (!_cpdLoaded) loadCpd();
 }
 
+var _cpdAllEntries = [];
+var _cpdPeriod = 'year';
+var _cpdTargets = { Mortgage: 900, Protection: 900 };
+
 function loadCpd() {
   _cpdLoaded = true;
   fetch('/api/cpd').then(r => r.json()).then(function(data) {
-    renderCpdProgress(data);
-    renderCpdEntries(data.entries);
+    _cpdAllEntries = data.entries || [];
+    _cpdTargets    = data.targets || { Mortgage: 900, Protection: 900 };
+    renderCpdProgress();
+    renderCpdEntries(_cpdAllEntries);
   }).catch(function() {
     document.getElementById('cpd-entries').innerHTML = '<div style="padding:40px;text-align:center;color:#c00;font-size:13px;">Could not load CPD log.</div>';
+  });
+}
+
+function downloadCpdPdf() {
+  var btn = event.currentTarget;
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+  var a = document.createElement('a');
+  a.href = '/api/cpd/pdf?period=' + (_cpdPeriod || 'year');
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function() {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save as PDF';
+  }, 2000);
+}
+
+function setCpdPeriod(p) {
+  _cpdPeriod = p;
+  ['month','quarter','year'].forEach(function(id) {
+    var b = document.getElementById('cpd-period-' + id);
+    if (!b) return;
+    var active = id === p;
+    b.style.background   = active ? '#003768' : '#f5f7fa';
+    b.style.color        = active ? '#fff'    : '#6b7c8f';
+    b.style.borderColor  = active ? '#003768' : '#e8ecf0';
+  });
+  renderCpdProgress();
+}
+
+function _cpdEntriesForPeriod(period) {
+  var now = new Date();
+  return _cpdAllEntries.filter(function(e) {
+    if (!e.date) return false;
+    var d = new Date(e.date);
+    if (period === 'month')   return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    if (period === 'quarter') { var q = Math.floor(now.getMonth() / 3); return d.getFullYear() === now.getFullYear() && Math.floor(d.getMonth() / 3) === q; }
+    return d.getFullYear() === now.getFullYear(); // year
   });
 }
 
@@ -2618,38 +2685,77 @@ function fmtMins(m) {
   return h > 0 ? (h + 'h ' + (min > 0 ? min + 'm' : '')) : (min + 'm');
 }
 
-function renderCpdProgress(data) {
-  var byType  = data.byType  || {};
-  var targets = data.targets || { Mortgage: 900, Protection: 900 };
-  var total   = data.totalMins || 0;
-  document.getElementById('cpd-total-display').textContent = fmtMins(total) + ' total all time';
+function renderCpdProgress() {
+  var targets = _cpdTargets || { Mortgage: 900, Protection: 900 };
+  var periodEntries = _cpdEntriesForPeriod(_cpdPeriod);
+  var byType = { Mortgage: 0, Protection: 0 };
+  periodEntries.forEach(function(e) {
+    if (e.cpdType && byType[e.cpdType] !== undefined) byType[e.cpdType] += e.minutes || 0;
+  });
+  var totalAllTime = _cpdAllEntries.reduce(function(s, e){ return s + (e.minutes || 0); }, 0);
+  var periodLabel  = _cpdPeriod === 'month' ? 'This Month' : _cpdPeriod === 'quarter' ? 'This Quarter' : 'This Year';
+  document.getElementById('cpd-total-display').textContent = fmtMins(totalAllTime) + ' total all time';
 
   // Determine which types to show — default to both Mortgage + Protection
   var user = _currentUser || {};
   var noFlags = !user.sellsMortgages && !user.sellsProtection;
   var typeConf = [
-    { key: 'Mortgage',   label: 'Mortgage',   color: '#2e99d5', show: user.sellsMortgages   || noFlags },
-    { key: 'Protection', label: 'Protection', color: '#fcb034', show: user.sellsProtection  || noFlags }
+    { key: 'Mortgage',   label: 'Mortgage',   color: '#2e99d5', show: user.sellsMortgages  || noFlags },
+    { key: 'Protection', label: 'Protection', color: '#fcb034', show: user.sellsProtection || noFlags }
   ];
   var visible = typeConf.filter(function(t){ return t.show; });
-  if (!visible.length) visible = typeConf; // safety fallback
+  if (!visible.length) visible = typeConf;
 
-  var combinedYtd    = visible.reduce(function(s,t){ return s + (byType[t.key] || 0); }, 0);
+  var combinedMins   = visible.reduce(function(s,t){ return s + (byType[t.key] || 0); }, 0);
   var combinedTarget = visible.reduce(function(s,t){ return s + (targets[t.key] || 900); }, 0);
-  var combinedPct    = combinedTarget > 0 ? Math.min(100, Math.round((combinedYtd / combinedTarget) * 100)) : 0;
+  var combinedPct    = combinedTarget > 0 ? Math.min(100, Math.round((combinedMins / combinedTarget) * 100)) : 0;
 
   var container = document.getElementById('cpd-progress-bars');
-  var barsHtml = visible.map(function(t) {
-    var ytd       = byType[t.key] || 0;
+
+  // Pie chart SVG (only when two types shown)
+  var pieHtml = '';
+  if (visible.length > 1 && combinedMins > 0) {
+    var mortMins = byType['Mortgage']   || 0;
+    var protMins = byType['Protection'] || 0;
+    var total    = mortMins + protMins;
+    var mortPct  = total > 0 ? mortMins / total : 0.5;
+    var protPct  = 1 - mortPct;
+    // SVG donut via arc
+    var cx = 50, cy = 50, r = 38, sw = 14;
+    function arcPath(pct, offset, color) {
+      if (pct <= 0) return '';
+      if (pct >= 1) pct = 0.9999;
+      var start = offset * 2 * Math.PI - Math.PI / 2;
+      var end   = (offset + pct) * 2 * Math.PI - Math.PI / 2;
+      var x1 = cx + r * Math.cos(start), y1 = cy + r * Math.sin(start);
+      var x2 = cx + r * Math.cos(end),   y2 = cy + r * Math.sin(end);
+      var large = pct > 0.5 ? 1 : 0;
+      return '<path d="M' + x1.toFixed(2) + ',' + y1.toFixed(2) + ' A' + r + ',' + r + ' 0 ' + large + ',1 ' + x2.toFixed(2) + ',' + y2.toFixed(2) + '" fill="none" stroke="' + color + '" stroke-width="' + sw + '"/>';
+    }
+    pieHtml = '<div style="display:flex;flex-direction:column;align-items:center;min-width:120px;">' +
+      '<svg viewBox="0 0 100 100" width="100" height="100" style="display:block;">' +
+        '<circle cx="50" cy="50" r="38" fill="none" stroke="#f0f4f8" stroke-width="14"/>' +
+        arcPath(mortPct, 0, '#2e99d5') +
+        arcPath(protPct, mortPct, '#fcb034') +
+      '</svg>' +
+      '<div style="display:flex;flex-direction:column;gap:4px;margin-top:6px;">' +
+        '<div style="font-size:11px;font-weight:600;color:#2e99d5;">■ Mortgage ' + Math.round(mortPct*100) + '%</div>' +
+        '<div style="font-size:11px;font-weight:600;color:#fcb034;">■ Protection ' + Math.round(protPct*100) + '%</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  var barsHtml = '<div style="flex:1;">' + visible.map(function(t) {
+    var mins      = byType[t.key] || 0;
     var target    = targets[t.key] || 900;
-    var pct       = Math.min(100, Math.round((ytd / target) * 100));
-    var remaining = Math.max(0, target - ytd);
+    var pct       = Math.min(100, Math.round((mins / target) * 100));
+    var remaining = Math.max(0, target - mins);
     var done      = pct >= 100;
     var barColor  = done ? '#22c55e' : t.color;
     return '<div style="margin-bottom:14px;">' +
       '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px;">' +
         '<div style="font-size:13px;font-weight:700;color:#1a2a3a;">' + t.label + ' CPD</div>' +
-        '<div style="font-size:13px;color:#6b7c8f;font-weight:600;">' + fmtMins(ytd) + ' / ' + fmtMins(target) + '</div>' +
+        '<div style="font-size:13px;color:#6b7c8f;font-weight:600;">' + fmtMins(mins) + ' / ' + fmtMins(target) + '</div>' +
       '</div>' +
       '<div style="background:#f0f4f8;border-radius:6px;height:9px;overflow:hidden;">' +
         '<div style="background:' + barColor + ';height:100%;width:' + pct + '%;border-radius:6px;transition:width .6s ease;"></div>' +
@@ -2660,26 +2766,26 @@ function renderCpdProgress(data) {
     '</div>';
   }).join('');
 
-  // Combined total row (only shown if more than one type)
-  var combinedHtml = '';
+  // Combined total
   if (visible.length > 1) {
     var combinedDone  = combinedPct >= 100;
     var combinedColor = combinedDone ? '#22c55e' : '#003768';
-    combinedHtml = '<div style="margin-top:4px;padding-top:14px;border-top:1px solid #e8ecf0;">' +
+    barsHtml += '<div style="margin-top:4px;padding-top:14px;border-top:1px solid #e8ecf0;">' +
       '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px;">' +
         '<div style="font-size:13px;font-weight:700;color:#003768;">Combined Total</div>' +
-        '<div style="font-size:13px;font-weight:700;color:#003768;">' + fmtMins(combinedYtd) + ' / ' + fmtMins(combinedTarget) + '</div>' +
+        '<div style="font-size:13px;font-weight:700;color:#003768;">' + fmtMins(combinedMins) + ' / ' + fmtMins(combinedTarget) + '</div>' +
       '</div>' +
       '<div style="background:#f0f4f8;border-radius:6px;height:11px;overflow:hidden;">' +
         '<div style="background:' + combinedColor + ';height:100%;width:' + combinedPct + '%;border-radius:6px;transition:width .6s ease;"></div>' +
       '</div>' +
       '<div style="font-size:11px;color:' + (combinedDone ? '#22c55e' : '#6b7c8f') + ';margin-top:4px;">' +
-        (combinedDone ? '✓ All targets met this year' : combinedPct + '% of combined target (' + fmtMins(combinedTarget) + ')') +
+        (combinedDone ? '✓ All targets met — ' + periodLabel : combinedPct + '% of combined target (' + fmtMins(combinedTarget) + ') — ' + periodLabel) +
       '</div>' +
     '</div>';
   }
+  barsHtml += '</div>';
 
-  container.innerHTML = barsHtml + combinedHtml;
+  container.innerHTML = '<div style="display:flex;gap:20px;align-items:flex-start;">' + barsHtml + pieHtml + '</div>';
 }
 
 function renderCpdEntries(entries) {
@@ -2693,7 +2799,7 @@ function renderCpdEntries(entries) {
   var catText   = { 'Lender Update':'#1d4ed8', 'Insurer Update':'#854d0e', 'Compliance':'#166534', 'Technical Knowledge':'#6b21a8', 'Other':'#475569' };
   var typeColors = { 'Investment':'#ede9fe', 'Mortgage':'#dbeafe', 'Protection':'#fef9c3' };
   var typeText   = { 'Investment':'#6b21a8', 'Mortgage':'#1d4ed8', 'Protection':'#854d0e' };
-  var rows = entries.map(function(e) {
+  var rows = entries.map(function(e, i) {
     var d = e.date ? new Date(e.date).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '—';
     var bg = catColors[e.category] || '#f1f5f9';
     var tc = catText[e.category]   || '#475569';
@@ -2703,15 +2809,26 @@ function renderCpdEntries(entries) {
     var srcIcon = e.source === 'Learning Zone'
       ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:3px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>'
       : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-1px;margin-right:3px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-    return '<tr style="border-bottom:1px solid #f0f2f5;">' +
+    var learnedRow = e.learned
+      ? '<tr id="cpd-expand-' + i + '" style="display:none;background:#f7fafc;border-bottom:1px solid #e8ecf0;">' +
+          '<td colspan="7" style="padding:10px 20px 14px 20px;">' +
+            '<div style="font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">What I Learned</div>' +
+            '<div style="font-size:13px;color:#1a2a3a;line-height:1.6;white-space:pre-wrap;">' + escHtml(e.learned) + '</div>' +
+          '</td>' +
+        '</tr>'
+      : '';
+    var chevron = e.learned
+      ? '<svg id="cpd-chev-' + i + '" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6b7c8f" stroke-width="2.5" style="vertical-align:middle;margin-right:4px;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>'
+      : '';
+    return '<tr onclick="toggleCpdRow(' + i + ')" style="border-bottom:1px solid #f0f2f5;cursor:' + (e.learned ? 'pointer' : 'default') + ';" onmouseover="this.style.background=\'#fafbfc\'" onmouseout="this.style.background=\'\'">' +
       '<td style="padding:11px 16px;font-size:13px;color:#6b7c8f;white-space:nowrap;">' + d + '</td>' +
-      '<td style="padding:11px 16px;font-size:13px;color:#1a2a3a;font-weight:600;">' + escHtml(e.activity) + '</td>' +
+      '<td style="padding:11px 16px;font-size:13px;color:#1a2a3a;font-weight:600;">' + chevron + escHtml(e.activity) + '</td>' +
       '<td style="padding:11px 16px;">' + typeTag + '</td>' +
       '<td style="padding:11px 16px;"><span style="background:' + bg + ';color:' + tc + ';font-size:11px;font-weight:600;padding:3px 8px;border-radius:10px;white-space:nowrap;">' + escHtml(e.category) + '</span></td>' +
       '<td style="padding:11px 16px;font-size:13px;color:#6b7c8f;white-space:nowrap;">' + srcIcon + escHtml(e.source) + '</td>' +
       '<td style="padding:11px 16px;font-size:13px;font-weight:700;color:#003768;text-align:right;white-space:nowrap;">' + fmtMins(e.minutes) + '</td>' +
-      '<td style="padding:11px 16px;text-align:right;"><button onclick="deleteCpdEntry(\'' + e.id + '\')" style="background:none;border:none;color:#d1d5db;cursor:pointer;font-size:16px;line-height:1;padding:2px 6px;border-radius:4px;" onmouseover="this.style.color=\'#c00\'" onmouseout="this.style.color=\'#d1d5db\'">&#x2715;</button></td>' +
-    '</tr>';
+      '<td style="padding:11px 16px;text-align:right;" onclick="event.stopPropagation()"><button onclick="deleteCpdEntry(\'' + e.id + '\')" style="background:none;border:none;color:#d1d5db;cursor:pointer;font-size:16px;line-height:1;padding:2px 6px;border-radius:4px;" onmouseover="this.style.color=\'#c00\'" onmouseout="this.style.color=\'#d1d5db\'">&#x2715;</button></td>' +
+    '</tr>' + learnedRow;
   }).join('');
   el.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
     '<thead><tr style="background:#f9fafc;">' +
@@ -2723,12 +2840,24 @@ function renderCpdEntries(entries) {
     '<th style="padding:10px 16px;font-size:11px;font-weight:700;color:#6b7c8f;text-align:right;text-transform:uppercase;letter-spacing:.5px;">Time</th>' +
     '<th></th>' +
     '</thead><tbody>' + rows + '</tbody></table>';
+
+  window._cpdExpandState = {};
+}
+
+function toggleCpdRow(i) {
+  var row = document.getElementById('cpd-expand-' + i);
+  var chev = document.getElementById('cpd-chev-' + i);
+  if (!row) return;
+  var open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : 'table-row';
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
 }
 
 function openCpdForm() {
   document.getElementById('cpdf-date').value = new Date().toISOString().split('T')[0];
   document.getElementById('cpdf-minutes').value = '60';
   document.getElementById('cpdf-activity').value = '';
+  document.getElementById('cpdf-learned').value = '';
   document.getElementById('cpd-form-error').style.display = 'none';
   // Pre-select CPD type: default Mortgage unless user only sells Protection
   var user = _currentUser || {};
@@ -2750,13 +2879,14 @@ function saveCpdEntry() {
   var minutes  = document.getElementById('cpdf-minutes').value;
   var category = document.getElementById('cpdf-category').value;
   var cpdType  = document.getElementById('cpdf-cpdtype').value;
-  if (!activity) { errEl.textContent = 'Activity is required.'; errEl.style.display = 'block'; return; }
-  if (!date)     { errEl.textContent = 'Date is required.';     errEl.style.display = 'block'; return; }
+  var learned  = document.getElementById('cpdf-learned').value.trim();
+  if (!activity) { errEl.textContent = 'Please select an activity.'; errEl.style.display = 'block'; return; }
+  if (!date)     { errEl.textContent = 'Date is required.';          errEl.style.display = 'block'; return; }
   if (!minutes || minutes < 1) { errEl.textContent = 'Duration must be at least 1 minute.'; errEl.style.display = 'block'; return; }
   fetch('/api/cpd', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ activity, date, minutes: parseInt(minutes), category, cpdType })
+    body: JSON.stringify({ activity, date, minutes: parseInt(minutes), category, cpdType, learned })
   }).then(function(r) { return r.json().then(function(d){ return {ok:r.ok,data:d}; }); })
     .then(function(res) {
       if (!res.ok) { errEl.textContent = res.data.error || 'Something went wrong.'; errEl.style.display = 'block'; return; }
