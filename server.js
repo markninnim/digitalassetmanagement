@@ -191,7 +191,7 @@ app.post('/api/profile/photo', requireAuth, async (req, res) => {
 // ── Admin: list users ─────────────────────────────────────────
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
   try {
-    const data = await atFetch(`?returnFieldsByFieldId=true&pageSize=100`);
+    const data = await atFetch(`?returnFieldsByFieldId=true&pageSize=50`);
     const users = (data.records || []).map(r => {
       const u = recordToUser(r);
       u.hasPassword = !!r.fields[F_PASSWORD];
@@ -280,7 +280,7 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
 // ── Supervisor: list all supervisors (for transfer dropdown) ──
 app.get('/api/supervisor/list', requireAuth, async (req, res) => {
   try {
-    const data = await atFetch(`?returnFieldsByFieldId=true&pageSize=100`);
+    const data = await atFetch(`?returnFieldsByFieldId=true&pageSize=50`);
     const supervisors = (data.records || [])
       .filter(r => r.fields[F_IS_SUPERVISOR])
       .map(r => {
@@ -301,7 +301,7 @@ app.get('/api/supervisor/adviser-cpd', requireAuth, async (req, res) => {
     const thisYear = new Date().getFullYear();
     const startOfYear = `${thisYear}-01-01`;
     const formula = encodeURIComponent(`AND({User Email}="${email}",IS_AFTER({Date},"${startOfYear}"))`);
-    const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=200`);
+    const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=50`);
     const entries = (data.records || []).map(cpdRecordToEntry);
     res.json({ entries });
   } catch (err) {
@@ -335,7 +335,7 @@ app.get('/api/supervisor/team', requireAuth, async (req, res) => {
   try {
     // 1. Get team members — fetch all users, filter by supervisor email in Node
     // (more reliable than Airtable formula filtering on email fields)
-    const teamData = await atFetch(`?returnFieldsByFieldId=true&pageSize=100`);
+    const teamData = await atFetch(`?returnFieldsByFieldId=true`);
     const members = (teamData.records || [])
       .filter(r => (r.fields[F_SUPERVISOR_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase())
       .map(r => {
@@ -344,25 +344,14 @@ app.get('/api/supervisor/team', requireAuth, async (req, res) => {
         return u;
       });
 
-    if (!members.length) return res.json({
-      members: [], cpdByMember: {},
-      _debug: {
-        supervisorEmail,
-        totalRecords: (teamData.records || []).length,
-        fieldSamples: (teamData.records || []).map(r => ({
-          id: r.id,
-          supervisorEmailField: JSON.stringify(r.fields[F_SUPERVISOR_EMAIL]),
-          emailField: JSON.stringify(r.fields[F_EMAIL])
-        }))
-      }
-    });
+    if (!members.length) return res.json({ members: [], cpdByMember: {} });
 
     // 2. Fetch this year's CPD entries for all team members in one query
     const thisYear = new Date().getFullYear();
     const startOfYear = `${thisYear}-01-01`;
     const emails = members.map(m => `{User Email}="${m.email}"`).join(',');
     const cpdFormula = encodeURIComponent(`AND(OR(${emails}),IS_AFTER({Date},"${startOfYear}"))`);
-    const cpdData = await cpdFetch(`?filterByFormula=${cpdFormula}&returnFieldsByFieldId=true&pageSize=1000`);
+    const cpdData = await cpdFetch(`?filterByFormula=${cpdFormula}&returnFieldsByFieldId=true&pageSize=50`);
     const allEntries = (cpdData.records || []).map(cpdRecordToEntry);
 
     // 3. Aggregate per member per CPD type
@@ -417,7 +406,7 @@ function lvRecordToVideo(record) {
 // GET /api/learning — featured 8 + archive (auth required)
 app.get('/api/learning', requireAuth, async (req, res) => {
   try {
-    const data = await lvFetch(`?sort[0][field]=${LV_ADDED}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=100`);
+    const data = await lvFetch(`?sort[0][field]=${LV_ADDED}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=50`);
     const all = (data.records || []).map(lvRecordToVideo);
     res.json({ featured: all.slice(0, FEATURED_COUNT), archive: all.slice(FEATURED_COUNT) });
   } catch (err) {
@@ -510,7 +499,7 @@ app.get('/api/cpd', requireAuth, async (req, res) => {
   const email = req.session.user.email;
   try {
     const formula = encodeURIComponent(`{User Email}="${email}"`);
-    const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=100`);
+    const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=50`);
     const entries = (data.records || []).map(cpdRecordToEntry);
     const totalMins = entries.reduce((sum, e) => sum + (e.minutes || 0), 0);
     // Year-to-date totals — overall and per CPD type
@@ -600,7 +589,7 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
   try {
     // Fetch all entries for user
     const formula = encodeURIComponent(`{User Email}="${email}"`);
-    const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=100`);
+    const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=50`);
     const allEntries = (data.records || []).map(cpdRecordToEntry);
 
     // Filter by period
