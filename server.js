@@ -384,11 +384,13 @@ app.get('/api/supervisor/export-csv', requireAuth, async (req, res) => {
   const from = req.query.from || `${new Date().getFullYear()}-01-01`;
   const to   = req.query.to   || new Date().toISOString().slice(0, 10);
   try {
-    // Get team members
+    // Get team members (all, or filtered to single adviser)
+    const singleEmail = req.query.email || null;
     const teamData = await atFetch(`?returnFieldsByFieldId=true`);
-    const members = (teamData.records || [])
+    let members = (teamData.records || [])
       .filter(r => (r.fields[F_SUPERVISOR_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase())
       .map(r => recordToUser(r));
+    if (singleEmail) members = members.filter(m => m.email.toLowerCase() === singleEmail.toLowerCase());
     if (!members.length) {
       res.setHeader('Content-Type', 'text/csv');
       return res.send('No team members found');

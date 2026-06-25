@@ -866,21 +866,23 @@ html { height: 100%; }
           <div id="sv-subtitle" style="font-size:13px;color:#6b7c8f;margin-top:3px;">Year-to-date team CPD</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-          <div style="display:flex;gap:8px;align-items:center;">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
             <div style="display:flex;border:1.5px solid #e8ecf0;border-radius:8px;overflow:hidden;">
               <button id="sv-view-card" onclick="setSvView('card')" style="padding:7px 13px;border:none;background:#003768;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⊞ Cards</button>
               <button id="sv-view-list" onclick="setSvView('list')" style="padding:7px 13px;border:none;background:#f5f7fa;color:#003768;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☰ List</button>
             </div>
-            <button id="sv-viewas-trigger" onclick="svToggleViewAsBar()" style="display:none;background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">View As</button>
+            <div style="display:flex;align-items:center;gap:5px;background:#f5f7fa;border:1.5px solid #e8ecf0;border-radius:8px;padding:4px 10px;">
+              <span style="font-size:11px;color:#6b7c8f;font-weight:600;">From</span>
+              <input id="sv-date-from" type="date" style="border:none;background:transparent;font-size:12px;font-family:inherit;color:#1a2a3a;outline:none;cursor:pointer;width:120px;">
+              <span style="font-size:11px;color:#6b7c8f;font-weight:600;">To</span>
+              <input id="sv-date-to" type="date" style="border:none;background:transparent;font-size:12px;font-family:inherit;color:#1a2a3a;outline:none;cursor:pointer;width:120px;">
+            </div>
             <button onclick="svExportCsv()" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">↓ Export CSV</button>
+            <button id="sv-viewas-trigger" onclick="svToggleViewAsBar()" style="display:none;background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">View As</button>
             <button onclick="loadSupervisorZone()" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">↻ Refresh</button>
           </div>
-          <!-- View As / date filter panel — right-aligned, drops below button row -->
+          <!-- View As panel — right-aligned, drops below button row -->
           <div id="sv-viewas-bar" style="display:none;align-items:center;gap:8px;background:#f5f7fa;border:1.5px solid #e8ecf0;border-radius:8px;padding:7px 12px;flex-wrap:wrap;">
-            <span style="font-size:11px;color:#6b7c8f;font-weight:600;white-space:nowrap;">From</span>
-            <input id="sv-date-from" type="date" style="border:1.5px solid #e8ecf0;border-radius:7px;padding:4px 8px;font-size:12px;font-family:inherit;background:#fff;color:#1a2a3a;outline:none;cursor:pointer;">
-            <span style="font-size:11px;color:#6b7c8f;font-weight:600;white-space:nowrap;">To</span>
-            <input id="sv-date-to" type="date" style="border:1.5px solid #e8ecf0;border-radius:7px;padding:4px 8px;font-size:12px;font-family:inherit;background:#fff;color:#1a2a3a;outline:none;cursor:pointer;">
             <div id="sv-viewas-wrap" style="display:none;align-items:center;gap:8px;">
               <span style="font-size:11px;color:#6b7c8f;font-weight:600;white-space:nowrap;">View as</span>
               <div style="position:relative;">
@@ -2088,7 +2090,7 @@ function switchTab(tab) {
   window.location.hash = tab;
   if (tab === 'learning')         loadLearningZone();
   if (tab === 'compliance')       { if (!_cpdLoaded) loadCpd(); }
-  if (tab === 'supervisor-zone')  loadSupervisorZone();
+  if (tab === 'supervisor-zone')  { svInitDates(); loadSupervisorZone(); }
 }
 
 // Hash routing — navigate on load (called directly, no event wrapper needed)
@@ -2708,16 +2710,7 @@ function setSvView(v) {
 
 function svToggleViewAsBar() {
   var bar = document.getElementById('sv-viewas-bar');
-  if (bar.style.display === 'none') {
-    // Set default dates if empty
-    var fromEl = document.getElementById('sv-date-from');
-    var toEl   = document.getElementById('sv-date-to');
-    if (!fromEl.value) fromEl.value = new Date().getFullYear() + '-01-01';
-    if (!toEl.value)   toEl.value   = new Date().toISOString().slice(0,10);
-    bar.style.display = 'flex';
-  } else {
-    bar.style.display = 'none';
-  }
+  bar.style.display = bar.style.display === 'none' ? 'flex' : 'none';
 }
 
 function svExportCsv() {
@@ -2728,6 +2721,26 @@ function svExportCsv() {
   var a = document.createElement('a');
   a.href = url;
   a.download = 'team-cpd-' + from + '-to-' + to + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function svInitDates() {
+  var fromEl = document.getElementById('sv-date-from');
+  var toEl   = document.getElementById('sv-date-to');
+  if (fromEl && !fromEl.value) fromEl.value = new Date().getFullYear() + '-01-01';
+  if (toEl   && !toEl.value)   toEl.value   = new Date().toISOString().slice(0,10);
+}
+
+function svExportAdviserCsv(email, name) {
+  var from = (document.getElementById('sv-date-from') || {}).value || (new Date().getFullYear() + '-01-01');
+  var to   = (document.getElementById('sv-date-to')   || {}).value || new Date().toISOString().slice(0,10);
+  var url  = '/api/supervisor/export-csv?from=' + from + '&to=' + to + '&email=' + encodeURIComponent(email);
+  var safe = name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = safe + '-cpd-' + from + '-to-' + to + '.csv';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -2891,6 +2904,7 @@ function renderSvDashboard(data) {
           '</div>' +
           '<div style="display:flex;gap:6px;align-items:center;">' +
             '<button onclick="svDrillDown(\'' + safeEmail + '\',\'' + drillId + '\')" style="font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#003768;cursor:pointer;font-family:inherit;">View ▾</button>' +
+            '<button onclick="svExportAdviserCsv(\'' + safeEmail + '\',\'' + safeName + '\')" style="font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#003768;cursor:pointer;font-family:inherit;">↓ CSV</button>' +
             '<button onclick="openSvTransfer(\'' + safeEmail + '\',\'' + safeName + '\')" style="font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;cursor:pointer;font-family:inherit;">Transfer →</button>' +
           '</div>' +
         '</div>' +
@@ -2927,6 +2941,7 @@ function renderSvDashboard(data) {
       '<span style="background:' + overall.bg + ';color:' + overall.tc + ';font-size:10px;font-weight:700;padding:3px 9px;border-radius:8px;white-space:nowrap;">' + overall.label + '</span>' +
       '<div style="display:flex;gap:6px;">' +
         '<button onclick="svDrillDown(\'' + safeEmail + '\',\'' + drillId + '\')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#003768;cursor:pointer;font-family:inherit;">View ▾</button>' +
+        '<button onclick="svExportAdviserCsv(\'' + safeEmail + '\',\'' + safeName + '\')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#003768;cursor:pointer;font-family:inherit;">↓ CSV</button>' +
         '<button onclick="openSvTransfer(\'' + safeEmail + '\',\'' + safeName + '\')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;cursor:pointer;font-family:inherit;">Transfer →</button>' +
       '</div>' +
     '</div>' +
