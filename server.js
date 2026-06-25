@@ -344,7 +344,18 @@ app.get('/api/supervisor/team', requireAuth, async (req, res) => {
         return u;
       });
 
-    if (!members.length) return res.json({ members: [], cpdByMember: {} });
+    if (!members.length) return res.json({
+      members: [], cpdByMember: {},
+      _debug: {
+        supervisorEmail,
+        totalRecords: (teamData.records || []).length,
+        fieldSamples: (teamData.records || []).map(r => ({
+          id: r.id,
+          supervisorEmailField: JSON.stringify(r.fields[F_SUPERVISOR_EMAIL]),
+          emailField: JSON.stringify(r.fields[F_EMAIL])
+        }))
+      }
+    });
 
     // 2. Fetch this year's CPD entries for all team members in one query
     const thisYear = new Date().getFullYear();
