@@ -1775,7 +1775,7 @@ function renderLvGrid(containerId, videos, isFeatured) {
 
   // Real video cards
   items.forEach(function(v) {
-    var thumb = makeLvThumb(v.title);
+    var thumb = makeLvThumb(v.title, v.added);
     cards.push(
       '<div onclick="openLvPlayer(\'' + escAttr(v.url) + '\',\'' + escAttr(v.title) + '\',\'' + escAttr(v.description) + '\')" style="cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform=\'translateY(-3px)\';this.style.boxShadow=\'0 6px 24px rgba(0,0,0,.16)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 2px 12px rgba(0,0,0,.1)\'">' +
         '<div style="position:relative;padding-bottom:56.25%;background:#fff;">' +
@@ -1798,7 +1798,7 @@ function renderLvGrid(containerId, videos, isFeatured) {
   var placeholders = slots - items.length;
   for (var i = 0; i < placeholders; i++) {
     var num = items.length + i + 1;
-    var phThumb = makeLvThumb('Video ' + num);
+    var phThumb = makeLvThumb('Video ' + num, null);
     cards.push(
       '<div style="border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);opacity:.45;">' +
         '<div style="position:relative;padding-bottom:56.25%;background:#fff;">' +
@@ -1825,32 +1825,45 @@ function getVideoThumb(url) {
   return '';
 }
 
-function makeLvThumb(title) {
+function makeLvThumb(title, added) {
   var w = 400, h = 225;
-  // Hero triangle formation — same as login page, scaled from 1920×1080
   var sc = w / 1920;
-  // Orange (smaller, corner)
-  var oA = (1445.242*sc).toFixed(2) + ',' + h;
-  var oB = w + ',' + h;
-  var oC = w + ',' + (605.242*sc).toFixed(2);
+  // Flip the hero formation to top-right: y_new = h - y_original * sc
+  // Orange (small corner triangle, top-right)
+  var oA = (1445.242*sc).toFixed(1) + ',0';
+  var oB = w + ',0';
+  var oC = w + ',' + (h - 605.242*sc).toFixed(1);
   // Blue (larger, overlapping)
-  var bA = (966.332*sc).toFixed(2) + ',' + h;
-  var bB = w + ',' + h;
-  var bC = (1443.09*sc).toFixed(2) + ',' + (603.242*sc).toFixed(2);
+  var bA = (966.332*sc).toFixed(1) + ',0';
+  var bB = w + ',0';
+  var bC = (1443.09*sc).toFixed(1) + ',' + (h - 603.242*sc).toFixed(1);
 
-  // Wrap title
+  // Format date
+  var dateStr = '';
+  if (added) {
+    var d = new Date(added);
+    if (!isNaN(d)) {
+      dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+  }
+
+  // Wrap title at ~24 chars per line
   var words = (title || '').split(' ');
   var lines = [], cur = '';
   words.forEach(function(word) {
-    if ((cur + ' ' + word).trim().length > 26 && cur) { lines.push(cur.trim()); cur = word; }
+    if ((cur + ' ' + word).trim().length > 24 && cur) { lines.push(cur.trim()); cur = word; }
     else cur = (cur + ' ' + word).trim();
   });
   if (cur) lines.push(cur);
   lines = lines.slice(0, 3);
 
-  var lineH = 24, startY = 118 - ((lines.length - 1) * lineH) / 2;
+  var lineH = 22;
+  var titleY = h - 22 - (lines.length - 1) * lineH - (dateStr ? 22 : 0);
+  var dateEl = dateStr
+    ? '<text x="22" y="' + (titleY - 8) + '" font-family="\'Plus Jakarta Sans\', sans-serif" font-weight="600" font-size="11" fill="#6b7c8f" letter-spacing="0.3">' + dateStr + '</text>'
+    : '';
   var textEls = lines.map(function(l, i) {
-    return '<text x="28" y="' + (startY + i * lineH) + '" font-family="\'Plus Jakarta Sans\', sans-serif" font-weight="800" font-size="17" fill="#003768">' +
+    return '<text x="22" y="' + (titleY + i * lineH) + '" font-family="\'Plus Jakarta Sans\', sans-serif" font-weight="800" font-size="15" fill="#003768">' +
       l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') +
     '</text>';
   }).join('');
@@ -1859,6 +1872,7 @@ function makeLvThumb(title) {
     '<rect width="' + w + '" height="' + h + '" fill="#ffffff"/>' +
     '<polygon points="' + oA + ' ' + oB + ' ' + oC + '" fill="#fcb034"/>' +
     '<polygon points="' + bA + ' ' + bB + ' ' + bC + '" fill="#003768"/>' +
+    dateEl +
     textEls +
   '</svg>';
 
