@@ -26,7 +26,12 @@ const F_TITLE     = 'flddJxQNvOYVOAud7';
 const F_MOBILE    = 'fldtBa4TSYjbE3nDY';
 const F_LANDLINE  = 'fldpF1q0oD0Hhastr';
 const F_WEBSITE   = 'fld31BHXAjONR2GGR';
-const F_ADMIN     = 'fldX7dyR6P45kAXqU';
+const F_ADMIN          = 'fldX7dyR6P45kAXqU';
+const F_MORTGAGES      = 'fldSYyjEeiQYqSl3b';
+const F_PROTECTION     = 'fldpLRcjuGeL1muYF';
+const F_INVESTMENTS    = 'fld7C7E8seECPWbNh';
+const F_IS_SUPERVISOR  = 'fldhOYcUHF3SrnC5C';
+const F_SUPERVISOR_EMAIL = 'fldvyCzxvpIEjD7PU';
 
 async function atFetch(endpoint, options = {}) {
   const url = `https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}${endpoint}`;
@@ -51,7 +56,12 @@ function recordToUser(record) {
     mobile:    f[F_MOBILE]   || '',
     landline:  f[F_LANDLINE] || '',
     website:   f[F_WEBSITE]  || '',
-    isAdmin:   f[F_ADMIN]    || false
+    isAdmin:          f[F_ADMIN]       || false,
+    sellsMortgages:   f[F_MORTGAGES]        || false,
+    sellsProtection:  f[F_PROTECTION]       || false,
+    sellsInvestments: f[F_INVESTMENTS]      || false,
+    isSupervisor:     f[F_IS_SUPERVISOR]    || false,
+    supervisorEmail:  f[F_SUPERVISOR_EMAIL] || ''
   };
 }
 
@@ -74,6 +84,11 @@ function requireAuth(req, res, next) {
 
 function requireAdmin(req, res, next) {
   if (req.session.authenticated && req.session.user && req.session.user.isAdmin) return next();
+  res.status(403).json({ error: 'Forbidden' });
+}
+
+function requireSupervisor(req, res, next) {
+  if (req.session.authenticated && req.session.user && req.session.user.isSupervisor) return next();
   res.status(403).json({ error: 'Forbidden' });
 }
 
@@ -140,21 +155,26 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
 
 // ── Admin: create user ────────────────────────────────────────
 app.post('/api/admin/users', requireAdmin, async (req, res) => {
-  const { email, password, salutation, firstName, lastName, jobTitle, mobile, landline, website, isAdmin } = req.body;
+  const { email, password, salutation, firstName, lastName, jobTitle, mobile, landline, website, isAdmin, sellsMortgages, sellsProtection, sellsInvestments, isSupervisor, supervisorEmail } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
   try {
     const hash = bcrypt.hashSync(password, 10);
     const fields = {
-      [F_EMAIL]: email.trim().toLowerCase(),
-      [F_PASSWORD]: hash,
-      [F_SAL]:      salutation  || '',
-      [F_FIRST]:    firstName   || '',
-      [F_LAST]:     lastName    || '',
-      [F_TITLE]:    jobTitle    || '',
-      [F_MOBILE]:   mobile      || '',
-      [F_LANDLINE]: landline    || '',
-      [F_WEBSITE]:  website     || '',
-      [F_ADMIN]:    isAdmin === true || isAdmin === 'true'
+      [F_EMAIL]:       email.trim().toLowerCase(),
+      [F_PASSWORD]:    hash,
+      [F_SAL]:         salutation  || '',
+      [F_FIRST]:       firstName   || '',
+      [F_LAST]:        lastName    || '',
+      [F_TITLE]:       jobTitle    || '',
+      [F_MOBILE]:      mobile      || '',
+      [F_LANDLINE]:    landline    || '',
+      [F_WEBSITE]:     website     || null,
+      [F_ADMIN]:            isAdmin      === true || isAdmin      === 'true',
+      [F_MORTGAGES]:        sellsMortgages   === true || sellsMortgages   === 'true',
+      [F_PROTECTION]:       sellsProtection  === true || sellsProtection  === 'true',
+      [F_INVESTMENTS]:      sellsInvestments === true || sellsInvestments === 'true',
+      [F_IS_SUPERVISOR]:    isSupervisor === true || isSupervisor === 'true',
+      [F_SUPERVISOR_EMAIL]: supervisorEmail  || null
     };
     const data = await atFetch('', {
       method: 'POST',
@@ -169,17 +189,22 @@ app.post('/api/admin/users', requireAdmin, async (req, res) => {
 // ── Admin: update user ────────────────────────────────────────
 app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const { password, salutation, firstName, lastName, jobTitle, mobile, landline, website, isAdmin } = req.body;
+  const { password, salutation, firstName, lastName, jobTitle, mobile, landline, website, isAdmin, sellsMortgages, sellsProtection, sellsInvestments, isSupervisor, supervisorEmail } = req.body;
   try {
     const fields = {
-      [F_SAL]:      salutation  || '',
-      [F_FIRST]:    firstName   || '',
-      [F_LAST]:     lastName    || '',
-      [F_TITLE]:    jobTitle    || '',
-      [F_MOBILE]:   mobile      || '',
-      [F_LANDLINE]: landline    || '',
-      [F_WEBSITE]:  website     || '',
-      [F_ADMIN]:    isAdmin === true || isAdmin === 'true'
+      [F_SAL]:              salutation  || '',
+      [F_FIRST]:            firstName   || '',
+      [F_LAST]:             lastName    || '',
+      [F_TITLE]:            jobTitle    || '',
+      [F_MOBILE]:           mobile      || '',
+      [F_LANDLINE]:         landline    || '',
+      [F_WEBSITE]:          website     || null,
+      [F_ADMIN]:            isAdmin      === true || isAdmin      === 'true',
+      [F_MORTGAGES]:        sellsMortgages   === true || sellsMortgages   === 'true',
+      [F_PROTECTION]:       sellsProtection  === true || sellsProtection  === 'true',
+      [F_INVESTMENTS]:      sellsInvestments === true || sellsInvestments === 'true',
+      [F_IS_SUPERVISOR]:    isSupervisor === true || isSupervisor === 'true',
+      [F_SUPERVISOR_EMAIL]: supervisorEmail  || null
     };
     if (password) fields[F_PASSWORD] = bcrypt.hashSync(password, 10);
     const data = await atFetch(`/${id}`, {
@@ -197,6 +222,46 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
   try {
     await atFetch(`/${req.params.id}`, { method: 'DELETE' });
     res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Supervisor: team CPD dashboard ───────────────────────────
+app.get('/api/supervisor/team', requireSupervisor, async (req, res) => {
+  const supervisorEmail = req.session.user.email;
+  try {
+    // 1. Get team members (users whose Supervisor Email = this supervisor)
+    const formula = encodeURIComponent(`{Supervisor Email}="${supervisorEmail}"`);
+    const teamData = await atFetch(`?filterByFormula=${formula}&returnFieldsByFieldId=true&pageSize=100`);
+    const members = (teamData.records || []).map(r => {
+      const u = recordToUser(r);
+      u.hasPassword = !!r.fields[F_PASSWORD];
+      return u;
+    });
+
+    if (!members.length) return res.json({ members: [], cpdByMember: {} });
+
+    // 2. Fetch this year's CPD entries for all team members in one query
+    const thisYear = new Date().getFullYear();
+    const startOfYear = `${thisYear}-01-01`;
+    const emails = members.map(m => `{User Email}="${m.email}"`).join(',');
+    const cpdFormula = encodeURIComponent(`AND(OR(${emails}),IS_AFTER({Date},"${startOfYear}"))`);
+    const cpdData = await cpdFetch(`?filterByFormula=${cpdFormula}&returnFieldsByFieldId=true&pageSize=1000`);
+    const allEntries = (cpdData.records || []).map(cpdRecordToEntry);
+
+    // 3. Aggregate per member per CPD type
+    const cpdByMember = {};
+    members.forEach(m => { cpdByMember[m.email] = { Investment: 0, Mortgage: 0, Protection: 0, total: 0 }; });
+    allEntries.forEach(e => {
+      if (!cpdByMember[e.email]) return;
+      cpdByMember[e.email].total += e.minutes || 0;
+      if (e.cpdType && cpdByMember[e.email][e.cpdType] !== undefined) {
+        cpdByMember[e.email][e.cpdType] += e.minutes || 0;
+      }
+    });
+
+    res.json({ members, cpdByMember, targets: CPD_TARGETS });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -291,7 +356,9 @@ const CPD_MINUTES  = 'fldr6SXrwR1TYnqf8';
 const CPD_CATEGORY = 'fldX8oYvUMtCdsXSD';
 const CPD_SOURCE   = 'fldSjdFlkizyQVNzP';
 const CPD_VTITLE   = 'fldXmHRWv246Wb5FF';
-const CPD_TARGET_MINS = (process.env.CPD_TARGET_HOURS || 35) * 60; // default 35 hrs
+const CPD_TYPE     = 'fldRi9wWzALjvvzu1';
+// Per-product CPD targets in minutes: Investment 35hrs, Mortgage 15hrs, Protection 15hrs
+const CPD_TARGETS  = { Investment: 2100, Mortgage: 900, Protection: 900 };
 
 async function cpdFetch(endpoint, options = {}) {
   const url = `https://api.airtable.com/v0/${AT_BASE}/${CPD_TABLE}${endpoint}`;
@@ -308,12 +375,14 @@ function cpdRecordToEntry(record) {
   const f = record.fields;
   return {
     id:         record.id,
+    email:      f[CPD_EMAIL]     || '',
     activity:   f[CPD_ACTIVITY]  || '',
     date:       f[CPD_DATE]      || '',
     minutes:    f[CPD_MINUTES]   || 0,
     category:   f[CPD_CATEGORY]  || '',
     source:     f[CPD_SOURCE]    || '',
-    videoTitle: f[CPD_VTITLE]    || ''
+    videoTitle: f[CPD_VTITLE]    || '',
+    cpdType:    f[CPD_TYPE]      || ''
   };
 }
 
@@ -325,12 +394,15 @@ app.get('/api/cpd', requireAuth, async (req, res) => {
     const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=100`);
     const entries = (data.records || []).map(cpdRecordToEntry);
     const totalMins = entries.reduce((sum, e) => sum + (e.minutes || 0), 0);
-    // Year-to-date total
+    // Year-to-date totals — overall and per CPD type
     const thisYear = new Date().getFullYear();
-    const ytdMins = entries
-      .filter(e => e.date && new Date(e.date).getFullYear() === thisYear)
-      .reduce((sum, e) => sum + (e.minutes || 0), 0);
-    res.json({ entries, totalMins, ytdMins, targetMins: CPD_TARGET_MINS });
+    const ytdEntries = entries.filter(e => e.date && new Date(e.date).getFullYear() === thisYear);
+    const ytdMins = ytdEntries.reduce((sum, e) => sum + (e.minutes || 0), 0);
+    const byType = { Investment: 0, Mortgage: 0, Protection: 0 };
+    ytdEntries.forEach(e => {
+      if (e.cpdType && byType[e.cpdType] !== undefined) byType[e.cpdType] += e.minutes || 0;
+    });
+    res.json({ entries, totalMins, ytdMins, byType, targets: CPD_TARGETS });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -338,7 +410,7 @@ app.get('/api/cpd', requireAuth, async (req, res) => {
 
 // POST /api/cpd — manual entry
 app.post('/api/cpd', requireAuth, async (req, res) => {
-  const { activity, date, minutes, category } = req.body;
+  const { activity, date, minutes, category, cpdType } = req.body;
   if (!activity || !date || !minutes) return res.status(400).json({ error: 'Activity, date and minutes required' });
   try {
     const data = await cpdFetch('', {
@@ -349,7 +421,8 @@ app.post('/api/cpd', requireAuth, async (req, res) => {
         [CPD_DATE]:     date,
         [CPD_MINUTES]:  parseInt(minutes, 10),
         [CPD_CATEGORY]: category || 'Other',
-        [CPD_SOURCE]:   'Manual'
+        [CPD_SOURCE]:   'Manual',
+        [CPD_TYPE]:     cpdType || 'Mortgage'
       }}], returnFieldsByFieldId: true })
     });
     res.json(cpdRecordToEntry(data.records[0]));
@@ -360,7 +433,7 @@ app.post('/api/cpd', requireAuth, async (req, res) => {
 
 // POST /api/cpd/video — auto-log a Learning Zone video
 app.post('/api/cpd/video', requireAuth, async (req, res) => {
-  const { videoTitle } = req.body;
+  const { videoTitle, cpdType } = req.body;
   try {
     const today = new Date().toISOString().split('T')[0];
     const data = await cpdFetch('', {
@@ -372,7 +445,8 @@ app.post('/api/cpd/video', requireAuth, async (req, res) => {
         [CPD_MINUTES]:  60,
         [CPD_CATEGORY]: 'Technical Knowledge',
         [CPD_SOURCE]:   'Learning Zone',
-        [CPD_VTITLE]:   videoTitle || ''
+        [CPD_VTITLE]:   videoTitle || '',
+        [CPD_TYPE]:     cpdType || 'Mortgage'
       }}], returnFieldsByFieldId: true })
     });
     res.json(cpdRecordToEntry(data.records[0]));
