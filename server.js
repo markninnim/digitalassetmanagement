@@ -556,6 +556,9 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     entries.forEach(e => { if (e.cpdType && byType[e.cpdType] !== undefined) byType[e.cpdType] += e.minutes || 0; });
     const targets = CPD_TARGETS;
 
+    const user = req.session.user;
+    const userName = ((user.firstName || '') + ' ' + (user.lastName || '')).trim() || email;
+
     // Load fonts and logo
     const fontBoldBytes = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-ExtraBold.ttf'));
     const fontMedBytes  = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-Medium.ttf'));
@@ -593,8 +596,6 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     const fmtMin = m => { const h = Math.floor(m/60), mn = m%60; return h > 0 ? (h + 'h' + (mn > 0 ? ' ' + mn + 'm' : '')) : (mn + 'm'); };
     const periodTarget = (annual, p) => p === 'month' ? Math.round(annual/12) : p === 'quarter' ? Math.round(annual/4) : annual;
     const periodLabel = period === 'month' ? 'This Month' : period === 'quarter' ? 'This Quarter' : 'This Year';
-    const user = req.session.user;
-    const userName = ((user.firstName || '') + ' ' + (user.lastName || '')).trim() || email;
     const dateStr = now.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
 
     // ── Page background ────────────────────────────────────────
