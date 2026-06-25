@@ -404,13 +404,20 @@ app.put('/api/supervisor/transfer', requireAuth, async (req, res) => {
 
 // ── Supervisor: team CPD dashboard ────────────────────────────
 app.get('/api/supervisor/team', requireAuth, async (req, res) => {
-  // Allow admins/supervisors to view as another supervisor via ?as=email
+  const isAdmin = req.session.user.isAdmin;
+  // ?as=all → whole company (admin only); ?as=email → specific supervisor
   let supervisorEmail = req.session.user.email;
-  if (req.query.as && (req.session.user.isAdmin || req.session.user.isSupervisor)) {
+  let viewAll = false;
+  if (req.query.as === 'all' && isAdmin) {
+    viewAll = true;
+  } else if (req.query.as && (isAdmin || req.session.user.isSupervisor)) {
     supervisorEmail = req.query.as;
+  } else if (isAdmin && !req.query.as) {
+    // Admins default to whole-company view
+    viewAll = true;
   }
   try {
-    // 1. Get team members — paginate through all users, filter by supervisor email
+    // 1. Get team members — paginate through all users
     const allRecords = [];
     let teamOffset = '';
     do {
@@ -420,7 +427,10 @@ app.get('/api/supervisor/team', requireAuth, async (req, res) => {
       teamOffset = page.offset || '';
     } while (teamOffset);
     const members = allRecords
-      .filter(r => (r.fields[F_SUPERVISOR_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase())
+      .filter(r => {
+        if (viewAll) return !r.fields[F_IS_SUPERVISOR] && !r.fields[F_ADMIN]; // advisers only
+        return (r.fields[F_SUPERVISOR_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase();
+      })
       .map(r => {
         const u = recordToUser(r);
         u.hasPassword = !!r.fields[F_PASSWORD];
