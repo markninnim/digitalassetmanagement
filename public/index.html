@@ -907,14 +907,12 @@ html { height: 100%; }
         <iframe id="lv-iframe" src="" allow="autoplay;encrypted-media;fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
       </div>
       <!-- CPD strip below video -->
-      <div style="margin-top:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-        <span style="color:rgba(255,255,255,.7);font-size:13px;font-weight:600;white-space:nowrap;">Log 1hr CPD as:</span>
-        <div style="display:flex;gap:6px;">
-          <button id="lv-cpd-mortgage" onclick="selectLvCpdType('Mortgage')" style="padding:5px 13px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:#2e99d5;color:#fff;border:2px solid #2e99d5;">Mortgage</button>
-          <button id="lv-cpd-protection" onclick="selectLvCpdType('Protection')" style="padding:5px 13px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:2px solid transparent;">Protection</button>
+      <div style="margin-top:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;">
+        <div style="color:rgba(255,255,255,.55);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Log CPD for this video</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="lv-cpd-mortgage" onclick="logLvCpdType('Mortgage')" style="flex:1;min-width:160px;padding:9px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:not-allowed;font-family:inherit;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);border:1.5px solid rgba(255,255,255,.12);transition:all .2s;">Auto submit available in 30 mins</button>
+          <button id="lv-cpd-protection" onclick="logLvCpdType('Protection')" style="flex:1;min-width:160px;padding:9px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:not-allowed;font-family:inherit;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);border:1.5px solid rgba(255,255,255,.12);transition:all .2s;">Auto submit available in 30 mins</button>
         </div>
-        <button id="lv-cpd-log-btn" onclick="logLvCpd()" style="margin-left:auto;background:#fcb034;color:#003768;border:none;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">+ Log CPD</button>
-        <span id="lv-cpd-status" style="font-size:12px;color:#22c55e;display:none;"></span>
       </div>
     </div>
 
@@ -932,13 +930,11 @@ html { height: 100%; }
             <div id="lv-split-desc" style="color:rgba(255,255,255,.6);font-size:13px;line-height:1.6;"></div>
           </div>
           <div style="border-top:1px solid rgba(255,255,255,.12);padding-top:16px;margin-top:auto;">
-            <div style="color:rgba(255,255,255,.7);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Log 1hr CPD</div>
-            <div style="display:flex;gap:6px;margin-bottom:12px;">
-              <button id="lv-cpd-mortgage-s" onclick="selectLvCpdType('Mortgage')" style="flex:1;padding:8px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:#2e99d5;color:#fff;border:2px solid #2e99d5;">Mortgage</button>
-              <button id="lv-cpd-protection-s" onclick="selectLvCpdType('Protection')" style="flex:1;padding:8px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:2px solid transparent;">Protection</button>
+            <div style="color:rgba(255,255,255,.55);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Log CPD for this video</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <button id="lv-cpd-mortgage-s" onclick="logLvCpdType('Mortgage')" style="width:100%;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:not-allowed;font-family:inherit;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);border:1.5px solid rgba(255,255,255,.12);transition:all .2s;">Auto submit available in 30 mins</button>
+              <button id="lv-cpd-protection-s" onclick="logLvCpdType('Protection')" style="width:100%;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:not-allowed;font-family:inherit;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4);border:1.5px solid rgba(255,255,255,.12);transition:all .2s;">Auto submit available in 30 mins</button>
             </div>
-            <button id="lv-cpd-log-btn-s" onclick="logLvCpd()" style="width:100%;background:#fcb034;color:#003768;border:none;padding:9px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">+ Log CPD</button>
-            <div id="lv-cpd-status-s" style="font-size:12px;color:#22c55e;margin-top:8px;text-align:center;display:none;"></div>
           </div>
         </div>
       </div>
@@ -2093,13 +2089,57 @@ function escAttr(s) {
   return String(s || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
 }
 
-var _lvCpdType = 'Mortgage';
 var _lvCurrentTitle = '';
 var _lvSplit = false;
 var _lvTimerInterval = null;
 var _lvTimerSeconds = 0;
-var _lvCpdReady = false;
-var CPD_UNLOCK_SECS = 50 * 60; // 50 minutes
+var _lvCpdUnlocked = false;
+var _lvMortgageLogged = false;
+var _lvProtectionLogged = false;
+var CPD_UNLOCK_SECS = 30 * 60; // 30 minutes
+
+// Button ID pairs: [full-layout, split-layout]
+var LV_BTN_MORTGAGE  = ['lv-cpd-mortgage',   'lv-cpd-mortgage-s'];
+var LV_BTN_PROTECTION= ['lv-cpd-protection',  'lv-cpd-protection-s'];
+
+function _lvSetBtnState(ids, state, label) {
+  // state: 'locked' | 'ready' | 'logging' | 'done'
+  ids.forEach(function(id) {
+    var b = document.getElementById(id);
+    if (!b) return;
+    var s = b.style;
+    if (state === 'locked') {
+      b.disabled = true;
+      s.background = 'rgba(255,255,255,.08)';
+      s.color = 'rgba(255,255,255,.4)';
+      s.border = '1.5px solid rgba(255,255,255,.12)';
+      s.cursor = 'not-allowed';
+      s.opacity = '1';
+    } else if (state === 'ready') {
+      b.disabled = false;
+      s.background = '#fcb034';
+      s.color = '#003768';
+      s.border = '1.5px solid #fcb034';
+      s.cursor = 'pointer';
+      s.opacity = '1';
+    } else if (state === 'logging') {
+      b.disabled = true;
+      s.background = 'rgba(255,255,255,.08)';
+      s.color = 'rgba(255,255,255,.4)';
+      s.border = '1.5px solid rgba(255,255,255,.12)';
+      s.cursor = 'not-allowed';
+      s.opacity = '1';
+    } else if (state === 'done') {
+      b.disabled = true;
+      s.background = 'rgba(34,197,94,.18)';
+      s.color = '#22c55e';
+      s.border = '1.5px solid rgba(34,197,94,.4)';
+      s.cursor = 'default';
+      s.opacity = '1';
+    }
+    if (label) b.textContent = label;
+  });
+}
 
 function openLvPlayer(url, title, desc) {
   _lvCurrentTitle = title || 'Learning Zone video';
@@ -2110,44 +2150,31 @@ function openLvPlayer(url, title, desc) {
   document.getElementById('lv-split-title').textContent  = title || '';
   document.getElementById('lv-split-desc').textContent   = desc  || '';
   document.getElementById('lv-player-modal').style.display = 'flex';
-  // Reset CPD strip
-  _lvCpdType = 'Mortgage';
-  selectLvCpdType('Mortgage');
-  ['lv-cpd-status','lv-cpd-status-s'].forEach(function(id){ document.getElementById(id).style.display='none'; });
-  // Start locked — 50-minute timer
-  _lvCpdReady = false;
+  // Reset state
+  _lvCpdUnlocked = false;
+  _lvMortgageLogged = false;
+  _lvProtectionLogged = false;
   _lvTimerSeconds = 0;
   clearInterval(_lvTimerInterval);
-  setLvBtnLocked(true);
+  // Set both buttons to locked with initial countdown label
+  _lvSetBtnState(LV_BTN_MORTGAGE,   'locked', 'Auto submit available in 30 mins');
+  _lvSetBtnState(LV_BTN_PROTECTION, 'locked', 'Auto submit available in 30 mins');
+  // Countdown timer
   _lvTimerInterval = setInterval(function() {
     _lvTimerSeconds++;
     var remaining = Math.max(0, CPD_UNLOCK_SECS - _lvTimerSeconds);
-    var m = Math.floor(remaining / 60);
-    var s = remaining % 60;
-    var label = 'Available in ' + m + ':' + (s < 10 ? '0' : '') + s;
-    if (remaining <= 0 && !_lvCpdReady) {
-      _lvCpdReady = true;
+    var m = Math.ceil(remaining / 60);
+    if (remaining <= 0 && !_lvCpdUnlocked) {
+      _lvCpdUnlocked = true;
       clearInterval(_lvTimerInterval);
-      setLvBtnLocked(false);
-    } else if (!_lvCpdReady) {
-      ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){
-        var b = document.getElementById(id);
-        if (b) b.textContent = label;
-      });
+      if (!_lvMortgageLogged)  _lvSetBtnState(LV_BTN_MORTGAGE,   'ready', 'Log Mortgage CPD');
+      if (!_lvProtectionLogged) _lvSetBtnState(LV_BTN_PROTECTION, 'ready', 'Log Protection CPD');
+    } else if (!_lvCpdUnlocked) {
+      var label = 'Auto submit available in ' + m + ' min' + (m !== 1 ? 's' : '');
+      if (!_lvMortgageLogged)   _lvSetBtnState(LV_BTN_MORTGAGE,   'locked', label);
+      if (!_lvProtectionLogged) _lvSetBtnState(LV_BTN_PROTECTION, 'locked', label);
     }
   }, 1000);
-}
-
-function setLvBtnLocked(locked) {
-  var lockedStyle = 'background:#4a5568;color:#9ca3af;border:none;cursor:not-allowed;opacity:.7;';
-  var readyStyle  = 'background:#fcb034;color:#003768;border:none;cursor:pointer;opacity:1;';
-  ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id) {
-    var b = document.getElementById(id);
-    if (!b) return;
-    b.disabled = locked;
-    b.style.cssText += locked ? lockedStyle : readyStyle;
-    if (!locked) b.textContent = '+ Log CPD';
-  });
 }
 
 function toggleLvSplit() {
@@ -2178,42 +2205,27 @@ function toggleLvSplit() {
   }
 }
 
-function selectLvCpdType(type) {
-  _lvCpdType = type;
-  var on  = 'background:#2e99d5;color:#fff;border:2px solid #2e99d5;';
-  var off = 'background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:2px solid transparent;';
-  // Full layout buttons
-  var mEl = document.getElementById('lv-cpd-mortgage');
-  var pEl = document.getElementById('lv-cpd-protection');
-  if (mEl) mEl.style.cssText += type==='Mortgage' ? on : off;
-  if (pEl) pEl.style.cssText += type==='Protection' ? on : off;
-  // Split layout buttons
-  var mEs = document.getElementById('lv-cpd-mortgage-s');
-  var pEs = document.getElementById('lv-cpd-protection-s');
-  if (mEs) mEs.style.cssText += type==='Mortgage' ? on : off;
-  if (pEs) pEs.style.cssText += type==='Protection' ? on : off;
-}
-
-function logLvCpd() {
-  if (!_lvCpdReady) return;
-  var btn    = _lvSplit ? document.getElementById('lv-cpd-log-btn-s') : document.getElementById('lv-cpd-log-btn');
-  var status = _lvSplit ? document.getElementById('lv-cpd-status-s')  : document.getElementById('lv-cpd-status');
-  // Also disable both buttons to prevent double-logging
-  ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.disabled=true; b.textContent='Logging…'; } });
+function logLvCpdType(type) {
+  if (!_lvCpdUnlocked) return;
+  if (type === 'Mortgage'   && _lvMortgageLogged)   return;
+  if (type === 'Protection' && _lvProtectionLogged)  return;
+  var ids = type === 'Mortgage' ? LV_BTN_MORTGAGE : LV_BTN_PROTECTION;
+  _lvSetBtnState(ids, 'logging', 'Logging…');
   fetch('/api/cpd/video', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ videoTitle: _lvCurrentTitle, cpdType: _lvCpdType })
+    body: JSON.stringify({ videoTitle: _lvCurrentTitle, cpdType: type })
   }).then(function(r) {
     if (r.ok) {
-      ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.textContent='✓ Logged'; } });
-      ['lv-cpd-status','lv-cpd-status-s'].forEach(function(id){ var s=document.getElementById(id); if(s){ s.textContent='✓ 1hr '+_lvCpdType+' CPD logged'; s.style.display='inline'; } });
+      if (type === 'Mortgage')   _lvMortgageLogged   = true;
+      if (type === 'Protection') _lvProtectionLogged  = true;
+      _lvSetBtnState(ids, 'done', '✓ ' + type + ' CPD Logged');
       _cpdLoaded = false;
     } else {
-      ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.disabled=false; b.textContent='+ Log CPD'; } });
+      _lvSetBtnState(ids, 'ready', 'Log ' + type + ' CPD');
     }
   }).catch(function() {
-    ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.disabled=false; b.textContent='+ Log CPD'; } });
+    _lvSetBtnState(ids, 'ready', 'Log ' + type + ' CPD');
   });
 }
 
