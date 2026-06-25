@@ -1826,48 +1826,40 @@ function getVideoThumb(url) {
 }
 
 function makeLvThumb(title) {
-  // Branded white card: FPG triangles top-right, title in Plus Jakarta Sans
   var w = 400, h = 225;
-  // Triangle coords scaled from 1920×1080 brand asset
+  // Hero triangle formation — same as login page, scaled from 1920×1080
   var sc = w / 1920;
-  var p1 = { x: 1445.242*sc, y: h };  // orange: bottom-left of triangle
-  var p2 = { x: w,           y: h };
-  var p3 = { x: w,           y: 605.242*sc };
-  var p4 = { x: 966.332*sc,  y: h };
-  var p5 = { x: w,           y: h };
-  var p6 = { x: 1443.09*sc,  y: 603.242*sc };
+  // Orange (smaller, corner)
+  var oA = (1445.242*sc).toFixed(2) + ',' + h;
+  var oB = w + ',' + h;
+  var oC = w + ',' + (605.242*sc).toFixed(2);
+  // Blue (larger, overlapping)
+  var bA = (966.332*sc).toFixed(2) + ',' + h;
+  var bB = w + ',' + h;
+  var bC = (1443.09*sc).toFixed(2) + ',' + (603.242*sc).toFixed(2);
 
-  // Wrap title at ~28 chars
+  // Wrap title
   var words = (title || '').split(' ');
   var lines = [], cur = '';
-  words.forEach(function(w2) {
-    if ((cur + ' ' + w2).trim().length > 28 && cur) { lines.push(cur.trim()); cur = w2; }
-    else cur = (cur + ' ' + w2).trim();
+  words.forEach(function(word) {
+    if ((cur + ' ' + word).trim().length > 26 && cur) { lines.push(cur.trim()); cur = word; }
+    else cur = (cur + ' ' + word).trim();
   });
   if (cur) lines.push(cur);
   lines = lines.slice(0, 3);
 
-  var lineH = 22, startY = 148 - ((lines.length - 1) * lineH) / 2;
+  var lineH = 24, startY = 118 - ((lines.length - 1) * lineH) / 2;
   var textEls = lines.map(function(l, i) {
-    return '<text x="28" y="' + (startY + i * lineH) + '" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="16" fill="#003768">' + l.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</text>';
+    return '<text x="28" y="' + (startY + i * lineH) + '" font-family="\'Plus Jakarta Sans\', sans-serif" font-weight="800" font-size="17" fill="#003768">' +
+      l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') +
+    '</text>';
   }).join('');
 
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' +
     '<rect width="' + w + '" height="' + h + '" fill="#ffffff"/>' +
-    // Orange triangle
-    '<polygon points="' + p1.x+','+p1.y+' '+p2.x+','+p2.y+' '+p3.x+','+p3.y + '" fill="#fcb034"/>' +
-    // Blue triangle
-    '<polygon points="' + p4.x+','+p4.y+' '+p5.x+','+p5.y+' '+p6.x+','+p6.y + '" fill="#003768"/>' +
-    // Subtle top border
-    '<rect width="' + w + '" height="4" fill="#003768"/>' +
-    // FPG label
-    '<text x="28" y="36" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="13" fill="#003768" letter-spacing="2">FPG</text>' +
-    // Play icon circle
-    '<circle cx="28+12" cy="' + (h-32) + '" r="0" fill="none"/>' +
+    '<polygon points="' + oA + ' ' + oB + ' ' + oC + '" fill="#fcb034"/>' +
+    '<polygon points="' + bA + ' ' + bB + ' ' + bC + '" fill="#003768"/>' +
     textEls +
-    // Small play hint bottom-left
-    '<circle cx="' + (w-48) + '" cy="' + (h-38) + '" r="14" fill="#003768" opacity=".08"/>' +
-    '<polygon points="' + (w-52)+','+(h-44)+' '+(w-38)+','+(h-38)+' '+(w-52)+','+(h-32) + '" fill="#003768" opacity=".25"/>' +
   '</svg>';
 
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
