@@ -494,7 +494,7 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
     const qrSize = 130;
     const qrX = (420 - qrSize) / 2;   // centred in left half (~420pt wide)
     const qrY = 145;
-    scanPage.drawRectangle({ x: 55, y: 130, width: 210, height: 175, color: rgb(1,1,1) });
+    scanPage.drawRectangle({ x: 55, y: 130, width: 210, height: 158, color: rgb(1,1,1) });
     scanPage.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
 
     // ── Broker logo above scan text ───────────────────────────────
