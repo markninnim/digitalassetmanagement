@@ -3617,9 +3617,10 @@ async function confirmImport() {
     });
     var result = await res.json();
     barEl.style.width = '100%';
+    var firstErr = result.errors && result.errors.length ? ' — ' + JSON.stringify(result.errors[0]) : '';
     textEl.textContent = result.created + ' imported' +
       (result.skipped  ? ', ' + result.skipped  + ' skipped' : '') +
-      (result.errors && result.errors.length ? ', ' + result.errors.length + ' errors' : '') + '.';
+      (result.errors && result.errors.length ? ', ' + result.errors.length + ' errors' + firstErr : '') + '.';
   } catch(e) {
     textEl.textContent = 'Import failed: ' + e.message;
   }
