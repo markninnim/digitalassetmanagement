@@ -489,13 +489,29 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
     const qrImage = await pdfDoc.embedPng(qrPngBuffer);
 
     // Place QR on page 0 (index 0) — under "Scan for more great mortgage and protection advice."
-    // Text ends at y≈307. Cover existing FPG QR then draw personalised one centred in left panel.
     const scanPage = pdfDoc.getPages()[0];
     const qrSize = 130;
     const qrX = (420 - qrSize) / 2;   // centred in left half (~420pt wide)
-    const qrY = 159;                   // equalised gap below scan text (~18pt)
+    const qrY = 159;
     scanPage.drawRectangle({ x: 55, y: 130, width: 210, height: 162, color: rgb(1,1,1) });
     scanPage.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
+
+    // Cover original scan text and redraw at smaller size
+    // Original: 18pt ExtraBold, two lines centred at x≈210, y centre ≈319.83 (PDF coords)
+    scanPage.drawRectangle({ x: 38, y: 295, width: 345, height: 52, color: rgb(1,1,1) });
+    const scanFontSize = 13;
+    const scanLine1 = 'Scan for more great mortgage';
+    const scanLine2 = 'and protection advice.';
+    const scanDarkBlue = rgb(0/255, 55/255, 104/255);
+    const cx = 210;
+    const lineH = scanFontSize * 1.25;
+    const scanCentreY = 319.83;
+    const s1y = scanCentreY + lineH * 0.5;
+    const s2y = scanCentreY - lineH * 0.5;
+    const w1 = fontBold.widthOfTextAtSize(scanLine1, scanFontSize);
+    const w2 = fontBold.widthOfTextAtSize(scanLine2, scanFontSize);
+    scanPage.drawText(scanLine1, { x: cx - w1 / 2, y: s1y, size: scanFontSize, font: fontBold, color: scanDarkBlue });
+    scanPage.drawText(scanLine2, { x: cx - w2 / 2, y: s2y, size: scanFontSize, font: fontBold, color: scanDarkBlue });
 
     // ── Broker logo above scan text ───────────────────────────────
     // broker-branded.png is 2262×1029px; "Broker Name" sits at px x=615–1655, y=228–380 (from top)
