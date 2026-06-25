@@ -158,7 +158,7 @@ html { height: 100%; }
   <!-- Supervisor Zone sidebar -->
   <div id="sidebar-supervisor-zone" style="display:none">
     <h2 style="margin-top: 8px;">Supervisor Zone</h2>
-    <a href="#" class="active">Team CPD</a>
+    <a href="#" class="active">Team CPD <span id="sv-sidebar-count" style="margin-left:6px;background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;"></span></a>
   </div>
 </div>
 <!-- Hero triangles -->
@@ -2830,6 +2830,10 @@ function renderSvDashboard(data) {
     var obj = { m: m, cpd: cpd, visible: visible, worstPct: worstPct };
     if (worstPct < 100) behind.push(obj); else onTrack.push(obj);
   });
+
+  // Update sidebar count
+  var sbCount = document.getElementById('sv-sidebar-count');
+  if (sbCount) sbCount.textContent = onTrack.length + '/' + members.length;
 
   // Update subtitle with supervisor name
   var svName = '';
