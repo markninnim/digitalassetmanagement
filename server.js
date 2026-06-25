@@ -566,7 +566,7 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     const fontBold = await pdfDoc.embedFont(fontBoldBytes);
     const fontMed  = await pdfDoc.embedFont(fontMedBytes);
     const logoImg  = await pdfDoc.embedPng(logoBytes);
-    const logoDims = logoImg.scale(0.13); // smaller logo
+    const logoDims = logoImg.scale(0.104); // 0.13 * 0.8
 
     // Embed adviser photo if available
     let avatarImg = null;
@@ -603,10 +603,8 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     // ── Header (white card, full width) ────────────────────────
     const headerH = 76;
     page.drawRectangle({ x: 0, y: H - headerH, width: W, height: headerH, color: white });
-    // Thin dark-blue accent line at bottom of header
-    page.drawRectangle({ x: 0, y: H - headerH, width: W, height: 3, color: darkBlue });
     // Logo — top-left with breathing room
-    const logoX = 28, logoY = H - headerH + (headerH - 3 - logoDims.height) / 2 + 3;
+    const logoX = 28, logoY = H - headerH + (headerH - logoDims.height) / 2;
     page.drawImage(logoImg, { x: logoX, y: logoY, width: logoDims.width, height: logoDims.height });
     // Adviser photo (circle) + name — right side of header
     const avatarSize = 42;
