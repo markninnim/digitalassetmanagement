@@ -1775,7 +1775,7 @@ function renderLvGrid(containerId, videos, isFeatured) {
 
   // Real video cards
   items.forEach(function(v) {
-    var thumb = makeLvThumb(v.title, v.added);
+    var thumb = makeLvThumb(v.title);
     cards.push(
       '<div onclick="openLvPlayer(\'' + escAttr(v.url) + '\',\'' + escAttr(v.title) + '\',\'' + escAttr(v.description) + '\')" style="cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform=\'translateY(-3px)\';this.style.boxShadow=\'0 6px 24px rgba(0,0,0,.16)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'0 2px 12px rgba(0,0,0,.1)\'">' +
         '<div style="position:relative;padding-bottom:56.25%;background:#fff;">' +
@@ -1788,7 +1788,8 @@ function renderLvGrid(containerId, videos, isFeatured) {
         '</div>' +
         '<div style="padding:12px 14px;background:#fff;border-top:1px solid #f0f2f5;">' +
           '<div style="font-size:13px;font-weight:700;color:#1a2a3a;line-height:1.3;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(v.title) + '</div>' +
-          (v.description ? '<div style="font-size:12px;color:#6b7c8f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(v.description) + '</div>' : '<div style="font-size:12px;color:#b0bcc8;">Watch video</div>') +
+          (formatLvDate(v.added) ? '<div style="font-size:11px;color:#6b7c8f;margin-bottom:2px;">' + formatLvDate(v.added) + '</div>' : '') +
+          (v.description ? '<div style="font-size:12px;color:#6b7c8f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(v.description) + '</div>' : '') +
         '</div>' +
       '</div>'
     );
@@ -1798,7 +1799,7 @@ function renderLvGrid(containerId, videos, isFeatured) {
   var placeholders = slots - items.length;
   for (var i = 0; i < placeholders; i++) {
     var num = items.length + i + 1;
-    var phThumb = makeLvThumb('Video ' + num, null);
+    var phThumb = makeLvThumb('Video ' + num);
     cards.push(
       '<div style="border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);opacity:.45;">' +
         '<div style="position:relative;padding-bottom:56.25%;background:#fff;">' +
@@ -1825,27 +1826,16 @@ function getVideoThumb(url) {
   return '';
 }
 
-function makeLvThumb(title, added) {
+function makeLvThumb(title) {
   var w = 400, h = 225;
   var sc = w / 1920;
-  // Flip the hero formation to top-right: y_new = h - y_original * sc
-  // Orange (small corner triangle, top-right)
+  // Hero triangles flipped to top-right
   var oA = (1445.242*sc).toFixed(1) + ',0';
   var oB = w + ',0';
   var oC = w + ',' + (h - 605.242*sc).toFixed(1);
-  // Blue (larger, overlapping)
   var bA = (966.332*sc).toFixed(1) + ',0';
   var bB = w + ',0';
   var bC = (1443.09*sc).toFixed(1) + ',' + (h - 603.242*sc).toFixed(1);
-
-  // Format date
-  var dateStr = '';
-  if (added) {
-    var d = new Date(added);
-    if (!isNaN(d)) {
-      dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-  }
 
   // Wrap title at ~24 chars per line
   var words = (title || '').split(' ');
@@ -1858,10 +1848,7 @@ function makeLvThumb(title, added) {
   lines = lines.slice(0, 3);
 
   var lineH = 22;
-  var titleY = h - 22 - (lines.length - 1) * lineH - (dateStr ? 22 : 0);
-  var dateEl = dateStr
-    ? '<text x="22" y="' + (titleY - 8) + '" font-family="\'Plus Jakarta Sans\', sans-serif" font-weight="600" font-size="11" fill="#6b7c8f" letter-spacing="0.3">' + dateStr + '</text>'
-    : '';
+  var titleY = h - 22 - (lines.length - 1) * lineH;
   var textEls = lines.map(function(l, i) {
     return '<text x="22" y="' + (titleY + i * lineH) + '" font-family="\'Plus Jakarta Sans\', sans-serif" font-weight="800" font-size="15" fill="#003768">' +
       l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') +
@@ -1872,11 +1859,16 @@ function makeLvThumb(title, added) {
     '<rect width="' + w + '" height="' + h + '" fill="#ffffff"/>' +
     '<polygon points="' + oA + ' ' + oB + ' ' + oC + '" fill="#fcb034"/>' +
     '<polygon points="' + bA + ' ' + bB + ' ' + bC + '" fill="#003768"/>' +
-    dateEl +
     textEls +
   '</svg>';
 
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+function formatLvDate(added) {
+  if (!added) return '';
+  var d = new Date(added);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function getEmbedUrl(url) {
