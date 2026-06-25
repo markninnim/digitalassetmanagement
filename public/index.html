@@ -1143,16 +1143,16 @@ html { height: 100%; }
         <h2 style="color:#003768;font-size:18px;margin:0 0 2px;">User Management</h2>
         <p style="color:#6b7c8f;font-size:13px;margin:0;">Manage who can access the FPG DAM tool.</p>
       </div>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <button onclick="downloadCsvTemplate()" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">↓ Template</button>
-        <label style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button onclick="downloadCsvTemplate()" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;">↓ Template</button>
+        <label style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;display:inline-flex;align-items:center;">
           ↑ Import CSV<input type="file" accept=".csv" onchange="importCsv(this)" style="display:none;">
         </label>
-        <label style="background:#0057a8;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;">
+        <label style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;display:inline-flex;align-items:center;">
           ↑ Import Excel<input type="file" accept=".xlsx" onchange="importUsersExcel(this)" style="display:none;">
         </label>
-        <button onclick="openUserForm()" style="background:#003768;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">+ Add User</button>
-        <button onclick="closeAdminPanel()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7c8f;line-height:1;">&#x2715;</button>
+        <button onclick="openUserForm()" style="background:#003768;color:#fff;border:1.5px solid #003768;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;">+ Add User</button>
+        <button onclick="closeAdminPanel()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7c8f;line-height:1;padding:0 4px;">&#x2715;</button>
       </div>
     </div>
 
