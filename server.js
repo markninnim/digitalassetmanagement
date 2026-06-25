@@ -89,10 +89,6 @@ function requireAdmin(req, res, next) {
   res.status(403).json({ error: 'Forbidden' });
 }
 
-function requireAuth(req, res, next) {
-  if (req.session.authenticated && req.session.user && req.session.user.isSupervisor) return next();
-  res.status(403).json({ error: 'Forbidden' });
-}
 
 // ── Serve static assets (only after auth) ───────────────────
 // Public assets are gated — we serve them via a route, not express.static
