@@ -281,6 +281,57 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
   }
 });
 
+// ── Supervisor: list all supervisors (for transfer dropdown) ──
+app.get('/api/supervisor/list', requireSupervisor, async (req, res) => {
+  try {
+    const formula = encodeURIComponent(`{Is Supervisor}=1`);
+    const data = await atFetch(`?filterByFormula=${formula}&returnFieldsByFieldId=true&pageSize=100`);
+    const supervisors = (data.records || []).map(r => {
+      const u = recordToUser(r);
+      return { id: u.id, email: u.email, name: ([u.salutation, u.firstName, u.lastName].filter(Boolean).join(' ') || u.email) };
+    });
+    res.json({ supervisors });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Supervisor: CPD drill-down for one adviser ─────────────────
+app.get('/api/supervisor/adviser-cpd', requireSupervisor, async (req, res) => {
+  const { email } = req.query;
+  if (!email) return res.status(400).json({ error: 'email required' });
+  try {
+    const thisYear = new Date().getFullYear();
+    const startOfYear = `${thisYear}-01-01`;
+    const formula = encodeURIComponent(`AND({User Email}="${email}",IS_AFTER({Date},"${startOfYear}"))`);
+    const data = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=200`);
+    const entries = (data.records || []).map(cpdRecordToEntry);
+    res.json({ entries });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Supervisor: transfer adviser to another supervisor ─────────
+app.put('/api/supervisor/transfer', requireSupervisor, async (req, res) => {
+  const { adviserEmail, newSupervisorEmail } = req.body;
+  if (!adviserEmail || !newSupervisorEmail) return res.status(400).json({ error: 'adviserEmail and newSupervisorEmail required' });
+  try {
+    // Find the adviser record
+    const formula = encodeURIComponent(`{Email}="${adviserEmail}"`);
+    const data = await atFetch(`?filterByFormula=${formula}&returnFieldsByFieldId=true`);
+    if (!data.records || !data.records.length) return res.status(404).json({ error: 'Adviser not found' });
+    const recordId = data.records[0].id;
+    await atFetch(`/${recordId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ fields: { [F_SUPERVISOR_EMAIL]: newSupervisorEmail }, returnFieldsByFieldId: true })
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Supervisor: team CPD dashboard ───────────────────────────
 app.get('/api/supervisor/team', requireSupervisor, async (req, res) => {
   const supervisorEmail = req.session.user.email;

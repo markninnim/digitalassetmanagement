@@ -104,11 +104,9 @@ html { height: 100%; }
     <button class="tab-btn"        id="tab-btn-learning"      onclick="switchTab('learning')">Learning</button>
     <button class="tab-btn"        id="tab-btn-sales-process" onclick="switchTab('sales-process')">Sales Process</button>
     <button class="tab-btn"        id="tab-btn-selling-zone"  onclick="switchTab('selling-zone')">Selling Zone</button>
+    <button class="tab-btn"        id="tab-btn-supervisor-zone" onclick="switchTab('supervisor-zone')" style="display:none;">Supervisor Zone</button>
   </div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-    <button id="supervisor-btn" onclick="openSupervisorZone()" style="display:none;background:#2e99d5;color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;align-items:center;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Team CPD
-    </button>
     <button id="admin-btn" onclick="openAdminPanel()" style="display:none;background:#003768;color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;gap:6px;align-items:center;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Admin
     </button>
@@ -156,6 +154,11 @@ html { height: 100%; }
   <div id="sidebar-selling-zone" style="display:none">
     <h2 style="margin-top: 8px;">Selling Zone</h2>
     <a href="#" class="active">Overview</a>
+  </div>
+  <!-- Supervisor Zone sidebar -->
+  <div id="sidebar-supervisor-zone" style="display:none">
+    <h2 style="margin-top: 8px;">Supervisor Zone</h2>
+    <a href="#" class="active">Team CPD</a>
   </div>
 </div>
 <!-- Hero triangles -->
@@ -853,6 +856,54 @@ html { height: 100%; }
     </div>
   </div>
 
+  <!-- ── Supervisor Zone tab ───────────────────────────────── -->
+  <div id="tab-supervisor-zone" class="tab-pane">
+    <div style="max-width:960px;margin:0 auto;padding:0 8px;">
+      <!-- Header row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div>
+          <h2 style="margin:0;font-size:20px;font-weight:800;color:#003768;">Supervisor Zone</h2>
+          <div id="sv-subtitle" style="font-size:13px;color:#6b7c8f;margin-top:3px;">Year-to-date team CPD</div>
+        </div>
+        <button onclick="loadSupervisorZone()" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">↻ Refresh</button>
+      </div>
+      <!-- Summary stats -->
+      <div id="sv-stats" style="display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap;"></div>
+      <!-- Behind target section -->
+      <div id="sv-behind-wrap" style="display:none;margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;flex-shrink:0;"></div>
+          <div style="font-size:13px;font-weight:800;color:#991b1b;text-transform:uppercase;letter-spacing:.5px;">Behind Target</div>
+        </div>
+        <div id="sv-behind-list" style="display:grid;gap:12px;"></div>
+      </div>
+      <!-- On track section -->
+      <div id="sv-ontrack-wrap" style="display:none;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;"></div>
+          <div style="font-size:13px;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:.5px;">On Track / Complete</div>
+        </div>
+        <div id="sv-ontrack-list" style="display:grid;gap:12px;"></div>
+      </div>
+      <div id="sv-loading" style="text-align:center;padding:60px 0;color:#6b7c8f;font-size:13px;">Loading team…</div>
+    </div>
+  </div>
+
+  <!-- Transfer adviser modal -->
+  <div id="sv-transfer-modal" onclick="if(event.target===this)closeSvTransfer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:28px;max-width:420px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,.2);">
+      <div style="font-size:16px;font-weight:800;color:#003768;margin-bottom:6px;">Transfer Supervision</div>
+      <div id="sv-transfer-desc" style="font-size:13px;color:#6b7c8f;margin-bottom:20px;"></div>
+      <label style="display:block;font-size:11px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Assign to Supervisor</label>
+      <select id="sv-transfer-select" style="width:100%;padding:10px 12px;border:1.5px solid #e8ecf0;border-radius:8px;font-size:14px;font-family:inherit;outline:none;margin-bottom:20px;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'"></select>
+      <div id="sv-transfer-error" style="display:none;background:#fef2f2;color:#991b1b;font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:16px;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="closeSvTransfer()" style="padding:9px 18px;border-radius:8px;border:1.5px solid #e8ecf0;background:#fff;color:#1a2a3a;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+        <button onclick="confirmSvTransfer()" style="padding:9px 18px;border-radius:8px;border:none;background:#003768;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Transfer</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 <div id="cp-modal" onclick="if(event.target===this)closeCp()">
   <div id="cp-box">
@@ -1054,25 +1105,6 @@ html { height: 100%; }
   </div>
 </div>
 
-<div id="supervisor-modal" onclick="if(event.target===this)closeSupervisorZone()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:flex-start;justify-content:center;padding-top:60px;overflow-y:auto;">
-  <div style="background:#fff;border-radius:12px;width:100%;max-width:900px;margin:0 auto 40px;box-shadow:0 16px 48px rgba(0,0,0,.25);">
-    <!-- Header -->
-    <div style="padding:20px 28px;border-bottom:1px solid #e8ecf0;display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:16px;font-weight:700;color:#003768;">Team CPD Dashboard</div>
-        <div style="font-size:12px;color:#6b7c8f;margin-top:2px;">Year-to-date progress for your team</div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <button onclick="loadSupervisorTeam()" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">↻ Refresh</button>
-        <button onclick="closeSupervisorZone()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7c8f;line-height:1;">&#x2715;</button>
-      </div>
-    </div>
-    <!-- Team dashboard -->
-    <div id="supervisor-team-content" style="padding:24px 28px;">
-      <div style="color:#6b7c8f;font-size:13px;text-align:center;padding:40px 0;">Loading team…</div>
-    </div>
-  </div>
-</div>
 
 <!-- ── Admin Panel ─────────────────────────────────────────── -->
 <div id="admin-modal" onclick="if(event.target===this)closeAdminPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:flex-start;justify-content:center;padding-top:60px;overflow-y:auto;">
@@ -2018,7 +2050,7 @@ function generateBrokerBrand() {
 }
 
 // ── Tab switching ─────────────────────────────────────────────
-var TAB_IDS = ['marketing','compliance','learning','sales-process','selling-zone'];
+var TAB_IDS = ['marketing','compliance','learning','sales-process','selling-zone','supervisor-zone'];
 function switchTab(tab) {
   TAB_IDS.forEach(function(t) {
     var pane    = document.getElementById('tab-' + t);
@@ -2029,8 +2061,9 @@ function switchTab(tab) {
     if (btn)     btn.classList.toggle('active', t === tab);
   });
   window.location.hash = tab;
-  if (tab === 'learning')   loadLearningZone();
-  if (tab === 'compliance') { if (!_cpdLoaded) loadCpd(); }
+  if (tab === 'learning')         loadLearningZone();
+  if (tab === 'compliance')       { if (!_cpdLoaded) loadCpd(); }
+  if (tab === 'supervisor-zone')  loadSupervisorZone();
 }
 
 // Hash routing — navigate on load (called directly, no event wrapper needed)
@@ -2307,8 +2340,8 @@ var _currentUser = null;
       if (btn) btn.style.display = 'inline-flex';
     }
     if (user && user.isSupervisor) {
-      var sbtn = document.getElementById('supervisor-btn');
-      if (sbtn) sbtn.style.display = 'inline-flex';
+      var sbtn = document.getElementById('tab-btn-supervisor-zone');
+      if (sbtn) sbtn.style.display = '';
     }
     updateNavUser(user);
   }).catch(function(){});
@@ -2631,44 +2664,38 @@ function deleteUser(id, name) {
 }
 
 // ── Supervisor Zone ───────────────────────────────────────────
-function openSupervisorZone() {
-  document.getElementById('supervisor-modal').style.display = 'flex';
-  loadSupervisorTeam();
-}
+var _svLoaded = false;
+var _svData   = null;
+var _svTransferEmail = '';
+var _svTransferName  = '';
 
-function closeSupervisorZone() {
-  document.getElementById('supervisor-modal').style.display = 'none';
-}
-
-function loadSupervisorTeam() {
-  var el = document.getElementById('supervisor-team-content');
-  el.innerHTML = '<div style="color:#6b7c8f;font-size:13px;text-align:center;padding:40px 0;">Loading team…</div>';
+function loadSupervisorZone() {
+  _svLoaded = false;
+  document.getElementById('sv-loading').style.display = 'block';
+  document.getElementById('sv-stats').innerHTML = '';
+  document.getElementById('sv-behind-wrap').style.display = 'none';
+  document.getElementById('sv-ontrack-wrap').style.display = 'none';
   fetch('/api/supervisor/team').then(function(r){ return r.json(); }).then(function(data) {
-    renderSupervisorDashboard(data);
+    _svData = data;
+    _svLoaded = true;
+    document.getElementById('sv-loading').style.display = 'none';
+    renderSvDashboard(data);
   }).catch(function() {
-    el.innerHTML = '<div style="color:#c00;font-size:13px;text-align:center;padding:40px 0;">Could not load team data.</div>';
+    document.getElementById('sv-loading').textContent = 'Could not load team data.';
   });
 }
 
-function renderSupervisorDashboard(data) {
-  var el = document.getElementById('supervisor-team-content');
-  var members = data.members || [];
+function renderSvDashboard(data) {
+  var members     = data.members     || [];
   var cpdByMember = data.cpdByMember || {};
-  var targets = data.targets || { Investment: 2100, Mortgage: 900, Protection: 900 };
+  var targets     = data.targets     || { Mortgage: 900, Protection: 900 };
 
   if (!members.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px 0;">' +
+    document.getElementById('sv-loading').style.display = 'block';
+    document.getElementById('sv-loading').innerHTML =
       '<div style="font-size:15px;color:#1a2a3a;font-weight:600;margin-bottom:8px;">No team members yet</div>' +
-      '<div style="font-size:13px;color:#6b7c8f;">Set your email as the "Supervisor Email" on each adviser\'s profile in the Admin panel.</div>' +
-    '</div>';
+      '<div style="font-size:13px;color:#6b7c8f;">Set your email as the Supervisor Email on each adviser in the Admin panel.</div>';
     return;
-  }
-
-  // Status helper
-  function getStatus(pct) {
-    if (pct >= 100) return { label: 'Complete', bg: '#dcfce7', tc: '#166534' };
-    if (pct >= 60)  return { label: 'On track',  bg: '#fef9c3', tc: '#854d0e' };
-    return { label: 'Behind',   bg: '#fee2e2', tc: '#991b1b' };
   }
 
   var typeConf = [
@@ -2676,65 +2703,56 @@ function renderSupervisorDashboard(data) {
     { key: 'Protection', label: 'Protection', color: '#fcb034' }
   ];
 
-  // Summary bar
-  var doneCount = 0, behindCount = 0;
+  function getStatus(pct) {
+    if (pct >= 100) return { label: 'Complete', bg: '#dcfce7', tc: '#166534' };
+    if (pct >= 60)  return { label: 'On track',  bg: '#fef9c3', tc: '#854d0e' };
+    return              { label: 'Behind',    bg: '#fee2e2', tc: '#991b1b' };
+  }
+
+  // Classify members
+  var behind = [], onTrack = [];
   members.forEach(function(m) {
     var cpd = cpdByMember[m.email] || {};
     var noFlags = !m.sellsMortgages && !m.sellsProtection;
-    var types = typeConf.filter(function(t) {
-      if (t.key === 'Mortgage')   return m.sellsMortgages   || noFlags;
-      if (t.key === 'Protection') return m.sellsProtection  || noFlags;
+    var visible = typeConf.filter(function(t) {
+      return (t.key === 'Mortgage' && (m.sellsMortgages || noFlags)) ||
+             (t.key === 'Protection' && (m.sellsProtection || noFlags));
     });
-    var allDone = types.length > 0 && types.every(function(t) {
-      return (cpd[t.key] || 0) >= targets[t.key];
-    });
-    if (allDone) doneCount++; else behindCount++;
-  });
-
-  var html = '<div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">' +
-    '<div style="background:#f0fdf4;border-radius:10px;padding:14px 20px;flex:1;min-width:120px;">' +
-      '<div style="font-size:24px;font-weight:800;color:#166534;">' + doneCount + '</div>' +
-      '<div style="font-size:12px;color:#166534;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">All targets met</div>' +
-    '</div>' +
-    '<div style="background:#fef2f2;border-radius:10px;padding:14px 20px;flex:1;min-width:120px;">' +
-      '<div style="font-size:24px;font-weight:800;color:#991b1b;">' + behindCount + '</div>' +
-      '<div style="font-size:12px;color:#991b1b;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">In progress</div>' +
-    '</div>' +
-    '<div style="background:#eff6ff;border-radius:10px;padding:14px 20px;flex:1;min-width:120px;">' +
-      '<div style="font-size:24px;font-weight:800;color:#1d4ed8;">' + members.length + '</div>' +
-      '<div style="font-size:12px;color:#1d4ed8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">Team members</div>' +
-    '</div>' +
-  '</div>';
-
-  // Member cards
-  html += '<div style="display:grid;gap:14px;">';
-  members.forEach(function(m) {
-    var name = [m.salutation, m.firstName, m.lastName].filter(Boolean).join(' ') || m.email;
-    var cpd = cpdByMember[m.email] || { Investment: 0, Mortgage: 0, Protection: 0 };
-    var noFlags = !m.sellsMortgages && !m.sellsProtection;
-    var visibleTypes = typeConf.filter(function(t) {
-      if (t.key === 'Mortgage')   return m.sellsMortgages   || noFlags;
-      if (t.key === 'Protection') return m.sellsProtection  || noFlags;
-    });
-
-    // Overall worst status for the card border
-    var worstPct = 100;
-    visibleTypes.forEach(function(t) {
-      var pct = Math.round(((cpd[t.key] || 0) / targets[t.key]) * 100);
+    var worstPct = visible.length ? 100 : 0;
+    visible.forEach(function(t) {
+      var pct = targets[t.key] > 0 ? Math.round(((cpd[t.key]||0) / targets[t.key]) * 100) : 0;
       if (pct < worstPct) worstPct = pct;
     });
+    var obj = { m: m, cpd: cpd, visible: visible, worstPct: worstPct };
+    if (worstPct < 100) behind.push(obj); else onTrack.push(obj);
+  });
+
+  // Stats bar
+  document.getElementById('sv-stats').innerHTML =
+    '<div style="background:#fef2f2;border-radius:10px;padding:14px 20px;flex:1;min-width:120px;">' +
+      '<div style="font-size:28px;font-weight:800;color:#991b1b;">' + behind.length + '</div>' +
+      '<div style="font-size:11px;color:#991b1b;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Behind target</div>' +
+    '</div>' +
+    '<div style="background:#f0fdf4;border-radius:10px;padding:14px 20px;flex:1;min-width:120px;">' +
+      '<div style="font-size:28px;font-weight:800;color:#166534;">' + onTrack.length + '</div>' +
+      '<div style="font-size:11px;color:#166534;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">On track / complete</div>' +
+    '</div>' +
+    '<div style="background:#eff6ff;border-radius:10px;padding:14px 20px;flex:1;min-width:120px;">' +
+      '<div style="font-size:28px;font-weight:800;color:#1d4ed8;">' + members.length + '</div>' +
+      '<div style="font-size:11px;color:#1d4ed8;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Team members</div>' +
+    '</div>';
+
+  function buildCard(obj) {
+    var m = obj.m, cpd = obj.cpd, visible = obj.visible, worstPct = obj.worstPct;
+    var name = [m.salutation, m.firstName, m.lastName].filter(Boolean).join(' ') || m.email;
+    var safeEmail = m.email.replace(/'/g, "\\'");
+    var safeName  = name.replace(/'/g, "\\'");
     var borderColor = worstPct >= 100 ? '#22c55e' : worstPct >= 60 ? '#f59e0b' : '#ef4444';
 
-    var combinedYtd    = visibleTypes.reduce(function(s,t){ return s + (cpd[t.key]||0); }, 0);
-    var combinedTarget = visibleTypes.reduce(function(s,t){ return s + (targets[t.key]||900); }, 0);
-    var combinedPct    = combinedTarget > 0 ? Math.min(100, Math.round((combinedYtd/combinedTarget)*100)) : 0;
-
-    var barsHtml = visibleTypes.map(function(t) {
+    var barsHtml = visible.map(function(t) {
       var ytd    = cpd[t.key] || 0;
       var target = targets[t.key] || 900;
       var pct    = Math.min(100, Math.round((ytd / target) * 100));
-      var done   = pct >= 100;
-      var barColor = done ? '#22c55e' : t.color;
       var status = getStatus(pct);
       return '<div style="margin-bottom:10px;">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">' +
@@ -2745,47 +2763,155 @@ function renderSupervisorDashboard(data) {
           '</div>' +
         '</div>' +
         '<div style="background:#f0f4f8;border-radius:4px;height:7px;overflow:hidden;">' +
-          '<div style="background:' + barColor + ';height:100%;width:' + pct + '%;border-radius:4px;transition:width .5s ease;"></div>' +
+          '<div style="background:' + (pct >= 100 ? '#22c55e' : t.color) + ';height:100%;width:' + pct + '%;border-radius:4px;"></div>' +
         '</div>' +
       '</div>';
     }).join('');
 
-    // Combined total row (when more than one type)
-    if (visibleTypes.length > 1) {
-      var cDone  = combinedPct >= 100;
-      var cStatus = getStatus(combinedPct);
+    if (visible.length > 1) {
+      var cYtd    = visible.reduce(function(s,t){ return s+(cpd[t.key]||0); }, 0);
+      var cTarget = visible.reduce(function(s,t){ return s+(targets[t.key]||900); }, 0);
+      var cPct    = Math.min(100, Math.round((cYtd/cTarget)*100));
+      var cStatus = getStatus(cPct);
       barsHtml += '<div style="border-top:1px solid #f0f2f5;padding-top:8px;margin-top:2px;">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">' +
           '<span style="font-size:12px;font-weight:700;color:#003768;">Combined Total</span>' +
           '<div style="display:flex;align-items:center;gap:8px;">' +
-            '<span style="font-size:12px;font-weight:700;color:#003768;">' + fmtMins(combinedYtd) + ' / ' + fmtMins(combinedTarget) + '</span>' +
+            '<span style="font-size:12px;font-weight:700;color:#003768;">' + fmtMins(cYtd) + ' / ' + fmtMins(cTarget) + '</span>' +
             '<span style="background:' + cStatus.bg + ';color:' + cStatus.tc + ';font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;">' + cStatus.label + '</span>' +
           '</div>' +
         '</div>' +
         '<div style="background:#f0f4f8;border-radius:4px;height:9px;overflow:hidden;">' +
-          '<div style="background:' + (cDone ? '#22c55e' : '#003768') + ';height:100%;width:' + combinedPct + '%;border-radius:4px;transition:width .5s ease;"></div>' +
+          '<div style="background:' + (cPct >= 100 ? '#22c55e' : '#003768') + ';height:100%;width:' + cPct + '%;border-radius:4px;"></div>' +
         '</div>' +
       '</div>';
     }
 
-    var productTags = [];
-    if (m.sellsMortgages  || noFlags) productTags.push('<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;">Mortgage</span>');
-    if (m.sellsProtection || noFlags) productTags.push('<span style="background:#fef9c3;color:#854d0e;font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;">Protection</span>');
+    // Drill-down entries panel
+    var drillId = 'sv-drill-' + m.email.replace(/[^a-z0-9]/gi, '_');
 
-    html += '<div style="background:#fff;border-radius:10px;border-left:4px solid ' + borderColor + ';padding:16px 20px;box-shadow:0 1px 6px rgba(0,0,0,.06);">' +
-      '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">' +
-        '<div>' +
-          '<div style="font-size:14px;font-weight:700;color:#1a2a3a;">' + escHtml(name) + '</div>' +
-          '<div style="font-size:12px;color:#6b7c8f;margin-top:2px;">' + escHtml(m.jobTitle || m.email) + '</div>' +
+    return '<div style="background:#fff;border-radius:10px;border-left:4px solid ' + borderColor + ';box-shadow:0 1px 6px rgba(0,0,0,.07);overflow:hidden;">' +
+      '<div style="padding:16px 20px;">' +
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">' +
+          '<div>' +
+            '<div style="font-size:14px;font-weight:700;color:#1a2a3a;">' + escHtml(name) + '</div>' +
+            '<div style="font-size:12px;color:#6b7c8f;margin-top:2px;">' + escHtml(m.jobTitle || m.email) + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px;align-items:center;">' +
+            '<button onclick="svDrillDown(\'' + safeEmail + '\',\'' + drillId + '\')" style="font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#003768;cursor:pointer;font-family:inherit;">View CPD ▾</button>' +
+            '<button onclick="openSvTransfer(\'' + safeEmail + '\',\'' + safeName + '\')" style="font-size:11px;font-weight:700;padding:5px 11px;border-radius:7px;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;cursor:pointer;font-family:inherit;">Transfer</button>' +
+          '</div>' +
         '</div>' +
-        '<div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">' + productTags.join('') + '</div>' +
+        barsHtml +
       '</div>' +
-      barsHtml +
+      '<div id="' + drillId + '" style="display:none;border-top:1px solid #f0f2f5;background:#f9fafb;padding:0;"></div>' +
     '</div>';
-  });
-  html += '</div>';
+  }
 
-  el.innerHTML = html;
+  // Populate Behind
+  if (behind.length) {
+    document.getElementById('sv-behind-wrap').style.display = 'block';
+    document.getElementById('sv-behind-list').innerHTML = behind.map(buildCard).join('');
+  }
+  // Populate On Track
+  if (onTrack.length) {
+    document.getElementById('sv-ontrack-wrap').style.display = 'block';
+    document.getElementById('sv-ontrack-list').innerHTML = onTrack.map(buildCard).join('');
+  }
+}
+
+function svDrillDown(email, drillId) {
+  var panel = document.getElementById(drillId);
+  if (!panel) return;
+  // Toggle
+  if (panel.style.display !== 'none' && panel.dataset.loaded) {
+    panel.style.display = 'none';
+    return;
+  }
+  panel.style.display = 'block';
+  if (panel.dataset.loaded) return;
+  panel.innerHTML = '<div style="padding:16px 20px;color:#6b7c8f;font-size:13px;">Loading CPD entries…</div>';
+  fetch('/api/supervisor/adviser-cpd?email=' + encodeURIComponent(email))
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      panel.dataset.loaded = '1';
+      var entries = d.entries || [];
+      if (!entries.length) {
+        panel.innerHTML = '<div style="padding:16px 20px;color:#6b7c8f;font-size:13px;">No CPD entries this year.</div>';
+        return;
+      }
+      var rows = entries.map(function(e) {
+        var typeColor = e.cpdType === 'Protection' ? '#854d0e' : '#1d4ed8';
+        var typeBg    = e.cpdType === 'Protection' ? '#fef9c3' : '#dbeafe';
+        return '<tr style="border-bottom:1px solid #f0f2f5;">' +
+          '<td style="padding:9px 12px;font-size:12px;color:#6b7c8f;white-space:nowrap;">' + escHtml(e.date) + '</td>' +
+          '<td style="padding:9px 12px;font-size:12px;color:#1a2a3a;font-weight:600;">' + escHtml(e.activity || e.videoTitle || '—') + '</td>' +
+          '<td style="padding:9px 12px;"><span style="background:' + typeBg + ';color:' + typeColor + ';font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;">' + escHtml(e.cpdType||'—') + '</span></td>' +
+          '<td style="padding:9px 12px;font-size:12px;color:#003768;font-weight:700;text-align:right;">' + fmtMins(e.minutes) + '</td>' +
+        '</tr>';
+      }).join('');
+      var total = entries.reduce(function(s,e){ return s + (e.minutes||0); }, 0);
+      panel.innerHTML =
+        '<div style="padding:4px 0;">' +
+          '<table style="width:100%;border-collapse:collapse;">' +
+            '<thead><tr style="background:#f0f4f8;">' +
+              '<th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:.4px;">Date</th>' +
+              '<th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:.4px;">Activity</th>' +
+              '<th style="padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:.4px;">Type</th>' +
+              '<th style="padding:8px 12px;text-align:right;font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:.4px;">Time</th>' +
+            '</tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+            '<tfoot><tr style="background:#f0f4f8;"><td colspan="3" style="padding:9px 12px;font-size:12px;font-weight:700;color:#003768;">Total</td><td style="padding:9px 12px;font-size:12px;font-weight:800;color:#003768;text-align:right;">' + fmtMins(total) + '</td></tr></tfoot>' +
+          '</table>' +
+        '</div>';
+    }).catch(function() {
+      panel.innerHTML = '<div style="padding:16px 20px;color:#c00;font-size:13px;">Could not load entries.</div>';
+    });
+}
+
+function openSvTransfer(email, name) {
+  _svTransferEmail = email;
+  _svTransferName  = name;
+  document.getElementById('sv-transfer-desc').textContent = 'Reassign ' + name + ' to a different supervisor.';
+  document.getElementById('sv-transfer-error').style.display = 'none';
+  var sel = document.getElementById('sv-transfer-select');
+  sel.innerHTML = '<option value="">Loading supervisors…</option>';
+  document.getElementById('sv-transfer-modal').style.display = 'flex';
+  fetch('/api/supervisor/list').then(function(r){ return r.json(); }).then(function(d) {
+    var supervisors = (d.supervisors || []).filter(function(s){ return s.email !== (_currentUser && _currentUser.email); });
+    sel.innerHTML = supervisors.map(function(s) {
+      return '<option value="' + escAttr(s.email) + '">' + escHtml(s.name) + ' (' + escHtml(s.email) + ')</option>';
+    }).join('') || '<option value="">No other supervisors found</option>';
+  }).catch(function() {
+    sel.innerHTML = '<option value="">Could not load supervisors</option>';
+  });
+}
+
+function closeSvTransfer() {
+  document.getElementById('sv-transfer-modal').style.display = 'none';
+}
+
+function confirmSvTransfer() {
+  var newSup = document.getElementById('sv-transfer-select').value;
+  var errEl  = document.getElementById('sv-transfer-error');
+  if (!newSup) { errEl.textContent = 'Please select a supervisor.'; errEl.style.display = 'block'; return; }
+  errEl.style.display = 'none';
+  fetch('/api/supervisor/transfer', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ adviserEmail: _svTransferEmail, newSupervisorEmail: newSup })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.ok) {
+      closeSvTransfer();
+      loadSupervisorZone(); // Refresh — adviser will now be gone from this supervisor's list
+    } else {
+      errEl.textContent = d.error || 'Transfer failed.';
+      errEl.style.display = 'block';
+    }
+  }).catch(function() {
+    errEl.textContent = 'Transfer failed.';
+    errEl.style.display = 'block';
+  });
 }
 
 // ── CPD Log ───────────────────────────────────────────────────
