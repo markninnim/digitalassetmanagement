@@ -112,6 +112,10 @@ html { height: 100%; }
     <button id="admin-btn" onclick="openAdminPanel()" style="display:none;background:#003768;color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;gap:6px;align-items:center;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Admin
     </button>
+    <button id="account-btn" onclick="openAccountModal()" style="display:flex;align-items:center;gap:7px;background:none;border:1.5px solid #e8ecf0;padding:5px 13px 5px 8px;border-radius:20px;cursor:pointer;font-family:inherit;color:#1a2a3a;transition:background .15s;" onmouseover="this.style.background='#f5f7fa'" onmouseout="this.style.background='none'">
+      <span id="nav-user-avatar" style="width:26px;height:26px;border-radius:50%;background:#003768;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></span>
+      <span id="nav-user-name" style="font-size:13px;font-weight:600;"></span>
+    </button>
     <a href="/logout" style="color:#6b7c8f;font-size:13px;font-weight:600;text-decoration:none;padding:6px 12px;border-radius:20px;transition:background .15s;" onmouseover="this.style.background='#f5f7fa'" onmouseout="this.style.background='none'">Sign out</a>
   </div>
 </div>
@@ -700,28 +704,33 @@ html { height: 100%; }
         <button onclick="openCpdForm()" style="flex-shrink:0;background:#003768;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">+ Add Entry</button>
       </div>
 
-      <!-- Progress card -->
-      <div id="cpd-progress-card" style="background:#fff;border-radius:12px;padding:24px 28px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.07);">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
-          <div style="font-size:13px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;">CPD Progress</div>
-          <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
-            <button id="cpd-period-month"   onclick="setCpdPeriod('month')"   style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #003768;background:#003768;color:#fff;">Month</button>
-            <button id="cpd-period-quarter" onclick="setCpdPeriod('quarter')" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;">Quarter</button>
-            <button id="cpd-period-year"    onclick="setCpdPeriod('year')"    style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;">Year</button>
-            <button id="cpd-pdf-btn" onclick="downloadCpdPdf()" style="display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#003768;margin-left:4px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              PDF
-            </button>
-          </div>
-          <div id="cpd-total-display" style="font-size:12px;font-weight:600;color:#6b7c8f;"></div>
-        </div>
-        <div id="cpd-progress-bars"><div style="font-size:13px;color:#6b7c8f;padding:8px 0;">Loading…</div></div>
-      </div>
+      <!-- Progress + Pie row -->
+      <div style="display:flex;gap:16px;margin-bottom:24px;align-items:stretch;">
 
-      <!-- Pie chart card -->
-      <div id="cpd-pie-card" style="background:#fff;border-radius:12px;padding:20px 28px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,.07);display:none;">
-        <div style="font-size:13px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">Mortgage vs Protection Split</div>
-        <div id="cpd-pie-content" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;"></div>
+        <!-- Progress card -->
+        <div id="cpd-progress-card" style="flex:1;background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 2px 12px rgba(0,0,0,.07);min-width:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+            <div style="font-size:12px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;">CPD Progress</div>
+            <div style="display:flex;gap:3px;align-items:center;">
+              <button id="cpd-period-month"   onclick="setCpdPeriod('month')"   style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #003768;background:#003768;color:#fff;">Month</button>
+              <button id="cpd-period-quarter" onclick="setCpdPeriod('quarter')" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;">Quarter</button>
+              <button id="cpd-period-year"    onclick="setCpdPeriod('year')"    style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#6b7c8f;">Year</button>
+              <button id="cpd-pdf-btn" onclick="downloadCpdPdf()" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid #e8ecf0;background:#f5f7fa;color:#003768;margin-left:3px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                PDF
+              </button>
+            </div>
+          </div>
+          <div id="cpd-progress-bars"><div style="font-size:13px;color:#6b7c8f;padding:8px 0;">Loading…</div></div>
+          <div id="cpd-total-display" style="font-size:11px;font-weight:600;color:#b0bec5;margin-top:10px;"></div>
+        </div>
+
+        <!-- Pie chart card (square) -->
+        <div id="cpd-pie-card" style="width:200px;flex-shrink:0;background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,.07);display:none;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="font-size:11px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;text-align:center;">Split</div>
+          <div id="cpd-pie-content" style="display:flex;flex-direction:column;align-items:center;gap:10px;"></div>
+        </div>
+
       </div>
 
       <!-- Add entry form -->
@@ -969,6 +978,81 @@ html { height: 100%; }
 </div>
 
 <!-- ── Supervisor Zone ────────────────────────────────────── -->
+<!-- ── Account modal ─────────────────────────────────────── -->
+<div id="account-modal" onclick="if(event.target===this)closeAccountModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2500;align-items:flex-start;justify-content:flex-end;">
+  <div style="background:#fff;width:100%;max-width:420px;height:100vh;overflow-y:auto;box-shadow:-8px 0 40px rgba(0,0,0,.18);display:flex;flex-direction:column;">
+    <!-- Header -->
+    <div style="background:#003768;padding:24px 28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:15px;font-weight:700;color:#fff;">My Account</div>
+        <button onclick="closeAccountModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div id="acc-avatar" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
+        <div>
+          <div id="acc-full-name" style="font-size:17px;font-weight:700;color:#fff;"></div>
+          <div id="acc-email" style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px;"></div>
+          <div id="acc-title" style="font-size:12px;color:#fcb034;margin-top:2px;font-weight:600;"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Form -->
+    <div style="padding:24px 28px;flex:1;">
+      <div style="font-size:11px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">Personal Details</div>
+      <div style="display:grid;grid-template-columns:90px 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">Salutation</label>
+          <select id="acc-sal" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;background:#fff;">
+            <option value="">—</option>
+            <option value="Mr">Mr</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Ms">Ms</option>
+            <option value="Dr">Dr</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">First Name</label>
+          <input id="acc-first" type="text" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+        </div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">Last Name</label>
+        <input id="acc-last" type="text" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">Job Title</label>
+        <input id="acc-jobtitle" type="text" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">Mobile</label>
+        <input id="acc-mobile" type="tel" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">Landline</label>
+        <input id="acc-landline" type="tel" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">Website</label>
+        <input id="acc-website" type="url" placeholder="https://…" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+      </div>
+
+      <div style="font-size:11px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding-top:16px;border-top:1px solid #f0f2f5;">Change Password</div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">New Password <span style="font-weight:400;">(leave blank to keep current)</span></label>
+        <input id="acc-password" type="password" placeholder="New password…" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:11px;font-weight:600;color:#6b7c8f;margin-bottom:4px;">Confirm Password</label>
+        <input id="acc-password2" type="password" placeholder="Confirm…" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+      </div>
+
+      <div id="acc-error" style="display:none;background:#fff0f0;border:1px solid #ffcccc;color:#c00;border-radius:7px;padding:8px 12px;font-size:13px;margin-bottom:12px;"></div>
+      <div id="acc-success" style="display:none;background:#f0fff4;border:1px solid #bbf7d0;color:#166534;border-radius:7px;padding:8px 12px;font-size:13px;margin-bottom:12px;">✓ Details saved successfully</div>
+      <button onclick="saveAccountDetails()" style="width:100%;background:#003768;color:#fff;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <div id="supervisor-modal" onclick="if(event.target===this)closeSupervisorZone()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:flex-start;justify-content:center;padding-top:60px;overflow-y:auto;">
   <div style="background:#fff;border-radius:12px;width:100%;max-width:900px;margin:0 auto 40px;box-shadow:0 16px 48px rgba(0,0,0,.25);">
     <!-- Header -->
@@ -2291,8 +2375,92 @@ var _currentUser = null;
       var sbtn = document.getElementById('supervisor-btn');
       if (sbtn) sbtn.style.display = 'inline-flex';
     }
+    updateNavUser(user);
   }).catch(function(){});
 })();
+
+function updateNavUser(user) {
+  if (!user) return;
+  var initials = ((user.firstName || '').charAt(0) + (user.lastName || '').charAt(0)).toUpperCase() || (user.email || '?').charAt(0).toUpperCase();
+  var displayName = user.firstName || user.email || '';
+  var avatarEl = document.getElementById('nav-user-avatar');
+  var nameEl   = document.getElementById('nav-user-name');
+  if (avatarEl) avatarEl.textContent = initials;
+  if (nameEl)   nameEl.textContent   = displayName;
+}
+
+function openAccountModal() {
+  var user = _currentUser || {};
+  // Populate header
+  var initials = ((user.firstName || '').charAt(0) + (user.lastName || '').charAt(0)).toUpperCase() || '?';
+  document.getElementById('acc-avatar').textContent    = initials;
+  document.getElementById('acc-full-name').textContent = ((user.salutation ? user.salutation + ' ' : '') + (user.firstName || '') + ' ' + (user.lastName || '')).trim() || '—';
+  document.getElementById('acc-email').textContent     = user.email || '';
+  document.getElementById('acc-title').textContent     = user.jobTitle || '';
+  // Populate form
+  document.getElementById('acc-sal').value      = user.salutation || '';
+  document.getElementById('acc-first').value    = user.firstName  || '';
+  document.getElementById('acc-last').value     = user.lastName   || '';
+  document.getElementById('acc-jobtitle').value = user.jobTitle   || '';
+  document.getElementById('acc-mobile').value   = user.mobile     || '';
+  document.getElementById('acc-landline').value = user.landline   || '';
+  document.getElementById('acc-website').value  = user.website    || '';
+  document.getElementById('acc-password').value  = '';
+  document.getElementById('acc-password2').value = '';
+  document.getElementById('acc-error').style.display   = 'none';
+  document.getElementById('acc-success').style.display = 'none';
+  var modal = document.getElementById('account-modal');
+  modal.style.display = 'flex';
+  // Animate slide-in
+  var panel = modal.firstElementChild;
+  panel.style.transform = 'translateX(100%)';
+  requestAnimationFrame(function() {
+    panel.style.transition = 'transform .3s cubic-bezier(.4,0,.2,1)';
+    panel.style.transform  = 'translateX(0)';
+  });
+}
+
+function closeAccountModal() {
+  var modal = document.getElementById('account-modal');
+  var panel = modal.firstElementChild;
+  panel.style.transition = 'transform .25s cubic-bezier(.4,0,.2,1)';
+  panel.style.transform  = 'translateX(100%)';
+  setTimeout(function() { modal.style.display = 'none'; }, 260);
+}
+
+function saveAccountDetails() {
+  var errEl  = document.getElementById('acc-error');
+  var okEl   = document.getElementById('acc-success');
+  errEl.style.display = okEl.style.display = 'none';
+  var pw1 = document.getElementById('acc-password').value;
+  var pw2 = document.getElementById('acc-password2').value;
+  if (pw1 && pw1 !== pw2) { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+  var body = {
+    salutation: document.getElementById('acc-sal').value,
+    firstName:  document.getElementById('acc-first').value.trim(),
+    lastName:   document.getElementById('acc-last').value.trim(),
+    jobTitle:   document.getElementById('acc-jobtitle').value.trim(),
+    mobile:     document.getElementById('acc-mobile').value.trim(),
+    landline:   document.getElementById('acc-landline').value.trim(),
+    website:    document.getElementById('acc-website').value.trim()
+  };
+  if (pw1) body.password = pw1;
+  fetch('/api/profile', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) })
+    .then(function(r) { return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+    .then(function(res) {
+      if (!res.ok) { errEl.textContent = res.data.error || 'Something went wrong.'; errEl.style.display = 'block'; return; }
+      _currentUser = Object.assign(_currentUser || {}, res.data);
+      // Refresh header
+      document.getElementById('acc-avatar').textContent    = ((res.data.firstName||'').charAt(0)+(res.data.lastName||'').charAt(0)).toUpperCase() || '?';
+      document.getElementById('acc-full-name').textContent = ((res.data.salutation ? res.data.salutation+' ' : '') + res.data.firstName + ' ' + res.data.lastName).trim();
+      document.getElementById('acc-title').textContent     = res.data.jobTitle || '';
+      document.getElementById('acc-password').value = '';
+      document.getElementById('acc-password2').value = '';
+      okEl.style.display = 'block';
+      updateNavUser(res.data);
+    })
+    .catch(function() { errEl.textContent = 'Network error.'; errEl.style.display = 'block'; });
+}
 
 // ── Admin Panel ───────────────────────────────────────────────
 var _adminUsers = [];
@@ -2778,10 +2946,10 @@ function renderCpdPie() {
   });
   var total = mort + prot;
   if (total === 0) { card.style.display = 'none'; return; }
-  card.style.display = 'block';
+  card.style.display = 'flex';
 
   var mortPct = mort / total, protPct = prot / total;
-  var cx = 60, cy = 60, r = 46, sw = 18;
+  var cx = 50, cy = 50, r = 38, sw = 15;
   function arcPath(pct, offset, color) {
     if (pct <= 0) return '';
     if (pct >= 1) pct = 0.9999;
@@ -2792,19 +2960,19 @@ function renderCpdPie() {
     return '<path d="M' + x1.toFixed(1) + ',' + y1.toFixed(1) + ' A' + r + ',' + r + ' 0 ' + (pct > 0.5 ? 1 : 0) + ',1 ' + x2.toFixed(1) + ',' + y2.toFixed(1) + '" fill="none" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round"/>';
   }
   content.innerHTML =
-    '<svg viewBox="0 0 120 120" width="120" height="120">' +
+    '<svg viewBox="0 0 100 100" width="100" height="100">' +
       '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="#f0f4f8" stroke-width="' + sw + '"/>' +
       arcPath(mortPct, 0, '#2e99d5') +
       arcPath(protPct, mortPct, '#fcb034') +
     '</svg>' +
-    '<div style="display:flex;flex-direction:column;gap:10px;">' +
-      '<div>' +
-        '<div style="font-size:22px;font-weight:800;color:#2e99d5;">' + Math.round(mortPct*100) + '%</div>' +
-        '<div style="font-size:12px;font-weight:600;color:#6b7c8f;">Mortgage — ' + fmtMins(mort) + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:8px;width:100%;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+        '<div style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:#2e99d5;flex-shrink:0;display:inline-block;"></span><span style="font-size:11px;font-weight:600;color:#6b7c8f;">Mortgage</span></div>' +
+        '<span style="font-size:14px;font-weight:800;color:#2e99d5;">' + Math.round(mortPct*100) + '%</span>' +
       '</div>' +
-      '<div>' +
-        '<div style="font-size:22px;font-weight:800;color:#fcb034;">' + Math.round(protPct*100) + '%</div>' +
-        '<div style="font-size:12px;font-weight:600;color:#6b7c8f;">Protection — ' + fmtMins(prot) + '</div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+        '<div style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:#fcb034;flex-shrink:0;display:inline-block;"></span><span style="font-size:11px;font-weight:600;color:#6b7c8f;">Protection</span></div>' +
+        '<span style="font-size:14px;font-weight:800;color:#fcb034;">' + Math.round(protPct*100) + '%</span>' +
       '</div>' +
     '</div>';
 }

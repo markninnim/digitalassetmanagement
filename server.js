@@ -138,6 +138,34 @@ app.get('/api/me', requireAuth, (req, res) => {
   res.json(req.session.user || {});
 });
 
+// ── Profile: current user self-edit ──────────────────────────
+app.put('/api/profile', requireAuth, async (req, res) => {
+  const { salutation, firstName, lastName, jobTitle, mobile, landline, website, password } = req.body;
+  const id = req.session.user.id;
+  try {
+    const fields = {
+      [F_SAL]:      salutation || '',
+      [F_FIRST]:    firstName  || '',
+      [F_LAST]:     lastName   || '',
+      [F_TITLE]:    jobTitle   || '',
+      [F_MOBILE]:   mobile     || '',
+      [F_LANDLINE]: landline   || '',
+      [F_WEBSITE]:  website    || null
+    };
+    if (password) fields[F_PASSWORD] = bcrypt.hashSync(password, 10);
+    const data = await atFetch(`/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ fields, returnFieldsByFieldId: true })
+    });
+    const updated = recordToUser(data);
+    // Refresh session
+    req.session.user = { ...req.session.user, ...updated };
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Admin: list users ─────────────────────────────────────────
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
   try {
@@ -506,7 +534,7 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     const fontBold = await pdfDoc.embedFont(fontBoldBytes);
     const fontMed  = await pdfDoc.embedFont(fontMedBytes);
     const logoImg  = await pdfDoc.embedPng(logoBytes);
-    const logoDims = logoImg.scale(0.18); // ~160×50ish
+    const logoDims = logoImg.scale(0.13); // smaller logo
 
     const W = 595.28, H = 841.89; // A4
     const page = pdfDoc.addPage([W, H]);
@@ -515,33 +543,44 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     const amber      = rgb(252/255, 176/255, 52/255);
     const green      = rgb(34/255,  197/255, 94/255);
     const grey       = rgb(107/255, 124/255, 143/255);
-    const lightGrey  = rgb(240/255, 244/255, 248/255);
-    const white      = rgb(1,1,1);
+    const midGrey    = rgb(160/255, 172/255, 185/255);
+    const lightGrey  = rgb(232/255, 236/255, 240/255);
+    const pageBg     = rgb(245/255, 247/255, 250/255); // matches #f5f7fa
+    const white      = rgb(1, 1, 1);
 
     const fmtMin = m => { const h = Math.floor(m/60), mn = m%60; return h > 0 ? (h + 'h' + (mn > 0 ? ' ' + mn + 'm' : '')) : (mn + 'm'); };
     const periodTarget = (annual, p) => p === 'month' ? Math.round(annual/12) : p === 'quarter' ? Math.round(annual/4) : annual;
     const periodLabel = period === 'month' ? 'This Month' : period === 'quarter' ? 'This Quarter' : 'This Year';
     const user = req.session.user;
     const userName = ((user.firstName || '') + ' ' + (user.lastName || '')).trim() || email;
-
-    // ── Header bar ─────────────────────────────────────────────
-    const headerH = 72;
-    page.drawRectangle({ x: 0, y: H - headerH, width: W, height: headerH, color: darkBlue });
-    // Logo top-right of header
-    page.drawImage(logoImg, { x: W - logoDims.width - 24, y: H - headerH + (headerH - logoDims.height) / 2, width: logoDims.width, height: logoDims.height });
-    // Adviser name large
-    page.drawText(userName, { x: 32, y: H - 34, size: 18, font: fontBold, color: white });
-    // Sub-line: report type + date
     const dateStr = now.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-    page.drawText('CPD Report — ' + periodLabel + '   |   ' + dateStr, { x: 32, y: H - 54, size: 9, font: fontMed, color: rgb(0.65,0.78,0.9) });
 
-    let y = H - headerH - 22;
+    // ── Page background ────────────────────────────────────────
+    page.drawRectangle({ x: 0, y: 0, width: W, height: H, color: pageBg });
 
-    // ── Progress bars ──────────────────────────────────────────
-    page.drawText('CPD Progress', { x: 32, y, size: 12, font: fontBold, color: darkBlue });
-    y -= 18;
+    // ── Header (white card, full width) ────────────────────────
+    const headerH = 76;
+    page.drawRectangle({ x: 0, y: H - headerH, width: W, height: headerH, color: white });
+    // Thin dark-blue accent line at bottom of header
+    page.drawRectangle({ x: 0, y: H - headerH, width: W, height: 3, color: darkBlue });
+    // Logo — top-left with breathing room
+    const logoX = 28, logoY = H - headerH + (headerH - 3 - logoDims.height) / 2 + 3;
+    page.drawImage(logoImg, { x: logoX, y: logoY, width: logoDims.width, height: logoDims.height });
+    // Adviser name — right-aligned block
+    page.drawText(userName, { x: W - 28 - fontBold.widthOfTextAtSize(userName, 16), y: H - 38, size: 16, font: fontBold, color: darkBlue });
+    const subLine = 'CPD Report — ' + periodLabel + '   ·   ' + dateStr;
+    page.drawText(subLine, { x: W - 28 - fontMed.widthOfTextAtSize(subLine, 8.5), y: H - 54, size: 8.5, font: fontMed, color: grey });
 
-    const barX = 32, barW = W - 200, barH = 10;
+    let y = H - headerH - 24;
+
+    // ── Progress card (white) ──────────────────────────────────
+    const progressCardTop = y;
+    page.drawRectangle({ x: 20, y: y - 148, width: W - 40, height: 158, color: white, borderRadius: 6 });
+    y -= 10;
+    page.drawText('CPD Progress', { x: 36, y, size: 11, font: fontBold, color: darkBlue });
+    y -= 20;
+
+    const barX = 36, barW = W - 210, barH = 9;
     const drawBar = (label, mins, annualTarget, color) => {
       const target = periodTarget(annualTarget, period);
       const pct = target > 0 ? Math.min(1, mins / target) : 0;
@@ -552,7 +591,7 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
       page.drawText(fmtMin(mins) + ' / ' + fmtMin(target), { x: barX + barW + 12, y: y+1, size: 9, font: fontMed, color: grey });
       y -= 14;
       // track
-      page.drawRectangle({ x: barX, y, width: barW, height: barH, color: lightGrey, borderRadius: 5 });
+      page.drawRectangle({ x: barX, y, width: barW, height: barH, color: pageBg, borderRadius: 5 });
       if (pct > 0) page.drawRectangle({ x: barX, y, width: barW * pct, height: barH, color: barColor, borderRadius: 5 });
       y -= 14;
       const pctText = Math.round(pct*100) + '% — ' + (done ? 'Target met ✓' : fmtMin(Math.max(0, target - mins)) + ' remaining');
@@ -570,47 +609,60 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     y -= 4;
     drawBar('Combined Total', combMins, combAnnualTarget, darkBlue);
 
-    y -= 8;
-
-    // ── Entries table ─────────────────────────────────────────
-    page.drawText('Entries (' + entries.length + ')', { x: 32, y, size: 12, font: fontBold, color: darkBlue });
     y -= 16;
 
-    // Table header
-    const cols = [{ x:32, w:70, label:'Date' }, { x:110, w:190, label:'Activity' }, { x:308, w:80, label:'Type' }, { x:396, w:110, label:'Category' }, { x:514, w:50, label:'Time' }];
-    page.drawRectangle({ x: 28, y: y-4, width: W-56, height: 18, color: lightGrey });
-    cols.forEach(c => page.drawText(c.label, { x: c.x, y: y+1, size: 8, font: fontBold, color: grey }));
+    // ── Entries card (white) ───────────────────────────────────
+    const entryRowH = 18;
+    const entriesCardH = 36 + entries.length * entryRowH + 20;
+    page.drawRectangle({ x: 20, y: y - entriesCardH, width: W - 40, height: entriesCardH + 10, color: white, borderRadius: 6 });
+    y -= 10;
+    page.drawText('Entries (' + entries.length + ')', { x: 36, y, size: 11, font: fontBold, color: darkBlue });
+    y -= 16;
+
+    // Table header row
+    const cols = [{ x:36, label:'Date' }, { x:114, label:'Activity' }, { x:310, label:'Type' }, { x:398, label:'Category' }, { x:514, label:'Time' }];
+    page.drawRectangle({ x: 20, y: y - 5, width: W - 40, height: 18, color: pageBg });
+    cols.forEach(c => page.drawText(c.label, { x: c.x, y: y+1, size: 7.5, font: fontBold, color: midGrey }));
     y -= 20;
 
     const truncate = (s, max) => s && s.length > max ? s.slice(0, max-1) + '…' : (s || '');
+    let currentPage = page;
     entries.forEach((e, i) => {
       // New page if needed
       if (y < 60) {
         const np = pdfDoc.addPage([W, H]);
-        // carry over header stripe
-        np.drawRectangle({ x: 0, y: H-60, width: W, height: 60, color: darkBlue });
-        np.drawText('CPD Report — continued', { x: 32, y: H-38, size: 14, font: fontBold, color: white });
-        y = H - 80;
+        np.drawRectangle({ x: 0, y: 0, width: W, height: H, color: pageBg });
+        np.drawRectangle({ x: 0, y: H - headerH, width: W, height: headerH, color: white });
+        np.drawRectangle({ x: 0, y: H - headerH, width: W, height: 3, color: darkBlue });
+        np.drawImage(logoImg, { x: logoX, y: logoY, width: logoDims.width, height: logoDims.height });
+        np.drawText(userName + ' — continued', { x: W - 28 - fontBold.widthOfTextAtSize(userName + ' — continued', 13), y: H - 42, size: 13, font: fontBold, color: darkBlue });
+        currentPage = np;
+        y = H - headerH - 36;
+        currentPage.drawRectangle({ x: 20, y: 40, width: W - 40, height: y - 40, color: white, borderRadius: 6 });
+        y -= 10;
+        currentPage.drawRectangle({ x: 20, y: y - 5, width: W - 40, height: 18, color: pageBg });
+        cols.forEach(c => currentPage.drawText(c.label, { x: c.x, y: y+1, size: 7.5, font: fontBold, color: midGrey }));
+        y -= 20;
       }
-      if (i % 2 === 0) page.drawRectangle({ x: 28, y: y-5, width: W-56, height: 16, color: rgb(0.975,0.98,0.99) });
+      if (i % 2 !== 0) currentPage.drawRectangle({ x: 20, y: y - 5, width: W - 40, height: 16, color: pageBg });
       const d = e.date ? new Date(e.date).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '—';
-      page.drawText(d,                                  { x: cols[0].x, y, size: 8, font: fontMed,  color: grey });
-      page.drawText(truncate(e.activity, 30),           { x: cols[1].x, y, size: 8, font: fontBold, color: darkBlue });
-      page.drawText(truncate(e.cpdType, 12),            { x: cols[2].x, y, size: 8, font: fontMed,  color: grey });
-      page.drawText(truncate(e.category, 18),           { x: cols[3].x, y, size: 8, font: fontMed,  color: grey });
-      page.drawText(fmtMin(e.minutes),                  { x: cols[4].x, y, size: 8, font: fontBold, color: darkBlue });
+      currentPage.drawText(d,                                  { x: cols[0].x, y, size: 8, font: fontMed,  color: grey });
+      currentPage.drawText(truncate(e.activity, 30),           { x: cols[1].x, y, size: 8, font: fontBold, color: darkBlue });
+      currentPage.drawText(truncate(e.cpdType, 12),            { x: cols[2].x, y, size: 8, font: fontMed,  color: e.cpdType === 'Mortgage' ? accentBlue : amber });
+      currentPage.drawText(truncate(e.category, 18),           { x: cols[3].x, y, size: 8, font: fontMed,  color: grey });
+      currentPage.drawText(fmtMin(e.minutes),                  { x: cols[4].x, y, size: 8, font: fontBold, color: darkBlue });
       if (e.learned) {
-        y -= 12;
-        page.drawText('  ' + truncate(e.learned, 80),  { x: cols[1].x, y, size: 7, font: fontMed,  color: grey });
+        y -= 11;
+        currentPage.drawText('  ' + truncate(e.learned, 82),  { x: cols[1].x, y, size: 7, font: fontMed,  color: midGrey });
       }
-      y -= 16;
+      y -= 17;
     });
 
     // ── Footer ────────────────────────────────────────────────
     const pages = pdfDoc.getPages();
     pages.forEach((pg, idx) => {
-      pg.drawText('Generated by FPG DAM  |  Page ' + (idx+1) + ' of ' + pages.length, {
-        x: 32, y: 20, size: 7, font: fontMed, color: grey
+      pg.drawText('Generated by FPG DAM  ·  Page ' + (idx+1) + ' of ' + pages.length, {
+        x: 28, y: 16, size: 7, font: fontMed, color: midGrey
       });
     });
 
