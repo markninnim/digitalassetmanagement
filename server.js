@@ -377,44 +377,65 @@ app.get('/api/supervisor/team', requireAuth, async (req, res) => {
 
 // ── Supervisor: export team CPD as CSV ───────────────────────
 app.get('/api/supervisor/export-csv', requireAuth, async (req, res) => {
-  let supervisorEmail = req.session.user.email;
-  if (req.query.as && (req.session.user.isAdmin || req.session.user.isSupervisor)) {
-    supervisorEmail = req.query.as;
-  }
-  const from = req.query.from || `${new Date().getFullYear()}-01-01`;
-  const to   = req.query.to   || new Date().toISOString().slice(0, 10);
+  const from        = req.query.from  || `${new Date().getFullYear()}-01-01`;
+  const to          = req.query.to    || new Date().toISOString().slice(0, 10);
+  const singleEmail = req.query.email || null;  // broker-level export
+  const exportAll   = req.query.all === 'true' && (req.session.user.isAdmin || req.session.user.isSupervisor);
+
   try {
-    // Get team members (all, or filtered to single adviser)
-    const singleEmail = req.query.email || null;
+    const esc = v => '"' + String(v || '').replace(/"/g, '""') + '"';
+
+    // ── Single broker export ──────────────────────────────────
+    if (singleEmail) {
+      const formula = encodeURIComponent(
+        `AND({User Email}="${singleEmail}",IS_AFTER({Date},"${from}"),NOT(IS_AFTER({Date},"${to}")))`
+      );
+      const cpdData = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=asc&returnFieldsByFieldId=true&pageSize=50`);
+      const entries = (cpdData.records || []).map(cpdRecordToEntry);
+      const rows = [['Name', 'Email', 'Date', 'CPD Type', 'Activity', 'Minutes', 'Hours', 'What I Learned'].map(esc).join(',')];
+      entries.forEach(e => {
+        rows.push([e.email, e.email, e.date || '', e.cpdType || '', e.title || '', e.minutes || 0, ((e.minutes || 0) / 60).toFixed(2), e.learned || ''].map(esc).join(','));
+      });
+      const safeName = singleEmail.replace(/[^a-z0-9]/gi, '-');
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="${safeName}-cpd-${from}-to-${to}.csv"`);
+      return res.send(rows.join('\r\n'));
+    }
+
+    // ── Whole company or supervisor team export ───────────────
     const teamData = await atFetch(`?returnFieldsByFieldId=true`);
-    let members = (teamData.records || [])
-      .filter(r => (r.fields[F_SUPERVISOR_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase())
-      .map(r => recordToUser(r));
-    if (singleEmail) members = members.filter(m => m.email.toLowerCase() === singleEmail.toLowerCase());
+    let members;
+    if (exportAll) {
+      // All users who have logged CPD (everyone)
+      members = (teamData.records || []).map(r => recordToUser(r));
+    } else {
+      let supervisorEmail = req.session.user.email;
+      if (req.query.as && (req.session.user.isAdmin || req.session.user.isSupervisor)) supervisorEmail = req.query.as;
+      members = (teamData.records || [])
+        .filter(r => (r.fields[F_SUPERVISOR_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase())
+        .map(r => recordToUser(r));
+    }
     if (!members.length) {
       res.setHeader('Content-Type', 'text/csv');
-      return res.send('No team members found');
+      return res.send('No members found');
     }
-    // Fetch CPD entries for date range
-    const emails = members.map(m => `{User Email}="${m.email}"`).join(',');
+    const emails  = members.map(m => `{User Email}="${m.email}"`).join(',');
     const formula = encodeURIComponent(
       `AND(OR(${emails}),IS_AFTER({Date},"${from}"),NOT(IS_AFTER({Date},"${to}")))`
     );
     const cpdData = await cpdFetch(`?filterByFormula=${formula}&sort[0][field]=${CPD_DATE}&sort[0][direction]=asc&returnFieldsByFieldId=true&pageSize=50`);
     const entries = (cpdData.records || []).map(cpdRecordToEntry);
-    // Build member lookup
     const memberMap = {};
     members.forEach(m => { memberMap[m.email] = m; });
-    // CSV
-    const esc = v => '"' + String(v || '').replace(/"/g, '""') + '"';
     const rows = [['Name', 'Email', 'Date', 'CPD Type', 'Activity', 'Minutes', 'Hours', 'What I Learned'].map(esc).join(',')];
     entries.forEach(e => {
       const m = memberMap[e.email] || {};
       const name = [m.salutation, m.firstName, m.lastName].filter(Boolean).join(' ') || e.email;
       rows.push([name, e.email, e.date || '', e.cpdType || '', e.title || '', e.minutes || 0, ((e.minutes || 0) / 60).toFixed(2), e.learned || ''].map(esc).join(','));
     });
+    const label = exportAll ? 'company' : 'team';
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="team-cpd-${from}-to-${to}.csv"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${label}-cpd-${from}-to-${to}.csv"`);
     res.send(rows.join('\r\n'));
   } catch (err) {
     res.status(500).json({ error: err.message });

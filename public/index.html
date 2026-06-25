@@ -2714,13 +2714,12 @@ function svToggleViewAsBar() {
 }
 
 function svExportCsv() {
-  var from  = (document.getElementById('sv-date-from') || {}).value || (new Date().getFullYear() + '-01-01');
-  var to    = (document.getElementById('sv-date-to')   || {}).value || new Date().toISOString().slice(0,10);
-  var as    = _svViewAsEmail ? '&as=' + encodeURIComponent(_svViewAsEmail) : '';
-  var url   = '/api/supervisor/export-csv?from=' + from + '&to=' + to + as;
+  var from = (document.getElementById('sv-date-from') || {}).value || (new Date().getFullYear() + '-01-01');
+  var to   = (document.getElementById('sv-date-to')   || {}).value || new Date().toISOString().slice(0,10);
+  var url  = '/api/supervisor/export-csv?all=true&from=' + from + '&to=' + to;
   var a = document.createElement('a');
   a.href = url;
-  a.download = 'team-cpd-' + from + '-to-' + to + '.csv';
+  a.download = 'company-cpd-' + from + '-to-' + to + '.csv';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
