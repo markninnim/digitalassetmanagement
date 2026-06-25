@@ -882,28 +882,68 @@ html { height: 100%; }
 </div>
 
 <!-- ── Video Player Modal ─────────────────────────────────── -->
-<div id="lv-player-modal" onclick="if(event.target===this)closeLvPlayer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1500;align-items:center;justify-content:center;">
-  <div style="width:100%;max-width:900px;padding:0 20px;box-sizing:border-box;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-      <div>
-        <div id="lv-player-title" style="color:#fff;font-size:18px;font-weight:700;"></div>
-        <div id="lv-player-desc" style="color:rgba(255,255,255,.65);font-size:13px;margin-top:2px;"></div>
+<div id="lv-player-modal" onclick="if(event.target===this)closeLvPlayer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1500;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+  <div id="lv-player-wrap" style="width:100%;max-width:920px;">
+
+    <!-- Header bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;">
+      <div style="min-width:0;">
+        <div id="lv-player-title" style="color:#fff;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       </div>
-      <button onclick="closeLvPlayer()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px;">&#x2715;</button>
-    </div>
-    <div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;background:#000;">
-      <iframe id="lv-iframe" src="" allow="autoplay;encrypted-media;fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
-    </div>
-    <!-- CPD log strip -->
-    <div style="margin-top:12px;background:rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <span style="color:rgba(255,255,255,.7);font-size:13px;font-weight:600;white-space:nowrap;">Log 1hr CPD as:</span>
-      <div style="display:flex;gap:6px;">
-        <button id="lv-cpd-mortgage" onclick="selectLvCpdType('Mortgage')" style="padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:#2e99d5;color:#fff;border:2px solid #2e99d5;transition:all .15s;">Mortgage</button>
-        <button id="lv-cpd-protection" onclick="selectLvCpdType('Protection')" style="padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:2px solid transparent;transition:all .15s;">Protection</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <!-- Layout toggle -->
+        <button id="lv-split-btn" onclick="toggleLvSplit()" title="Toggle 50/50 split"
+          style="background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;white-space:nowrap;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+          Split view
+        </button>
+        <button onclick="closeLvPlayer()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&#x2715;</button>
       </div>
-      <button id="lv-cpd-log-btn" onclick="logLvCpd()" style="margin-left:auto;background:#fcb034;color:#003768;border:none;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Log CPD</button>
-      <span id="lv-cpd-status" style="font-size:12px;color:#22c55e;display:none;"></span>
     </div>
+
+    <!-- Full-width layout (default) -->
+    <div id="lv-layout-full">
+      <div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;background:#000;">
+        <iframe id="lv-iframe" src="" allow="autoplay;encrypted-media;fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
+      </div>
+      <!-- CPD strip below video -->
+      <div style="margin-top:10px;background:rgba(255,255,255,.08);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="color:rgba(255,255,255,.7);font-size:13px;font-weight:600;white-space:nowrap;">Log 1hr CPD as:</span>
+        <div style="display:flex;gap:6px;">
+          <button id="lv-cpd-mortgage" onclick="selectLvCpdType('Mortgage')" style="padding:5px 13px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:#2e99d5;color:#fff;border:2px solid #2e99d5;">Mortgage</button>
+          <button id="lv-cpd-protection" onclick="selectLvCpdType('Protection')" style="padding:5px 13px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:2px solid transparent;">Protection</button>
+        </div>
+        <button id="lv-cpd-log-btn" onclick="logLvCpd()" style="margin-left:auto;background:#fcb034;color:#003768;border:none;padding:7px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">+ Log CPD</button>
+        <span id="lv-cpd-status" style="font-size:12px;color:#22c55e;display:none;"></span>
+      </div>
+    </div>
+
+    <!-- 50/50 split layout (hidden by default) -->
+    <div id="lv-layout-split" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+        <!-- Left: video -->
+        <div style="position:relative;padding-bottom:56.25%;height:0;border-radius:10px;overflow:hidden;background:#000;">
+          <iframe id="lv-iframe-split" src="" allow="autoplay;encrypted-media;fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
+        </div>
+        <!-- Right: info + CPD -->
+        <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:16px;min-height:200px;">
+          <div>
+            <div id="lv-split-title" style="color:#fff;font-size:16px;font-weight:700;margin-bottom:6px;"></div>
+            <div id="lv-split-desc" style="color:rgba(255,255,255,.6);font-size:13px;line-height:1.6;"></div>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,.12);padding-top:16px;margin-top:auto;">
+            <div style="color:rgba(255,255,255,.7);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Log 1hr CPD</div>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+              <button id="lv-cpd-mortgage-s" onclick="selectLvCpdType('Mortgage')" style="flex:1;padding:8px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:#2e99d5;color:#fff;border:2px solid #2e99d5;">Mortgage</button>
+              <button id="lv-cpd-protection-s" onclick="selectLvCpdType('Protection')" style="flex:1;padding:8px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:2px solid transparent;">Protection</button>
+            </div>
+            <button id="lv-cpd-log-btn-s" onclick="logLvCpd()" style="width:100%;background:#fcb034;color:#003768;border:none;padding:9px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">+ Log CPD</button>
+            <div id="lv-cpd-status-s" style="font-size:12px;color:#22c55e;margin-top:8px;text-align:center;display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -2055,54 +2095,133 @@ function escAttr(s) {
 
 var _lvCpdType = 'Mortgage';
 var _lvCurrentTitle = '';
+var _lvSplit = false;
+var _lvTimerInterval = null;
+var _lvTimerSeconds = 0;
+var _lvCpdReady = false;
+var CPD_UNLOCK_SECS = 50 * 60; // 50 minutes
 
 function openLvPlayer(url, title, desc) {
   _lvCurrentTitle = title || 'Learning Zone video';
-  document.getElementById('lv-iframe').src = getEmbedUrl(url);
+  var embedUrl = getEmbedUrl(url);
+  document.getElementById('lv-iframe').src = _lvSplit ? '' : embedUrl;
+  document.getElementById('lv-iframe-split').src = _lvSplit ? embedUrl : '';
   document.getElementById('lv-player-title').textContent = title || '';
-  document.getElementById('lv-player-desc').textContent = desc || '';
+  document.getElementById('lv-split-title').textContent  = title || '';
+  document.getElementById('lv-split-desc').textContent   = desc  || '';
   document.getElementById('lv-player-modal').style.display = 'flex';
-  // Reset CPD log strip
+  // Reset CPD strip
   _lvCpdType = 'Mortgage';
   selectLvCpdType('Mortgage');
-  document.getElementById('lv-cpd-status').style.display = 'none';
-  var btn = document.getElementById('lv-cpd-log-btn');
-  btn.disabled = false;
-  btn.textContent = '+ Log CPD';
+  ['lv-cpd-status','lv-cpd-status-s'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+  // Start locked — 50-minute timer
+  _lvCpdReady = false;
+  _lvTimerSeconds = 0;
+  clearInterval(_lvTimerInterval);
+  setLvBtnLocked(true);
+  _lvTimerInterval = setInterval(function() {
+    _lvTimerSeconds++;
+    var remaining = Math.max(0, CPD_UNLOCK_SECS - _lvTimerSeconds);
+    var m = Math.floor(remaining / 60);
+    var s = remaining % 60;
+    var label = 'Available in ' + m + ':' + (s < 10 ? '0' : '') + s;
+    if (remaining <= 0 && !_lvCpdReady) {
+      _lvCpdReady = true;
+      clearInterval(_lvTimerInterval);
+      setLvBtnLocked(false);
+    } else if (!_lvCpdReady) {
+      ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){
+        var b = document.getElementById(id);
+        if (b) b.textContent = label;
+      });
+    }
+  }, 1000);
+}
+
+function setLvBtnLocked(locked) {
+  var lockedStyle = 'background:#4a5568;color:#9ca3af;border:none;cursor:not-allowed;opacity:.7;';
+  var readyStyle  = 'background:#fcb034;color:#003768;border:none;cursor:pointer;opacity:1;';
+  ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id) {
+    var b = document.getElementById(id);
+    if (!b) return;
+    b.disabled = locked;
+    b.style.cssText += locked ? lockedStyle : readyStyle;
+    if (!locked) b.textContent = '+ Log CPD';
+  });
+}
+
+function toggleLvSplit() {
+  _lvSplit = !_lvSplit;
+  var full  = document.getElementById('lv-layout-full');
+  var split = document.getElementById('lv-layout-split');
+  var wrap  = document.getElementById('lv-player-wrap');
+  var btn   = document.getElementById('lv-split-btn');
+  if (_lvSplit) {
+    full.style.display  = 'none';
+    split.style.display = 'block';
+    wrap.style.maxWidth = '1200px';
+    btn.style.background = 'rgba(46,153,213,.4)';
+    btn.style.borderColor = '#2e99d5';
+    // Move iframe src
+    var src = document.getElementById('lv-iframe').src;
+    document.getElementById('lv-iframe-split').src = src || getEmbedUrl('');
+    document.getElementById('lv-iframe').src = '';
+  } else {
+    split.style.display = 'none';
+    full.style.display  = 'block';
+    wrap.style.maxWidth = '920px';
+    btn.style.background = 'rgba(255,255,255,.12)';
+    btn.style.borderColor = 'rgba(255,255,255,.2)';
+    var src2 = document.getElementById('lv-iframe-split').src;
+    document.getElementById('lv-iframe').src = src2 || '';
+    document.getElementById('lv-iframe-split').src = '';
+  }
 }
 
 function selectLvCpdType(type) {
   _lvCpdType = type;
-  var on  = 'padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:#2e99d5;color:#fff;border:2px solid #2e99d5;transition:all .15s;';
-  var off = 'padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:2px solid transparent;transition:all .15s;';
-  document.getElementById('lv-cpd-mortgage').style.cssText  = type === 'Mortgage'   ? on : off;
-  document.getElementById('lv-cpd-protection').style.cssText = type === 'Protection' ? on : off;
+  var on  = 'background:#2e99d5;color:#fff;border:2px solid #2e99d5;';
+  var off = 'background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border:2px solid transparent;';
+  // Full layout buttons
+  var mEl = document.getElementById('lv-cpd-mortgage');
+  var pEl = document.getElementById('lv-cpd-protection');
+  if (mEl) mEl.style.cssText += type==='Mortgage' ? on : off;
+  if (pEl) pEl.style.cssText += type==='Protection' ? on : off;
+  // Split layout buttons
+  var mEs = document.getElementById('lv-cpd-mortgage-s');
+  var pEs = document.getElementById('lv-cpd-protection-s');
+  if (mEs) mEs.style.cssText += type==='Mortgage' ? on : off;
+  if (pEs) pEs.style.cssText += type==='Protection' ? on : off;
 }
 
 function logLvCpd() {
-  var btn    = document.getElementById('lv-cpd-log-btn');
-  var status = document.getElementById('lv-cpd-status');
-  btn.disabled = true;
-  btn.textContent = 'Logging…';
+  if (!_lvCpdReady) return;
+  var btn    = _lvSplit ? document.getElementById('lv-cpd-log-btn-s') : document.getElementById('lv-cpd-log-btn');
+  var status = _lvSplit ? document.getElementById('lv-cpd-status-s')  : document.getElementById('lv-cpd-status');
+  // Also disable both buttons to prevent double-logging
+  ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.disabled=true; b.textContent='Logging…'; } });
   fetch('/api/cpd/video', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ videoTitle: _lvCurrentTitle, cpdType: _lvCpdType })
   }).then(function(r) {
     if (r.ok) {
-      status.textContent = '✓ 1hr ' + _lvCpdType + ' CPD logged';
-      status.style.display = 'inline';
-      btn.textContent = '✓ Logged';
+      ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.textContent='✓ Logged'; } });
+      ['lv-cpd-status','lv-cpd-status-s'].forEach(function(id){ var s=document.getElementById(id); if(s){ s.textContent='✓ 1hr '+_lvCpdType+' CPD logged'; s.style.display='inline'; } });
       _cpdLoaded = false;
     } else {
-      btn.textContent = '+ Log CPD'; btn.disabled = false;
+      ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.disabled=false; b.textContent='+ Log CPD'; } });
     }
-  }).catch(function() { btn.textContent = '+ Log CPD'; btn.disabled = false; });
+  }).catch(function() {
+    ['lv-cpd-log-btn','lv-cpd-log-btn-s'].forEach(function(id){ var b=document.getElementById(id); if(b){ b.disabled=false; b.textContent='+ Log CPD'; } });
+  });
 }
 
 function closeLvPlayer() {
+  clearInterval(_lvTimerInterval);
   document.getElementById('lv-player-modal').style.display = 'none';
   document.getElementById('lv-iframe').src = '';
+  document.getElementById('lv-iframe-split').src = '';
 }
 
 function toggleLvArchive() {
