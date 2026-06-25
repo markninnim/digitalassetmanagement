@@ -32,6 +32,7 @@ const F_PROTECTION     = 'fldpLRcjuGeL1muYF';
 const F_INVESTMENTS    = 'fld7C7E8seECPWbNh';
 const F_IS_SUPERVISOR  = 'fldhOYcUHF3SrnC5C';
 const F_SUPERVISOR_EMAIL = 'fldvyCzxvpIEjD7PU';
+const F_AVATAR         = 'fldiQ06FtP4BehJU7';
 
 async function atFetch(endpoint, options = {}) {
   const url = `https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}${endpoint}`;
@@ -61,7 +62,8 @@ function recordToUser(record) {
     sellsProtection:  f[F_PROTECTION]       || false,
     sellsInvestments: f[F_INVESTMENTS]      || false,
     isSupervisor:     f[F_IS_SUPERVISOR]    || false,
-    supervisorEmail:  f[F_SUPERVISOR_EMAIL] || ''
+    supervisorEmail:  f[F_SUPERVISOR_EMAIL] || '',
+    avatarUrl:        f[F_AVATAR]           || ''
   };
 }
 
@@ -161,6 +163,30 @@ app.put('/api/profile', requireAuth, async (req, res) => {
     // Refresh session
     req.session.user = { ...req.session.user, ...updated };
     res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Profile: upload photo (base64 data URL) ───────────────────
+app.post('/api/profile/photo', requireAuth, async (req, res) => {
+  const { dataUrl } = req.body;
+  if (!dataUrl || !dataUrl.startsWith('data:image/')) {
+    return res.status(400).json({ error: 'Invalid image data' });
+  }
+  // Limit to ~2MB base64
+  if (dataUrl.length > 2_800_000) {
+    return res.status(400).json({ error: 'Image too large (max ~2MB)' });
+  }
+  const id = req.session.user.id;
+  try {
+    const data = await atFetch(`/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ fields: { [F_AVATAR]: dataUrl }, returnFieldsByFieldId: true })
+    });
+    const updated = recordToUser(data);
+    req.session.user = { ...req.session.user, ...updated };
+    res.json({ avatarUrl: updated.avatarUrl });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -542,6 +568,16 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     const logoImg  = await pdfDoc.embedPng(logoBytes);
     const logoDims = logoImg.scale(0.13); // smaller logo
 
+    // Embed adviser photo if available
+    let avatarImg = null;
+    if (user.avatarUrl && user.avatarUrl.startsWith('data:image/')) {
+      try {
+        const base64Data = user.avatarUrl.split(',')[1];
+        const imgBytes   = Buffer.from(base64Data, 'base64');
+        avatarImg = await pdfDoc.embedJpg(imgBytes);
+      } catch(_) { avatarImg = null; }
+    }
+
     const W = 595.28, H = 841.89; // A4
     const page = pdfDoc.addPage([W, H]);
     const darkBlue   = rgb(0/255,   55/255,  104/255);
@@ -572,10 +608,17 @@ app.get('/api/cpd/pdf', requireAuth, async (req, res) => {
     // Logo — top-left with breathing room
     const logoX = 28, logoY = H - headerH + (headerH - 3 - logoDims.height) / 2 + 3;
     page.drawImage(logoImg, { x: logoX, y: logoY, width: logoDims.width, height: logoDims.height });
-    // Adviser name — right-aligned block
-    page.drawText(userName, { x: W - 28 - fontBold.widthOfTextAtSize(userName, 16), y: H - 38, size: 16, font: fontBold, color: darkBlue });
+    // Adviser photo (circle) + name — right side of header
+    const avatarSize = 42;
+    const avatarX = W - 28 - avatarSize;
+    const avatarY = H - headerH + (headerH - 3 - avatarSize) / 2 + 3;
+    if (avatarImg) {
+      page.drawImage(avatarImg, { x: avatarX, y: avatarY, width: avatarSize, height: avatarSize });
+    }
+    const nameX = avatarImg ? avatarX - 10 : W - 28;
+    page.drawText(userName, { x: nameX - fontBold.widthOfTextAtSize(userName, 13), y: H - 36, size: 13, font: fontBold, color: darkBlue });
     const subLine = 'CPD Report — ' + periodLabel + '   ·   ' + dateStr;
-    page.drawText(subLine, { x: W - 28 - fontMed.widthOfTextAtSize(subLine, 8.5), y: H - 54, size: 8.5, font: fontMed, color: grey });
+    page.drawText(subLine, { x: nameX - fontMed.widthOfTextAtSize(subLine, 8), y: H - 52, size: 8, font: fontMed, color: grey });
 
     let y = H - headerH - 24;
 

@@ -113,7 +113,7 @@ html { height: 100%; }
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Admin
     </button>
     <button id="account-btn" onclick="openAccountModal()" style="display:flex;align-items:center;gap:7px;background:none;border:1.5px solid #e8ecf0;padding:5px 13px 5px 8px;border-radius:20px;cursor:pointer;font-family:inherit;color:#1a2a3a;transition:background .15s;" onmouseover="this.style.background='#f5f7fa'" onmouseout="this.style.background='none'">
-      <span id="nav-user-avatar" style="width:26px;height:26px;border-radius:50%;background:#003768;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></span>
+      <span id="nav-user-avatar" style="width:26px;height:26px;border-radius:50%;background:#003768;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;"></span>
       <span id="nav-user-name" style="font-size:13px;font-weight:600;"></span>
     </button>
     <a href="/logout" style="color:#6b7c8f;font-size:13px;font-weight:600;text-decoration:none;padding:6px 12px;border-radius:20px;transition:background .15s;" onmouseover="this.style.background='#f5f7fa'" onmouseout="this.style.background='none'">Sign out</a>
@@ -982,11 +982,18 @@ html { height: 100%; }
         <button onclick="closeAccountModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;">×</button>
       </div>
       <div style="display:flex;align-items:center;gap:14px;">
-        <div id="acc-avatar" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"></div>
+        <div style="position:relative;flex-shrink:0;" onclick="document.getElementById('acc-photo-input').click()" title="Change photo" style="cursor:pointer;">
+          <div id="acc-avatar" style="width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;border:2.5px solid rgba(255,255,255,.3);" onclick="document.getElementById('acc-photo-input').click()"></div>
+          <div style="position:absolute;bottom:0;right:0;width:20px;height:20px;background:#fcb034;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <input id="acc-photo-input" type="file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(this)">
+        </div>
         <div>
           <div id="acc-full-name" style="font-size:17px;font-weight:700;color:#fff;"></div>
           <div id="acc-email" style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px;"></div>
           <div id="acc-title" style="font-size:12px;color:#fcb034;margin-top:2px;font-weight:600;"></div>
+          <div id="acc-photo-status" style="font-size:11px;color:rgba(255,255,255,.5);margin-top:3px;"></div>
         </div>
       </div>
     </div>
@@ -2313,18 +2320,35 @@ function updateNavUser(user) {
   var displayName = user.firstName || user.email || '';
   var avatarEl = document.getElementById('nav-user-avatar');
   var nameEl   = document.getElementById('nav-user-name');
-  if (avatarEl) avatarEl.textContent = initials;
-  if (nameEl)   nameEl.textContent   = displayName;
+  if (avatarEl) {
+    if (user.avatarUrl) {
+      avatarEl.innerHTML = '<img src="' + user.avatarUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    } else {
+      avatarEl.textContent = initials;
+    }
+  }
+  if (nameEl) nameEl.textContent = displayName;
+}
+
+function renderAccAvatar(user) {
+  var avatarEl = document.getElementById('acc-avatar');
+  if (!avatarEl) return;
+  if (user && user.avatarUrl) {
+    avatarEl.innerHTML = '<img src="' + user.avatarUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+  } else {
+    var initials = ((user && user.firstName || '').charAt(0) + (user && user.lastName || '').charAt(0)).toUpperCase() || '?';
+    avatarEl.textContent = initials;
+  }
 }
 
 function openAccountModal() {
   var user = _currentUser || {};
   // Populate header
-  var initials = ((user.firstName || '').charAt(0) + (user.lastName || '').charAt(0)).toUpperCase() || '?';
-  document.getElementById('acc-avatar').textContent    = initials;
+  renderAccAvatar(user);
   document.getElementById('acc-full-name').textContent = ((user.salutation ? user.salutation + ' ' : '') + (user.firstName || '') + ' ' + (user.lastName || '')).trim() || '—';
   document.getElementById('acc-email').textContent     = user.email || '';
   document.getElementById('acc-title').textContent     = user.jobTitle || '';
+  document.getElementById('acc-photo-status').textContent = '';
   // Populate form
   document.getElementById('acc-sal').value      = user.salutation || '';
   document.getElementById('acc-first').value    = user.firstName  || '';
@@ -2346,6 +2370,54 @@ function openAccountModal() {
     panel.style.transition = 'transform .3s cubic-bezier(.4,0,.2,1)';
     panel.style.transform  = 'translateX(0)';
   });
+}
+
+function handlePhotoUpload(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var statusEl = document.getElementById('acc-photo-status');
+  statusEl.textContent = 'Uploading…';
+  statusEl.style.color = 'rgba(255,255,255,.5)';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      // Resize to max 300px square
+      var MAX = 300;
+      var w = img.width, h = img.height;
+      if (w > MAX || h > MAX) {
+        var ratio = Math.min(MAX / w, MAX / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      fetch('/api/profile/photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dataUrl: dataUrl })
+      }).then(function(r) { return r.json(); }).then(function(d) {
+        if (d.avatarUrl) {
+          _currentUser = Object.assign(_currentUser || {}, { avatarUrl: d.avatarUrl });
+          renderAccAvatar(_currentUser);
+          updateNavUser(_currentUser);
+          statusEl.textContent = '✓ Photo saved';
+          statusEl.style.color = '#22c55e';
+        } else {
+          statusEl.textContent = d.error || 'Upload failed';
+          statusEl.style.color = '#ef4444';
+        }
+      }).catch(function() {
+        statusEl.textContent = 'Upload failed';
+        statusEl.style.color = '#ef4444';
+      });
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
 }
 
 function closeAccountModal() {
@@ -2379,7 +2451,7 @@ function saveAccountDetails() {
       if (!res.ok) { errEl.textContent = res.data.error || 'Something went wrong.'; errEl.style.display = 'block'; return; }
       _currentUser = Object.assign(_currentUser || {}, res.data);
       // Refresh header
-      document.getElementById('acc-avatar').textContent    = ((res.data.firstName||'').charAt(0)+(res.data.lastName||'').charAt(0)).toUpperCase() || '?';
+      renderAccAvatar(_currentUser);
       document.getElementById('acc-full-name').textContent = ((res.data.salutation ? res.data.salutation+' ' : '') + res.data.firstName + ' ' + res.data.lastName).trim();
       document.getElementById('acc-title').textContent     = res.data.jobTitle || '';
       document.getElementById('acc-password').value = '';
