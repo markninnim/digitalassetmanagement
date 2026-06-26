@@ -4415,14 +4415,14 @@ function openNewsletter(url, title, monthLabel) {
   // Log 15 min Mortgage CPD
   fetch('/api/cpd', {
     method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ activity: title, date: today, minutes: 15, category: 'Technical Knowledge', cpdType: 'Mortgage', learned: 'Read FPG ' + monthLabel + ' CPD Round-up newsletter' })
+    body: JSON.stringify({ activity: title, date: today, minutes: 10, category: 'Technical Knowledge', cpdType: 'Mortgage', learned: 'Read FPG ' + monthLabel + ' CPD Round-up newsletter' })
   });
-  // Log 15 min Protection CPD
+  // Log 10 min Protection CPD
   fetch('/api/cpd', {
     method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ activity: title, date: today, minutes: 15, category: 'Technical Knowledge', cpdType: 'Protection', learned: 'Read FPG ' + monthLabel + ' CPD Round-up newsletter' })
+    body: JSON.stringify({ activity: title, date: today, minutes: 10, category: 'Technical Knowledge', cpdType: 'Protection', learned: 'Read FPG ' + monthLabel + ' CPD Round-up newsletter' })
   }).then(function() {
-    if (toast) { toast.textContent = '✓ 30 min CPD logged (15 Mortgage + 15 Protection)'; toast.style.opacity = 1; setTimeout(function(){ toast.style.opacity = 0; }, 5000); }
+    if (toast) { toast.textContent = '✓ 20 min CPD logged (10 Mortgage + 10 Protection)'; toast.style.opacity = 1; setTimeout(function(){ toast.style.opacity = 0; }, 5000); }
   }).catch(function() {
     if (toast) { toast.textContent = 'CPD log failed – try again'; toast.style.opacity = 1; setTimeout(function(){ toast.style.opacity = 0; }, 3000); }
   });
