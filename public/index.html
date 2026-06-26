@@ -5010,29 +5010,22 @@ function loadSupervisorZone() {
     _svListLoaded = true;
     fetch('/api/supervisor/list').then(function(r){ return r.json(); }).then(function(d) {
       var supervisors = d.supervisors || [];
-      if (supervisors.length > 1) {
-        var allOption = (_currentUser && _currentUser.isAdmin) ? '<option value="all">All Company</option>' : '';
-        sel.innerHTML = allOption + supervisors.map(function(s) {
-          return '<option value="' + escHtml(s.email) + '">' + escHtml(s.name) + '</option>';
-        }).join('');
-        // Admins default to "all", supervisors default to their own team
-        if (_svViewAsEmail) {
-          sel.value = _svViewAsEmail;
-        } else if (_currentUser && _currentUser.isAdmin) {
-          sel.value = 'all';
-          _svViewAsEmail = 'all';
+      // ── Populate sidebar supervisor links
+      var sbWrap = document.getElementById('sv-sb-supervisors');
+      if (sbWrap && supervisors.length > 0) {
+        var sbHtml = '<div style="margin:16px 0 4px;padding:0 18px;"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#fcb034;">SUPERVISORS</span></div>';
+        if (_currentUser && _currentUser.isAdmin) {
+          sbHtml += '<a href="#" onclick="return svSidebarSelect(\'all\',this)" style="padding-left:24px;">All Company</a>';
         }
-
-        // ── Populate sidebar supervisor links
-        var sbWrap = document.getElementById('sv-sb-supervisors');
-        if (sbWrap && supervisors.length > 0) {
-          var sbHtml = '<div style="margin:16px 0 4px;padding:0 18px;"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#fcb034;">SUPERVISORS</span></div>';
-          supervisors.forEach(function(s) {
-            sbHtml += '<a href="#" onclick="return svSidebarSelect(\'' + s.email + '\',this)" style="padding-left:24px;">' + escHtml(s.name) + '</a>';
-          });
-          sbWrap.innerHTML = sbHtml;
-          sbWrap.style.display = 'block';
-        }
+        supervisors.forEach(function(s) {
+          sbHtml += '<a href="#" onclick="return svSidebarSelect(\'' + s.email + '\',this)" style="padding-left:24px;">' + escHtml(s.name) + '</a>';
+        });
+        sbWrap.innerHTML = sbHtml;
+        sbWrap.style.display = 'block';
+      }
+      // Set default viewAs for admins
+      if (!_svViewAsEmail && _currentUser && _currentUser.isAdmin) {
+        _svViewAsEmail = 'all';
       }
     });
   }
