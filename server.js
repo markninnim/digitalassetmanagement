@@ -1471,6 +1471,98 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
   }
 });
 
+// ── Share Standards section ───────────────────────────────────
+const nodemailer = require('nodemailer');
+
+function makeMailTransport() {
+  return nodemailer.createTransport({
+    host:   process.env.SMTP_HOST || 'smtp.gmail.com',
+    port:   parseInt(process.env.SMTP_PORT || '587'),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
+
+// GET /api/share/advisers — all advisers (supervisors only)
+app.get('/api/share/advisers', requireAuth, async (req, res) => {
+  if (!req.session.user.isSupervisor && !req.session.user.isAdmin) {
+    return res.status(403).json({ error: 'Supervisors only' });
+  }
+  try {
+    const users = [];
+    let offset = '';
+    do {
+      const qs = `?returnFieldsByFieldId=true&pageSize=100${offset ? '&offset=' + offset : ''}`;
+      const data = await atFetch(qs);
+      for (const r of (data.records || [])) {
+        const u = recordToUser(r);
+        if (u.email) users.push({ id: u.id, name: [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email, email: u.email });
+      }
+      offset = data.offset || '';
+    } while (offset);
+    users.sort((a, b) => a.name.localeCompare(b.name));
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/share/standards — email a section to selected advisers
+app.post('/api/share/standards', requireAuth, async (req, res) => {
+  if (!req.session.user.isSupervisor && !req.session.user.isAdmin) {
+    return res.status(403).json({ error: 'Supervisors only' });
+  }
+  const { recipients, sectionTitle, docTitle, deepLink, bodyHtml } = req.body;
+  if (!recipients || !recipients.length) return res.status(400).json({ error: 'No recipients' });
+
+  const sender = req.session.user;
+  const senderName = [sender.firstName, sender.lastName].filter(Boolean).join(' ') || sender.email;
+  const appUrl = process.env.APP_URL || 'https://your-app.railway.app';
+  const linkUrl = appUrl + (deepLink || '');
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a2a3a;">
+      <div style="background:#003768;padding:20px 28px;border-radius:8px 8px 0 0;">
+        <h1 style="margin:0;font-size:20px;color:#fff;font-weight:700;">Finance Planning Group</h1>
+        <p style="margin:4px 0 0;font-size:13px;color:rgba(255,255,255,.7);">Advice Standards</p>
+      </div>
+      <div style="padding:24px 28px;background:#fff;border:1px solid #e8ecf0;border-top:none;">
+        <p style="margin:0 0 16px;font-size:14px;color:#2c3e50;">
+          <strong>${senderName}</strong> has shared a section of the <strong>${docTitle}</strong> with you.
+        </p>
+        <div style="background:#f5f7fa;border-left:4px solid #003768;padding:14px 18px;border-radius:0 6px 6px 0;margin-bottom:20px;">
+          <p style="margin:0;font-size:13px;font-weight:700;color:#003768;">${sectionTitle}</p>
+        </div>
+        <div style="font-size:13px;color:#2c3e50;line-height:1.7;margin-bottom:24px;">
+          ${bodyHtml || ''}
+        </div>
+        <a href="${linkUrl}" style="display:inline-block;background:#003768;color:#fff;text-decoration:none;padding:11px 22px;border-radius:7px;font-size:14px;font-weight:600;">Open in FPG Hub →</a>
+      </div>
+      <div style="padding:14px 28px;background:#f5f7fa;border:1px solid #e8ecf0;border-top:none;border-radius:0 0 8px 8px;font-size:11px;color:#9baabb;">
+        Sent by ${senderName} via FPG Digital Hub
+      </div>
+    </div>`;
+
+  try {
+    const transport = makeMailTransport();
+    await Promise.all(recipients.map(email =>
+      transport.sendMail({
+        from: `"${senderName} via FPG Hub" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: `${senderName} shared: ${sectionTitle} – ${docTitle}`,
+        html,
+      })
+    ));
+    res.json({ sent: recipients.length });
+  } catch (err) {
+    console.error('Share email error:', err.message);
+    res.status(500).json({ error: 'Email failed: ' + err.message });
+  }
+});
+
 // ── Start ─────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`FPG Digital Asset Management Tool running on port ${PORT}`);
