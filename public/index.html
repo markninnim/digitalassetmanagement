@@ -3835,7 +3835,7 @@ function switchTab(tab) {
   if (tab === 'supervisor-zone')  { svInitDates(); loadSupervisorZone(); }
   if (tab === 'sales-process')    { showSpSection('sp-overview', document.getElementById('sp-nav-overview')); }
   if (tab !== 'sales-process')   { stopMasTimer(); stopPasTimer(); }
-  if (tab === 'performance-zone') { pzInit(); }
+  if (tab === 'performance-zone') { pzInit(); } else { var ov=document.getElementById('pz-overlay'); if(ov) ov.style.display='none'; }
 }
 
 // Hash routing — navigate on load (called directly, no event wrapper needed)
@@ -6350,21 +6350,33 @@ function pzFilter(q) {
 }
 
 function pzShowBroker(name, el) {
-  alert('pzShowBroker: ' + name);
   document.querySelectorAll('#pz-broker-list a').forEach(function(a){ a.classList.remove('active'); });
   if (el) el.classList.add('active');
   var d = PZ_DATA[name];
-  var main = document.getElementById('pz-main');
-  if (!main || !d) { alert('FAIL: main=' + !!main + ' d=' + !!d); return; }
-  main.style.opacity = '1';
-  main.innerHTML =
+  if (!d) return;
+
+  // Write to a guaranteed-visible overlay first to confirm rendering works
+  var ov = document.getElementById('pz-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'pz-overlay';
+    ov.style.cssText = 'position:fixed;top:60px;left:220px;right:0;bottom:0;background:#f7f8fa;overflow-y:auto;z-index:10;padding:40px;';
+    document.body.appendChild(ov);
+  }
+  ov.style.display = 'block';
+  ov.innerHTML =
     '<h2 style="color:#003768;font-size:22px;font-weight:800;margin:0 0 8px;">' + escHtml(name) + '</h2>' +
     '<p style="color:#6b7c8f;font-size:13px;margin:0 0 24px;">2026 YTD · Data from MI Report</p>' +
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:860px;">' +
       pzCard('Mortgage Subs', d.ms, '#003768') + pzCard('Protection Subs', d.ps, '#fcb034') +
-      pzCard('GI Subs', d.gs, '#2e99d5') + pzCard('Mortgage Volume', String(d.mv), '#003768') +
-      pzCard('Net Proc Fee', String(d.mp), '#16a34a') + pzCard('Prot. Completions', d.pc, '#fcb034') +
-    '</div>';
+      pzCard('GI Subs', d.gs, '#2e99d5') + pzCard('Mortgage Volume', '£' + pzFmt(d.mv), '#003768') +
+      pzCard('Net Proc Fee', '£' + pzFmt(d.mp), '#16a34a') + pzCard('Prot. Completions', d.pc, '#fcb034') +
+    '</div>' + (d.ms > 0 ?
+    '<div style="background:#fff;border:1.5px solid #e8ecf0;border-radius:10px;padding:20px 24px;margin-top:20px;max-width:860px;">' +
+      '<div style="font-size:12px;font-weight:700;color:#003768;margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em;">Mortgage Submissions by Month</div>' +
+      '<div style="display:flex;align-items:flex-end;gap:6px;height:84px;">' +
+      (function(){var mx=Math.max.apply(null,d.mo.filter(function(v){return v>0;}))||1;return PZ_MONTHS.map(function(m,i){var v=d.mo[i];if(!v)return'';var h=Math.round((v/mx)*60);return'<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;"><span style="font-size:11px;font-weight:700;color:#003768;">'+v+'</span><div style="width:100%;max-width:32px;height:'+h+'px;background:#003768;border-radius:3px 3px 0 0;"></div><span style="font-size:10px;color:#6b7c8f;">'+m+'</span></div>';}).join('');})() +
+      '</div></div>' : '');
 }
 
 function pzCard(label, val, color) {
