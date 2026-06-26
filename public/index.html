@@ -6378,11 +6378,7 @@ function pzShowBroker(name, el) {
       '<div style="font-size:12px;font-weight:700;color:#003768;margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em;">Mortgage Submissions by Month</div>' +
       '<div style="display:flex;align-items:flex-end;gap:6px;height:84px;">' + bars + '</div></div>' : '');
 
-  var wrapper = document.createElement('div');
-  wrapper.innerHTML = html;
-  main.innerHTML = '';
-  main.appendChild(wrapper);
-  slideIn(wrapper);
+  main.innerHTML = '<div>' + html + '</div>';
 }
 
 function pzCard(label, val, color) {
