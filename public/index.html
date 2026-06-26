@@ -4914,6 +4914,7 @@ var _svData   = null;
 var _svTransferEmail = '';
 var _svTransferName  = '';
 
+var _svListLoaded = false;
 var _svView = 'card'; // 'card' | 'list'
 var _svViewAsEmail = ''; // empty = own view
 
@@ -5004,9 +5005,9 @@ function loadSupervisorZone() {
   document.getElementById('sv-ontrack-wrap').style.display = 'none';
   document.getElementById('sv-supervisors-wrap').style.display = 'none';
 
-  // Populate View As selector on first load
-  var sel = document.getElementById('sv-viewas-select');
-  if (sel && sel.options.length === 0) {
+  // Populate supervisor sidebar on first load
+  if (!_svListLoaded) {
+    _svListLoaded = true;
     fetch('/api/supervisor/list').then(function(r){ return r.json(); }).then(function(d) {
       var supervisors = d.supervisors || [];
       if (supervisors.length > 1) {
@@ -5021,9 +5022,7 @@ function loadSupervisorZone() {
           sel.value = 'all';
           _svViewAsEmail = 'all';
         }
-        document.getElementById('sv-viewas-trigger').style.display = 'inline-block';
-        var wrap = document.getElementById('sv-viewas-wrap');
-        if (wrap) wrap.style.display = 'flex';
+
         // ── Populate sidebar supervisor links
         var sbWrap = document.getElementById('sv-sb-supervisors');
         if (sbWrap && supervisors.length > 0) {
