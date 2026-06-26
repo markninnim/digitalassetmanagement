@@ -14,6 +14,12 @@
   font-style: normal;
   font-display: block;
 }
+
+@keyframes slideFromLeft {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.slide-in { animation: slideFromLeft .22s ease-out both; }
 </style>
 <style>
 @font-face {
@@ -3030,9 +3036,18 @@ html { height: 100%; }
   </div>
 </div>
 <script>
+function slideIn(el) {
+  if (!el) return;
+  el.classList.remove('slide-in');
+  void el.offsetWidth;
+  el.classList.add('slide-in');
+}
+
 function show(id, el) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  var _activeEl = document.getElementById(id);
+  _activeEl.classList.add('active');
+  slideIn(_activeEl);
   document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
   if (el) el.classList.add('active');
   window.location.hash = id;
@@ -3916,6 +3931,7 @@ function showSpSection(id, el) {
   });
   document.querySelectorAll('#sidebar-sales-process a').forEach(function(a) { a.classList.remove('active'); });
   if (el) el.classList.add('active');
+  slideIn(document.getElementById(id));
   if (id === 'mortgage-advice-standards') {
     masClearSearch(); _masSeconds = 0; startMasTimer();
   } else { stopMasTimer(); }
@@ -3932,6 +3948,7 @@ function showMasSection(id, el) {
   });
   document.querySelectorAll('#mas-nav a').forEach(function(a) { a.classList.remove('active'); });
   if (el) el.classList.add('active');
+  slideIn(document.getElementById('mas-content-area') || document.getElementById(id));
   // Hide search results, show normal content
   var sr = document.getElementById('mas-search-results');
   var ca = document.getElementById('mas-content-area');
@@ -4053,6 +4070,7 @@ function showPasSection(id, el) {
   });
   document.querySelectorAll('#pas-nav a').forEach(function(a) { a.classList.remove('active'); });
   if (el) el.classList.add('active');
+  slideIn(document.getElementById('pas-content-area') || document.getElementById(id));
   var sr = document.getElementById('pas-search-results');
   var ca = document.getElementById('pas-content-area');
   if (sr) sr.style.display = 'none';
@@ -4301,6 +4319,7 @@ function showLvSection(id, el) {
   });
   document.querySelectorAll('#sidebar-learning a').forEach(function(a) { a.classList.remove('active'); });
   if (el) el.classList.add('active');
+  slideIn(document.getElementById(id));
   if (id === 'induction-recordings')   loadInductionVideos();
   if (id === 'revalidation-recordings') loadRevalidationVideos();
   if (id === 'knowledge-tests')         ktShowLanding();
@@ -4964,6 +4983,7 @@ function svSidebarSelect(email, el) {
   document.getElementById('sv-behind-wrap').style.display = 'none';
   document.getElementById('sv-ontrack-wrap').style.display = 'none';
   document.getElementById('sv-supervisors-wrap').style.display = 'none';
+  slideIn(document.getElementById('tab-supervisor-zone'));
   var url = '/api/supervisor/team?as=' + encodeURIComponent(_svViewAsEmail);
   fetch(url).then(function(r){ return r.json(); }).then(function(data) {
     _svData = data;
