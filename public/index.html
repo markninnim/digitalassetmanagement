@@ -193,7 +193,10 @@ html { height: 100%; }
   <!-- Supervisor Zone sidebar -->
   <div id="sidebar-supervisor-zone" style="display:none">
     <h2 style="margin-top: 8px;">Supervisor Zone</h2>
-    <a href="#" class="active">Team CPD <span id="sv-sidebar-count" style="margin-left:6px;background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;"></span></a>
+    <a href="#" id="sv-sb-all" class="active" onclick="return svSidebarSelect('all',this)">Group CPD <span id="sv-sidebar-count" style="margin-left:6px;background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;"></span></a>
+    <div id="sv-sb-supervisors" style="display:none;">
+      <div style="margin:16px 0 4px;padding:0 18px;"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#fcb034;">SUPERVISORS</span></div>
+    </div>
   </div>
 </div>
 <!-- Hero triangles -->
@@ -4961,6 +4964,29 @@ function svViewAs(email) {
   loadSupervisorZone();
 }
 
+function svSidebarSelect(email, el) {
+  document.querySelectorAll('#sidebar-supervisor-zone a').forEach(function(a){ a.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  _svViewAsEmail = email === 'all' ? 'all' : email;
+  // Reload team data for selected supervisor
+  _svLoaded = false;
+  document.getElementById('sv-loading').style.display = 'block';
+  document.getElementById('sv-stats').innerHTML = '';
+  document.getElementById('sv-behind-wrap').style.display = 'none';
+  document.getElementById('sv-ontrack-wrap').style.display = 'none';
+  document.getElementById('sv-supervisors-wrap').style.display = 'none';
+  var url = '/api/supervisor/team?as=' + encodeURIComponent(_svViewAsEmail);
+  fetch(url).then(function(r){ return r.json(); }).then(function(data) {
+    _svData = data;
+    _svLoaded = true;
+    document.getElementById('sv-loading').style.display = 'none';
+    renderSvDashboard(data);
+  }).catch(function() {
+    document.getElementById('sv-loading').textContent = 'Could not load team data.';
+  });
+  return false;
+}
+
 function loadSupervisorZone() {
   _svLoaded = false;
   document.getElementById('sv-loading').style.display = 'block';
@@ -4989,6 +5015,16 @@ function loadSupervisorZone() {
         document.getElementById('sv-viewas-trigger').style.display = 'inline-block';
         var wrap = document.getElementById('sv-viewas-wrap');
         if (wrap) wrap.style.display = 'flex';
+        // ── Populate sidebar supervisor links
+        var sbWrap = document.getElementById('sv-sb-supervisors');
+        if (sbWrap && supervisors.length > 0) {
+          var sbHtml = '<div style="margin:16px 0 4px;padding:0 18px;"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#fcb034;">SUPERVISORS</span></div>';
+          supervisors.forEach(function(s) {
+            sbHtml += '<a href="#" onclick="return svSidebarSelect(' + JSON.stringify(s.email) + ',this)" style="padding-left:24px;">' + escHtml(s.name) + '</a>';
+          });
+          sbWrap.innerHTML = sbHtml;
+          sbWrap.style.display = 'block';
+        }
       }
     });
   }
