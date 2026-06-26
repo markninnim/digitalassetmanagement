@@ -1774,6 +1774,18 @@ function closeCp() {
 }
 function openCardModal() {
   document.getElementById('card-modal').style.display = 'flex';
+  // Pre-fill from logged-in user profile
+  if (_currentUser) {
+    var u = _currentUser;
+    var sal = document.getElementById('bc-salutation');
+    if (u.salutation) { for (var i = 0; i < sal.options.length; i++) { if (sal.options[i].value === u.salutation) { sal.selectedIndex = i; break; } } }
+    document.getElementById('bc-firstname').value = u.firstName  || '';
+    document.getElementById('bc-lastname').value  = u.lastName   || '';
+    document.getElementById('bc-title').value     = u.jobTitle   || '';
+    document.getElementById('bc-email').value     = u.email      || '';
+    document.getElementById('bc-phone').value     = u.mobile     || '';
+    document.getElementById('bc-url').value       = u.website    || '';
+  }
 }
 function closeCardModal() {
   document.getElementById('card-modal').style.display = 'none';
