@@ -32,6 +32,7 @@ const F_PROTECTION     = 'fldpLRcjuGeL1muYF';
 const F_INVESTMENTS    = 'fld7C7E8seECPWbNh';
 const F_IS_SUPERVISOR  = 'fldhOYcUHF3SrnC5C';
 const F_SUPERVISOR_EMAIL = 'fldvyCzxvpIEjD7PU';
+const F_CO_SUPERVISES  = 'fld2fG2C8sK9PQ3o2'; // "Co-supervises Email" — shares team view with
 const F_AVATAR         = 'fldiQ06FtP4BehJU7';
 
 async function atFetch(endpoint, options = {}) {
@@ -428,18 +429,12 @@ app.get('/api/supervisor/team', requireAuth, async (req, res) => {
     } while (teamOffset);
     let lookupEmail = supervisorEmail;
     if (!viewAll) {
-      // If this supervisor has no direct team, check if their supervisorEmail points
-      // to another supervisor (shared/delegate team)
-      const directCount = allRecords.filter(r =>
-        (r.fields[F_SUPERVISOR_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase()
-      ).length;
-      if (directCount === 0) {
-        const svRecord = allRecords.find(r =>
-          (r.fields[F_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase()
-        );
-        const sharedWith = svRecord?.fields[F_SUPERVISOR_EMAIL];
-        if (sharedWith) lookupEmail = sharedWith.toLowerCase();
-      }
+      // Check if this supervisor has a "Co-supervises Email" set — if so, show that team instead
+      const svRecord = allRecords.find(r =>
+        (r.fields[F_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase()
+      );
+      const coEmail = svRecord?.fields[F_CO_SUPERVISES];
+      if (coEmail) lookupEmail = coEmail.toLowerCase();
     }
 
     const members = allRecords
