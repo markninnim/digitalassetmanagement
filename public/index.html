@@ -34,7 +34,7 @@
 <style>
 body { font-family: sans-serif; margin: 0; background: #f5f7fa; overflow-y: scroll; }
 html { height: 100%; }
-.topbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #003768; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; padding: 0 24px; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.topbar { position: fixed; top: 0; left: 0; right: 0; height: 60px; background: #fff; border-bottom: 1px solid #e8ecf0; display: flex; align-items: center; padding: 0 24px; z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
 .topbar img { height: 36px; object-fit: contain; }
 .sidebar { width: 220px; background: #003768; position: fixed; top: 60px; bottom: 0; padding: 24px 0; overflow-y: auto; }
 .sidebar h2 { color: #fcb034; font-size: 11px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
@@ -45,6 +45,7 @@ html { height: 100%; }
 .ov-card-btn { display:inline-block; background:#003768; color:#fff; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:600; }
 .sidebar a { display: block; color: rgba(255,255,255,.7); text-decoration: none; padding: 9px 20px; font-size: 13px; }
 .sidebar a:hover, .sidebar a.active { color: #fff; background: rgba(255,255,255,.1); border-left: 3px solid #fcb034; }
+#pz-broker-panel a:hover, #pz-broker-panel a.active { background:#dde8f2; color:#003768; font-weight:600; }
 .main { margin-left: 220px; margin-top: 60px; padding: 40px; min-height: calc(100vh - 60px); }
 .hero { background: #003768; color: #fff; padding: 40px; border-radius: 10px; margin-bottom: 32px; }
 .hero h1 { font-size: 28px; margin: 8px 0; }
@@ -96,9 +97,9 @@ html { height: 100%; }
 .thumb canvas { max-height:104px; max-width:100%; }
 .thumb .type-badge { color:#fff; width:40px; height:40px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
 .tab-nav { display:flex; align-items:center; gap:4px; margin-left:28px; }
-.tab-btn { background:none; border:none; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:600; color:rgba(255,255,255,.75); cursor:pointer; font-family:inherit; transition:all .15s; white-space:nowrap; }
-.tab-btn:hover { background:rgba(255,255,255,.12); color:#fff; }
-.tab-btn.active { background:rgba(255,255,255,.18); color:#fff; border-bottom:2px solid #fcb034; border-radius:20px; }
+.tab-btn { background:none; border:none; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:600; color:#6b7c8f; cursor:pointer; font-family:inherit; transition:all .15s; white-space:nowrap; }
+.tab-btn:hover { background:#f5f7fa; color:#003768; }
+.tab-btn.active { background:#003768; color:#fff; }
 .tab-pane { display:none; }
 .tab-pane.active { display:block; }
 .coming-soon { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; }
@@ -132,14 +133,14 @@ html { height: 100%; }
     <button class="tab-btn"        id="tab-btn-supervisor-zone" onclick="switchTab('supervisor-zone')" style="display:none;">Supervisor Zone</button>
   </div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-    <button id="admin-btn" onclick="openAdminPanel()" style="display:none;background:rgba(255,255,255,.15);color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;gap:6px;align-items:center;">
+    <button id="admin-btn" onclick="openAdminPanel()" style="display:none;background:#003768;color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;gap:6px;align-items:center;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Admin
     </button>
-    <button id="account-btn" onclick="openAccountModal()" style="display:flex;align-items:center;gap:7px;background:none;border:1.5px solid rgba(255,255,255,.25);padding:5px 13px 5px 8px;border-radius:20px;cursor:pointer;font-family:inherit;color:#fff;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='none'">
-      <span id="nav-user-avatar" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.25);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;"></span>
+    <button id="account-btn" onclick="openAccountModal()" style="display:flex;align-items:center;gap:7px;background:none;border:1.5px solid #e8ecf0;padding:5px 13px 5px 8px;border-radius:20px;cursor:pointer;font-family:inherit;color:#1a2a3a;transition:background .15s;" onmouseover="this.style.background='#f5f7fa'" onmouseout="this.style.background='none'">
+      <span id="nav-user-avatar" style="width:26px;height:26px;border-radius:50%;background:#003768;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;"></span>
       <span id="nav-user-name" style="font-size:13px;font-weight:600;"></span>
     </button>
-    <a href="/logout" style="color:rgba(255,255,255,.75);font-size:13px;font-weight:600;text-decoration:none;padding:6px 12px;border-radius:20px;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.12)'" onmouseout="this.style.background='none'">Sign out</a>
+    <a href="/logout" style="color:#6b7c8f;font-size:13px;font-weight:600;text-decoration:none;padding:6px 12px;border-radius:20px;transition:background .15s;" onmouseover="this.style.background='#f5f7fa'" onmouseout="this.style.background='none'">Sign out</a>
   </div>
 </div>
 <div class="sidebar">
@@ -200,11 +201,7 @@ html { height: 100%; }
   <!-- Performance Zone sidebar -->
   <div id="sidebar-performance-zone" style="display:none">
     <h2 style="margin-top: 8px;">Performance Zone</h2>
-    <div style="padding:0 12px 8px;">
-      <input id="pz-search" type="text" placeholder="Search broker..." oninput="pzFilter(this.value)"
-        style="width:100%;box-sizing:border-box;padding:7px 10px;border:1.5px solid rgba(255,255,255,.2);border-radius:7px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;outline:none;font-family:inherit;">
-    </div>
-    <div id="pz-broker-list"></div>
+    <div id="pz-supervisor-list"></div>
   </div>
   <!-- Supervisor Zone sidebar -->
   <div id="sidebar-supervisor-zone" style="display:none">
@@ -3833,7 +3830,7 @@ function switchTab(tab) {
   if (tab === 'supervisor-zone')  { svInitDates(); loadSupervisorZone(); }
   if (tab === 'sales-process')    { showSpSection('sp-overview', document.getElementById('sp-nav-overview')); }
   if (tab !== 'sales-process')   { stopMasTimer(); stopPasTimer(); }
-  if (tab === 'performance-zone') { pzInit(); } else { var ov=document.getElementById('pz-overlay'); if(ov) ov.style.display='none'; }
+  if (tab === 'performance-zone') { pzInit(); } else { var ov=document.getElementById('pz-overlay'); if(ov) ov.style.display='none'; var bp=document.getElementById('pz-broker-panel'); if(bp) bp.style.display='none'; }
 }
 
 // Hash routing — navigate on load (called directly, no event wrapper needed)
@@ -6324,15 +6321,18 @@ var PZ_DATA = {"A B": {"ms": 38, "ps": 0, "gs": 0, "mv": 4134195, "mp": 13943.83
 var PZ_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; // PZ-v9
 
 function pzClick(el) {
-  var name = el.getAttribute('data-broker');
-  pzShowBroker(name, el);
+  var panel = document.getElementById('pz-broker-panel');
+  if (panel) panel.querySelectorAll('a').forEach(function(a){ a.classList.remove('active'); });
+  el.classList.add('active');
+  pzShowBroker(el.getAttribute('data-broker'));
   return false;
 }
 
-var PZ_SUP_MAP = null; // broker name → supervisor name
+var PZ_SUP_MAP = null;
+var PZ_GROUPS = {};
 
 function pzInit() {
-  var list = document.getElementById('pz-broker-list');
+  var list = document.getElementById('pz-supervisor-list');
   if (!list || list.dataset.loaded) return;
   list.dataset.loaded = '1';
   if (PZ_SUP_MAP) { pzRender(PZ_SUP_MAP); return; }
@@ -6344,112 +6344,145 @@ function pzInit() {
 
 function pzRender(map) {
   var names = Object.keys(PZ_DATA).sort();
-  // Group by supervisor
-  var groups = {}; // supervisorName → [brokerName,...]
+  PZ_GROUPS = {};
   for (var i = 0; i < names.length; i++) {
     var n = names[i];
     var sup = (map && map[n]) || 'Other';
-    if (!groups[sup]) groups[sup] = [];
-    groups[sup].push(n);
+    if (!PZ_GROUPS[sup]) PZ_GROUPS[sup] = [];
+    PZ_GROUPS[sup].push(n);
   }
-  var supNames = Object.keys(groups).sort(function(a,b){
-    // Management first, then alphabetical
-    if (a === 'Management') return -1; if (b === 'Management') return 1;
+  var supNames = Object.keys(PZ_GROUPS).sort(function(a,b){
+    if (a==='Management') return -1; if (b==='Management') return 1;
     return a.localeCompare(b);
   });
 
-  // ── Sidebar ──
-  var sideHtml = '';
-  for (var s = 0; s < supNames.length; s++) {
-    var sup = supNames[s];
-    sideHtml += '<div style="margin:14px 0 4px;padding:0 20px;"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#fcb034;">' + escHtml(sup.toUpperCase()) + '</span></div>';
-    var brokers = groups[sup];
-    for (var b = 0; b < brokers.length; b++) {
-      var n = escHtml(brokers[b]);
-      sideHtml += '<a href="javascript:void(0)" data-broker="' + n + '" onclick="pzClick(this);return false;">' + n + '</a>';
+  // ── Blue sidebar: supervisor list ──
+  var supList = document.getElementById('pz-supervisor-list');
+  if (supList) {
+    var sHtml = '';
+    for (var s = 0; s < supNames.length; s++) {
+      var sup = supNames[s];
+      var cnt = PZ_GROUPS[sup].length;
+      sHtml += '<a href="javascript:void(0)" data-sup="' + escHtml(sup) + '" onclick="pzClickSup(this);return false;">' +
+        escHtml(sup) +
+        '<span style="float:right;background:rgba(255,255,255,.2);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;">' + cnt + '</span></a>';
     }
+    supList.innerHTML = sHtml;
   }
-  document.getElementById('pz-broker-list').innerHTML = sideHtml;
 
   // ── Main page broker directory ──
   var main = document.getElementById('pz-main');
   if (!main) return;
-  var mainHtml = '<h2 style="color:#003768;font-size:22px;font-weight:800;margin:0 0 4px;">Performance Zone</h2>' +
-    '<p style="color:#6b7c8f;font-size:13.5px;margin:0 0 32px;">Select a broker to view their 2026 YTD performance.</p>';
+  var mHtml = '<h2 style="color:#003768;font-size:22px;font-weight:800;margin:0 0 4px;">Performance Zone</h2>' +
+    '<p style="color:#6b7c8f;font-size:13.5px;margin:0 0 28px;">Select a supervisor from the sidebar, or click any broker below.</p>';
   for (var s = 0; s < supNames.length; s++) {
     var sup = supNames[s];
-    var brokers = groups[sup];
-    mainHtml += '<div style="font-size:10px;font-weight:800;color:#003768;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;">' + escHtml(sup) + '</div>';
-    mainHtml += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:860px;margin-bottom:32px;">';
-    for (var b = 0; b < brokers.length; b++) {
-      var n = brokers[b];
-      var d = PZ_DATA[n];
-      var ne = escHtml(n);
-      mainHtml += '<div class="ov-card" onclick="pzShowBroker(' + JSON.stringify(n) + ',null);pzSetActive(' + JSON.stringify(n) + ');">' +
+    var bks = PZ_GROUPS[sup];
+    mHtml += '<div style="font-size:10px;font-weight:800;color:#003768;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;">' + escHtml(sup) + '</div>';
+    mHtml += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:860px;margin-bottom:32px;">';
+    for (var b = 0; b < bks.length; b++) {
+      var n = bks[b]; var d = PZ_DATA[n]; var ne = escHtml(n);
+      mHtml += '<div class="ov-card" onclick="pzOpenBroker(' + JSON.stringify(n) + ');">' +
         '<div class="ov-card-title">' + ne + '</div>' +
-        '<div class="ov-card-sub">Mtg: ' + (d.ms||0) + ' &nbsp;·&nbsp; Prot: ' + (d.ps||0) + ' &nbsp;·&nbsp; GI: ' + (d.gs||0) + '</div>' +
-        '<div class="ov-card-btn">View stats →</div>' +
-      '</div>';
+        '<div class="ov-card-sub">Mtg: '+(d.ms||0)+' · Prot: '+(d.ps||0)+' · GI: '+(d.gs||0)+'</div>' +
+        '<div class="ov-card-btn">View stats →</div></div>';
     }
-    mainHtml += '</div>';
+    mHtml += '</div>';
   }
-  main.innerHTML = mainHtml;
+  main.innerHTML = mHtml;
 }
 
-function pzSetActive(name) {
-  document.querySelectorAll('#pz-broker-list a').forEach(function(a){
-    a.classList.toggle('active', a.getAttribute('data-broker') === name);
-  });
+function pzClickSup(el) {
+  document.querySelectorAll('#pz-supervisor-list a').forEach(function(a){ a.classList.remove('active'); });
+  el.classList.add('active');
+  pzShowBrokerPanel(el.getAttribute('data-sup'));
+  return false;
+}
+
+function pzShowBrokerPanel(sup) {
+  var panel = document.getElementById('pz-broker-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'pz-broker-panel';
+    panel.style.cssText = 'position:fixed;top:60px;left:220px;width:200px;bottom:0;background:#f0f5f9;overflow-y:auto;z-index:9;border-right:1px solid #cdd8e3;';
+    document.body.appendChild(panel);
+  }
+  panel.style.display = 'block';
+  var ov = document.getElementById('pz-overlay');
+  if (ov && ov.style.display !== 'none') ov.style.left = '420px';
+
+  var bks = PZ_GROUPS[sup] || [];
+  var html = '<div style="padding:16px 16px 6px;font-size:10px;font-weight:700;color:#003768;letter-spacing:.08em;text-transform:uppercase;">' + escHtml(sup) + '</div>';
+  html += '<div style="padding:0 10px 8px;"><input type="text" placeholder="Search…" oninput="pzFilterPanel(this.value)" style="width:100%;box-sizing:border-box;padding:6px 10px;border:1.5px solid #cdd8e3;border-radius:7px;background:#fff;color:#1a2a3a;font-size:12px;outline:none;font-family:inherit;"></div>';
+  for (var i = 0; i < bks.length; i++) {
+    var n = escHtml(bks[i]);
+    html += '<a href="javascript:void(0)" data-broker="' + n + '" onclick="pzClick(this);return false;" style="display:block;color:#1a2a3a;text-decoration:none;padding:8px 14px;font-size:13px;">' + n + '</a>';
+  }
+  panel.innerHTML = html;
+}
+
+function pzFilterPanel(q) {
+  var panel = document.getElementById('pz-broker-panel');
+  if (!panel) return;
+  q = q.toLowerCase();
+  panel.querySelectorAll('a').forEach(function(a){ a.style.display = a.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+}
+
+function pzOpenBroker(name) {
+  var sup = (PZ_SUP_MAP && PZ_SUP_MAP[name]) || 'Other';
+  var supEl = document.querySelector('#pz-supervisor-list a[data-sup="' + escHtml(sup) + '"]');
+  if (supEl) { document.querySelectorAll('#pz-supervisor-list a').forEach(function(a){ a.classList.remove('active'); }); supEl.classList.add('active'); }
+  pzShowBrokerPanel(sup);
+  setTimeout(function() {
+    var panel = document.getElementById('pz-broker-panel');
+    if (panel) panel.querySelectorAll('a').forEach(function(a){ a.classList.toggle('active', a.getAttribute('data-broker') === name); });
+    pzShowBroker(name);
+  }, 0);
 }
 
 function pzHideOverlay() {
   var ov = document.getElementById('pz-overlay');
   if (ov) ov.style.display = 'none';
-  document.querySelectorAll('#pz-broker-list a').forEach(function(a){ a.classList.remove('active'); });
+  var panel = document.getElementById('pz-broker-panel');
+  if (panel) panel.querySelectorAll('a').forEach(function(a){ a.classList.remove('active'); });
 }
 
 function pzFilter(q) {
-  var items = document.querySelectorAll('#pz-broker-list a');
+  // Filters supervisor list in sidebar
   q = q.toLowerCase();
-  items.forEach(function(a){ a.style.display = a.textContent.toLowerCase().includes(q) ? '' : 'none'; });
-  // Hide supervisor headings with no visible children
-  document.querySelectorAll('#pz-broker-list div').forEach(function(div){
-    var next = div.nextElementSibling;
-    var hasVisible = false;
-    while (next && next.tagName === 'A') { if (next.style.display !== 'none') hasVisible = true; next = next.nextElementSibling; }
-    div.style.display = hasVisible ? '' : 'none';
+  document.querySelectorAll('#pz-supervisor-list a').forEach(function(a){
+    a.style.display = (a.getAttribute('data-sup')||'').toLowerCase().includes(q) ? '' : 'none';
   });
 }
 
-function pzShowBroker(name, el) {
-  document.querySelectorAll('#pz-broker-list a').forEach(function(a){ a.classList.remove('active'); });
-  if (el) el.classList.add('active');
+function pzShowBroker(name) {
   var d = PZ_DATA[name];
   if (!d) return;
-
-  // Write to a guaranteed-visible overlay first to confirm rendering works
   var ov = document.getElementById('pz-overlay');
   if (!ov) {
     ov = document.createElement('div');
     ov.id = 'pz-overlay';
-    ov.style.cssText = 'position:fixed;top:60px;left:220px;right:0;bottom:0;background:#f7f8fa;overflow-y:auto;z-index:10;padding:40px;';
     document.body.appendChild(ov);
   }
+  ov.style.cssText = 'position:fixed;top:60px;left:420px;right:0;bottom:0;background:#f7f8fa;overflow-y:auto;z-index:10;padding:40px;';
   ov.style.display = 'block';
   ov.innerHTML =
     '<div style="margin-bottom:20px;"><button onclick="pzHideOverlay()" style="background:none;border:none;color:#6b7c8f;font-size:13px;font-weight:600;cursor:pointer;padding:0;font-family:inherit;">← All Brokers</button></div>' +
     '<h2 style="color:#003768;font-size:22px;font-weight:800;margin:0 0 8px;">' + escHtml(name) + '</h2>' +
     '<p style="color:#6b7c8f;font-size:13px;margin:0 0 24px;">2026 YTD · Data from MI Report</p>' +
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:860px;">' +
-      pzCard('Mortgage Subs', d.ms) + pzCard('Protection Subs', d.ps) +
-      pzCard('GI Subs', d.gs) + pzCard('Mortgage Volume', '£' + pzFmt(d.mv)) +
-      pzCard('Net Proc Fee', '£' + pzFmt(d.mp)) + pzCard('Protection Completions', d.pc) +
-    '</div>' +
-    '<div style="background:#fff;border:1.5px solid #e8ecf0;border-radius:10px;padding:20px 24px;margin-top:14px;max-width:860px;">' +
-      '<div style="font-size:12px;font-weight:700;color:#003768;margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em;">Mortgage Submissions by Month</div>' +
-      '<div style="display:flex;align-items:flex-end;gap:4px;height:96px;">' +
-      (function(){var mx=Math.max.apply(null,d.mo)||1;return PZ_MONTHS.map(function(m,i){var v=d.mo[i]||0;var h=v>0?Math.round((v/mx)*64):0;return'<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;"><span style="font-size:10px;font-weight:700;color:'+(v>0?'#003768':'transparent')+';">'+v+'</span><div style="width:100%;max-width:30px;height:'+(h||2)+'px;background:'+(v>0?'#003768':'#e8ecf0')+';border-radius:3px 3px 0 0;"></div><span style="font-size:10px;color:#6b7c8f;">'+m+'</span></div>';}).join('');})() +
-      '</div></div>';
+    '<div style="max-width:780px;">' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">' +
+        pzCard('Mortgage Subs', d.ms) + pzCard('Protection Subs', d.ps) +
+        pzCard('GI Subs', d.gs) + pzCard('Mortgage Volume', '£' + pzFmt(d.mv)) +
+        pzCard('Net Proc Fee', '£' + pzFmt(d.mp)) + pzCard('Protection Completions', d.pc) +
+      '</div>' +
+      '<div style="background:#fff;border:1.5px solid #e8ecf0;border-radius:10px;padding:20px 24px;margin-top:14px;">' +
+        '<div style="font-size:12px;font-weight:700;color:#003768;margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em;">Mortgage Submissions by Month</div>' +
+        '<div style="display:flex;align-items:flex-end;gap:4px;height:96px;">' +
+        (function(){var mx=Math.max.apply(null,d.mo)||1;return PZ_MONTHS.map(function(m,i){var v=d.mo[i]||0;var h=v>0?Math.round((v/mx)*64):0;return'<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;"><span style="font-size:10px;font-weight:700;color:'+(v>0?'#003768':'transparent')+';">'+v+'</span><div style="width:100%;max-width:30px;height:'+(h||2)+'px;background:'+(v>0?'#003768':'#e8ecf0')+';border-radius:3px 3px 0 0;"></div><span style="font-size:10px;color:#6b7c8f;">'+m+'</span></div>';}).join('');})() +
+        '</div>' +
+      '</div>' +
+    '</div>';
 }
 
 function pzCard(label, val) {
