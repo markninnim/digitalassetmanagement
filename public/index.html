@@ -2378,7 +2378,7 @@ var _currentUser = null;
       var btn = document.getElementById('admin-btn');
       if (btn) btn.style.display = 'inline-flex';
     }
-    if (user && user.isSupervisor) {
+    if (user && (user.isSupervisor || user.isAdmin)) {
       var sbtn = document.getElementById('tab-btn-supervisor-zone');
       if (sbtn) sbtn.style.display = '';
     }
