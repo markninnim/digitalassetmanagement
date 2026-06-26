@@ -32,6 +32,11 @@ html { height: 100%; }
 .topbar img { height: 36px; object-fit: contain; }
 .sidebar { width: 220px; background: #003768; position: fixed; top: 60px; bottom: 0; padding: 24px 0; overflow-y: auto; }
 .sidebar h2 { color: #fcb034; font-size: 11px; text-transform: uppercase; padding: 0 20px; margin-bottom: 8px; }
+.ov-card { background:#fff; border:1.5px solid #e8ecf0; border-radius:10px; padding:18px 20px; cursor:pointer; transition:box-shadow .15s,border-color .15s; }
+.ov-card:hover { border-color:#003768; box-shadow:0 4px 14px rgba(0,55,104,.1); }
+.ov-card-title { font-size:14px; font-weight:700; color:#003768; margin-bottom:5px; }
+.ov-card-sub { font-size:12px; color:#6b7c8f; margin-bottom:14px; }
+.ov-card-btn { display:inline-block; background:#003768; color:#fff; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:600; }
 .sidebar a { display: block; color: rgba(255,255,255,.7); text-decoration: none; padding: 9px 20px; font-size: 13px; }
 .sidebar a:hover, .sidebar a.active { color: #fff; background: rgba(255,255,255,.1); border-left: 3px solid #fcb034; }
 .main { margin-left: 220px; margin-top: 60px; padding: 40px; min-height: calc(100vh - 60px); }
@@ -941,11 +946,88 @@ html { height: 100%; }
   <!-- ── Sales Process tab ─────────────────────────────────── -->
   <div id="tab-sales-process" class="tab-pane">
     <div id="sp-overview">
-      <div class="coming-soon">
-        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <h2>Sales Process</h2>
-        <p>Step-by-step sales process documentation, scripts, and workflow guides will appear here.</p>
-      </div>
+      <div style="padding:32px 40px;">
+  <h2 style="color:#003768;font-size:22px;font-weight:800;margin:0 0 4px;">Sales Process Overview</h2>
+  <p style="color:#6b7c8f;font-size:13.5px;margin:0 0 32px;">Click any document to open it directly.</p>
+
+  <!-- Mortgage group -->
+  <div style="font-size:10px;font-weight:800;color:#003768;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;">Mortgage</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;max-width:860px;margin-bottom:36px;">
+
+    <div class="ov-card" onclick="spGoTo('mortgage-advice-standards','mas-intro')">
+      <div class="ov-card-title">Mortgage Advice Standards</div>
+      <div class="ov-card-sub">Main standards document</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('mortgage-advice-standards','mas-app1')">
+      <div class="ov-card-title">App 1 – Lifetime Mortgages</div>
+      <div class="ov-card-sub">Appendix 1</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+  </div>
+
+  <!-- Protection group -->
+  <div style="font-size:10px;font-weight:800;color:#003768;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;">Protection</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;max-width:860px;">
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-intro')">
+      <div class="ov-card-title">Protection Advice Standards</div>
+      <div class="ov-card-sub">Main standards document</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-app1')">
+      <div class="ov-card-title">App 1 – Serious Illness Cover</div>
+      <div class="ov-card-sub">Appendix 1</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-app2')">
+      <div class="ov-card-title">App 2 – Income Protection</div>
+      <div class="ov-card-sub">Appendix 2</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-app3')">
+      <div class="ov-card-title">App 3 – Relevant Life Plan</div>
+      <div class="ov-card-sub">Appendix 3</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-app4')">
+      <div class="ov-card-title">App 4 – Business Protection</div>
+      <div class="ov-card-sub">Appendix 4</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-app5')">
+      <div class="ov-card-title">App 5 – Whole of Life</div>
+      <div class="ov-card-sub">Appendix 5</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-app6')">
+      <div class="ov-card-title">App 6 – Over 50s Plan</div>
+      <div class="ov-card-sub">Appendix 6</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-app7')">
+      <div class="ov-card-title">App 7 – Private Medical Insurance</div>
+      <div class="ov-card-sub">Appendix 7</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+    <div class="ov-card" onclick="spGoTo('protection-advice-standards','pas-app8')">
+      <div class="ov-card-title">App 8 – Self Sale Policy</div>
+      <div class="ov-card-sub">Appendix 8</div>
+      <div class="ov-card-btn">Open →</div>
+    </div>
+
+  </div>
+</div>
     </div>
     <div id="mortgage-advice-standards" style="display:none;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 28px 0;gap:12px;flex-wrap:wrap;">
@@ -3821,6 +3903,20 @@ function loadRevalidationVideos() {
 }
 
 // ── Sales Process sub-navigation ────────────────────────────────
+function spGoTo(spSection, subId) {
+  // Navigate sidebar to MAS or PAS
+  var spNavEl = document.querySelector('#sidebar-sales-process a[onclick*="' + spSection + '"]');
+  showSpSection(spSection, spNavEl);
+  // Then navigate to the sub-section
+  if (spSection === 'mortgage-advice-standards') {
+    var masEl = document.querySelector('#mas-nav a[data-mas="' + subId + '"]');
+    showMasSection(subId, masEl);
+  } else if (spSection === 'protection-advice-standards') {
+    var pasEl = document.querySelector('#pas-nav a[data-pas="' + subId + '"]');
+    showPasSection(subId, pasEl);
+  }
+}
+
 function showSpSection(id, el) {
   ['sp-overview','mortgage-advice-standards','protection-advice-standards'].forEach(function(s) {
     var div = document.getElementById(s);
