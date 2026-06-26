@@ -6345,11 +6345,14 @@ function pzFilter(q) {
 }
 
 function pzShowBroker(name, el) {
+  console.log('[PZ] pzShowBroker called:', name);
   document.querySelectorAll('#pz-broker-list a').forEach(function(a){ a.classList.remove('active'); });
   if (el) el.classList.add('active');
   var d = PZ_DATA[name];
+  console.log('[PZ] data found:', !!d, 'd=', d);
   var main = document.getElementById('pz-main');
-  if (!main || !d) return;
+  console.log('[PZ] pz-main element:', main, 'display:', main ? getComputedStyle(main).display : 'N/A');
+  if (!main || !d) { console.warn('[PZ] EARLY RETURN - main:', !!main, 'd:', !!d); return; }
 
   var maxMo = Math.max.apply(null, d.mo.filter(function(v){return v>0;})) || 1;
   var bars = PZ_MONTHS.map(function(m, i) {
@@ -6373,7 +6376,9 @@ function pzShowBroker(name, el) {
       '<div style="font-size:12px;font-weight:700;color:#003768;margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em;">Mortgage Submissions by Month</div>' +
       '<div style="display:flex;align-items:flex-end;gap:6px;height:84px;">' + bars + '</div></div>' : '');
 
+  console.log('[PZ] Setting innerHTML, length:', html.length);
   main.innerHTML = html;
+  console.log('[PZ] innerHTML set. main.children:', main.children.length, 'offsetHeight:', main.offsetHeight);
   slideIn(main);
 }
 
