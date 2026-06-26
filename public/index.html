@@ -2791,6 +2791,18 @@ html { height: 100%; }
   </div>
 </div>
 
+  <!-- ── Performance Zone tab ──────────────────────────────── -->
+  <div id="tab-performance-zone" class="tab-pane">
+    <div id="pz-main" style="max-width:900px;margin:0 auto;padding:32px 40px;">
+      <div id="pz-welcome" style="text-align:center;padding:80px 0;color:#6b7c8f;">
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <h2 style="color:#003768;margin:16px 0 8px;">Performance Zone</h2>
+        <p style="font-size:14px;">Select a broker from the sidebar to view their 2026 YTD performance.</p>
+      </div>
+      <div id="pz-broker-page" style="display:none;"></div>
+    </div>
+  </div>
+
 
 <!-- ── Admin Panel ─────────────────────────────────────────── -->
 <div id="admin-modal" onclick="if(event.target===this)closeAdminPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:flex-start;justify-content:center;padding-top:60px;overflow-y:auto;">
@@ -6390,17 +6402,6 @@ function pzFmt(n) {
 }
 
 </script>
+
 </body>
 </html>
-  <!-- ── Performance Zone tab ──────────────────────────────── -->
-  <div id="tab-performance-zone" class="tab-pane">
-    <div id="pz-main" style="max-width:900px;margin:0 auto;padding:32px 40px;">
-      <div id="pz-welcome" style="text-align:center;padding:80px 0;color:#6b7c8f;">
-        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <h2 style="color:#003768;margin:16px 0 8px;">Performance Zone</h2>
-        <p style="font-size:14px;">Select a broker from the sidebar to view their 2026 YTD performance.</p>
-      </div>
-      <div id="pz-broker-page" style="display:none;"></div>
-    </div>
-  </div>
-
