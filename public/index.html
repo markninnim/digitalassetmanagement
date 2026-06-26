@@ -95,9 +95,9 @@ html { height: 100%; }
 .coming-soon h2 { color:#003768; font-size:22px; margin:0 0 10px; }
 .coming-soon p { color:#6b7c8f; font-size:14px; max-width:360px; line-height:1.7; margin:0; }
 /* ── Mortgage Advice Standards ─────────────────────────────── */
-#mas-nav a { display:block; padding:9px 18px; font-size:13px; color:#3a4a5a; text-decoration:none; border-left:3px solid transparent; transition:background .15s, color .15s; line-height:1.4; }
-#mas-nav a:hover { background:#f5f7fa; color:#003768; }
-#mas-nav a.active { background:#eef3f8; color:#003768; font-weight:700; border-left-color:#003768; }
+#mas-nav a, #pas-nav a { display:block; padding:9px 18px; font-size:13px; color:#3a4a5a; text-decoration:none; border-left:3px solid transparent; transition:background .15s, color .15s; line-height:1.4; }
+#mas-nav a:hover, #pas-nav a:hover { background:#f5f7fa; color:#003768; }
+#mas-nav a.active, #pas-nav a.active { background:#eef3f8; color:#003768; font-weight:700; border-left-color:#003768; }
 .mas-section-title { font-size:18px; font-weight:800; color:#003768; margin:0 0 16px; padding-bottom:10px; border-bottom:2px solid #e8ecf0; }
 .mas-h4 { font-size:14px; font-weight:700; color:#1a2a3a; margin:20px 0 6px; display:flex; align-items:baseline; gap:8px; }
 .mas-h5 { font-size:13px; font-weight:700; color:#2c3e50; margin:16px 0 4px; }
@@ -165,6 +165,7 @@ html { height: 100%; }
     <h2 style="margin-top: 8px;">Sales Process</h2>
     <a href="#" id="sp-nav-overview" class="active" onclick="return showSpSection('sp-overview',this)">Overview</a>
     <a href="#" id="sp-nav-mas" onclick="return showSpSection('mortgage-advice-standards',this)">Mortgage Advice Standards</a>
+    <a href="#" id="sp-nav-pas" onclick="return showSpSection('protection-advice-standards',this)">Protection Advice Standards</a>
   </div>
   <!-- Selling Zone sidebar -->
   <div id="sidebar-selling-zone" style="display:none">
@@ -1584,6 +1585,717 @@ html { height: 100%; }
     </div>
   </div>
 
+    <div id="protection-advice-standards" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 28px 0;gap:12px;flex-wrap:wrap;">
+        <div>
+          <h2 style="margin:0;font-size:20px;font-weight:800;color:#003768;">Protection &amp; GI Advice Standards</h2>
+          <p style="margin:4px 0 0;font-size:13px;color:#6b7c8f;">FPG Protection &amp; General Insurance Advice Standards V5 – April 2025</p>
+        </div>
+        <div style="position:relative;flex-shrink:0;">
+          <input id="pas-search" type="text" placeholder="Search standards..." oninput="pasSearch(this.value)"
+            style="padding:8px 12px 8px 36px;border:1.5px solid #d1d9e0;border-radius:8px;font-size:13px;width:240px;outline:none;color:#1a2a3a;">
+          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9baabb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+      </div>
+      <div id="pas-cpd-strip" style="display:none;padding:7px 28px;margin-top:12px;background:#eef6f0;border-bottom:1px solid #c3e6cb;font-size:12px;color:#1a5c30;align-items:center;gap:8px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="pas-cpd-label">Reading time: 0:00</span>
+        <span style="color:#5a9a6a;">&#8212; CPD will be logged when you leave this section</span>
+      </div>
+      <div id="pas-search-banner" style="display:none;padding:8px 28px;background:#fff9e6;border-bottom:1px solid #ffe69c;font-size:13px;color:#6b4f00;">
+        <span id="pas-search-count"></span> &nbsp;<a href="#" onclick="pasClearSearch();return false;" style="color:#003768;font-weight:600;">Clear search</a>
+      </div>
+      <div style="display:flex;gap:0;min-height:500px;">
+        <div id="pas-nav" style="width:220px;flex-shrink:0;border-right:1px solid #e8ecf0;padding:16px 0;">
+          <a href="#" data-pas="pas-intro" onclick="return showPasSection('pas-intro',this)" class="active">1. Introduction & Overview</a>
+          <a href="#" data-pas="pas-meetings" onclick="return showPasSection('pas-meetings',this)">2. Customer Meetings</a>
+          <a href="#" data-pas="pas-rules" onclick="return showPasSection('pas-rules',this)">3. General Rules of Recommendation</a>
+          <a href="#" data-pas="pas-suitability" onclick="return showPasSection('pas-suitability',this)">4. Policy Suitability & Recommendations</a>
+          <a href="#" data-pas="pas-applying" onclick="return showPasSection('pas-applying',this)">5. Applying for Cover</a>
+          <a href="#" data-pas="pas-report" onclick="return showPasSection('pas-report',this)">6. Suitability Report</a>
+          <a href="#" data-pas="pas-records" onclick="return showPasSection('pas-records',this)">7. Record Keeping</a>
+          <a href="#" data-pas="pas-glossary" onclick="return showPasSection('pas-glossary',this)">8. Glossary</a>
+          <a href="#" data-pas="pas-app1" onclick="return showPasSection('pas-app1',this)">Appendix 1 – Serious Illness</a>
+          <a href="#" data-pas="pas-app2" onclick="return showPasSection('pas-app2',this)">Appendix 2 – Income Protection</a>
+          <a href="#" data-pas="pas-app3" onclick="return showPasSection('pas-app3',this)">Appendix 3 – Relevant Life Plan</a>
+          <a href="#" data-pas="pas-app4" onclick="return showPasSection('pas-app4',this)">Appendix 4 – Business Protection</a>
+          <a href="#" data-pas="pas-app5" onclick="return showPasSection('pas-app5',this)">Appendix 5 – Whole of Life</a>
+          <a href="#" data-pas="pas-app6" onclick="return showPasSection('pas-app6',this)">Appendix 6 – Over 50s Plan</a>
+          <a href="#" data-pas="pas-app7" onclick="return showPasSection('pas-app7',this)">Appendix 7 – Met Life Products</a>
+        </div>
+        <div id="pas-content-area" style="flex:1;padding:24px 32px;overflow-y:auto;max-height:75vh;">
+          <div id="pas-intro" class="pas-section" style="">
+<h2 class="mas-section-title">1. Introduction &amp; Overview</h2>
+<p>The protection and general insurance advice standards reflect the FCA and Finance Planning Group (FPG) requirements for advising on protection policies. It encourages the application of customer centric behaviours as defined in FCA handbooks Treating Customers Fairly handbook (TCF), and the wider principles (PRIN).</p>
+<h4 class="mas-h4"><span class="mas-num">1.1</span> Requirements</h4>
+<p>You, as an adviser of FPG or of a FPG Network firm, have a regulatory responsibility at all times to:</p>
+<p>Act in the customer&#x27;s best interests when giving advice to ensure a good customer outcome is achieved</p>
+<p>Ensure that the documentation given to the customer confirms your advice in the clearest way</p>
+<p>Follow these standards</p>
+<p>APERs within AR firms and FPG as a Network have a regulatory responsibility to ensure that you follow these standards.</p>
+<p>You must always encourage your customers to review all of their protection needs.</p>
+<p>Where no specific ruling or guidance exists within these standards, we expect that an individual or AR firm will take an intelligent view, and one that is in the interest of the customer, and not seek to exploit any apparent omissions.</p>
+<p>These Advice Standards are aimed at Multi Tie Advisers (Sole Tie Adviser should instead refer to comments in brackets where necessary).</p>
+<h4 class="mas-h4"><span class="mas-num">1.2</span> Permitted Activities</h4>
+<p>FCA ICOBs Regulated products</p>
+<p>You are only permitted to give advice on and sell the following suite of insurance products if the appropriate licences are held.</p>
+<ul class="mas-list">
+<li>Term Assurance</li>
+<li>Critical illness cover</li>
+<li>Family Income Benefit</li>
+<li>Income protection</li>
+<li>Accident, sickness and/or unemployment</li>
+<li>Buildings and contents</li>
+<li>Landlords Insurance</li>
+<li>Whole of Life</li>
+<li>Relevant Life Plans</li>
+<li>Business Protection</li>
+<li>Over 50s Plan</li>
+<li>Met Life products</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">1.3</span> Self-sales</h4>
+<p>Self-sales are not permitted without authorisation from your Sales Manager prior to any application.  Where such sales are made you will also be required to sign a “no advice” declaration, as will your partner if applicable, and this should be added to the POS (Point of Sale system, which is Acre).</p>
+          </div>
+          <div id="pas-meetings" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">2. Customer Meetings</h2>
+<h4 class="mas-h4"><span class="mas-num">2.1</span> Initial Disclosure</h4>
+<p>You must provide your customer with a Disclosure Documentation on first contact when you anticipate making a personal recommendation on a protection policy. You must attach this disclosure document to the customers POS record. You must verbally go through all sections of the disclosure document with your customer.  The IDD version in Acre does not cover-off us keeping in contact with clients in the future, and so it is mandatory to discuss the FPG version of the Disclosure Document and GDPR form with each customer.  Best practice is for the customer to sign the document too, but this is not essential where your customer has signed a previous version of the form.</p>
+<h4 class="mas-h4"><span class="mas-num">2.2</span> Factfinding</h4>
+<p>When introducing the fact find, you must stress to the customer the importance of receiving full, honest and accurate answers to the questions you ask them. Equally you should ensure that you ask for the information required by questioning in a way designed to encourage the customer to give you all the information you require honestly and accurately.</p>
+<p>If you are advising more than one customer, you must speak to each one to gather the information you require, or at least speak to both customers to confirm the accuracy of the information that has been provided if by another.</p>
+<p>The fact find must be fully completed in all areas relevant to the scope of service disclosed.</p>
+<p>Where you’ve given disclosure documentation to your customer indicating that you all be giving mortgage and protection advice, you must ensure that you then finalise the advice process by confirming your recommendations for both mortgage and protection.</p>
+<p>If your process is to separate the protection advice (e.g. one adviser deals with the Mortgage advice, and another adviser deals with the Protection advice) then the initial adviser must include a note in the Mortgage Suitability Report to explain that a second adviser will deal with the protection aspect of the advice.  On handing-off the case to the next adviser, the initial adviser should also pass over copies of the customer’s personal and address ID, to save having to repeat this process with the client.  Any aspects of customer vulnerability must also be mentioned, for the same reason.</p>
+<p>Existing Policies</p>
+<p>All existing policies, employer benefits (including sick pay or death in service), or provisions that could be used to cover an event (savings etc.) must be recorded in your fact find in order to get a full picture of the customer’s circumstances.</p>
+<p>You should request copies of a customer’s existing policy/ies (that relate to your scope of service) in order that you can get accurate details.</p>
+<p>You must endeavour to gain all of the following details of a customer’s existing policies and employer benefits including:</p>
+<p>Life/lives assured and how the policies are written</p>
+<p>Type of cover</p>
+<p>Current sum assured/benefit payable (e.g. waiver, guaranteed insurability options etc.)</p>
+<p>Start and end date of the policy</p>
+<p>Monthly cost of each policy, which should also be included in the budget planner where these are to continue</p>
+<p>You should obtain sufficient details of existing policies (including employer benefits) so you can advise on, or include them, in your recommendation. Whether the client has evidenced these policies/benefits, or merely told you about them, should be recorded in the Protection Suitability Report.</p>
+<p>You should seek the customer’s views on their existing policies and record the discussion in your POS record:</p>
+<p>What were/are they intended for?</p>
+<p>Do they intend on keeping them and why?</p>
+<p>Would they want to replace them and why?</p>
+<p>You should decide whether using current policy flexibility options or any guaranteed insurability options that may be available could result in a better outcome for the customer than a replacement policy.  You should note in your POS record the reasons for or against using these options, including the difference in cost and/or benefits.</p>
+<p>Where a client doesn’t provide you with sufficient information on their existing policies and / or their employment benefits you cannot advise on their suitability and should exclude these from your recommendations and record this in your Protection Suitability Report. Where a client doesn&#x27;t know what their entitlement to sick pay is under their contract of employment you should recommend an income protection policy with a short deferred period.</p>
+<p>Affordability</p>
+<p>A full budget section must be completed in all instances EXCEPT if buildings and/or contents insurance is the only protection being discussed with the customer. Just a summary of income and outgoings documented in the expenditure section is acceptable for B&amp;C only. Neither payslips nor bank statements are required though.</p>
+<p>The customer must have sufficient available funds to be able to afford your recommendation.</p>
+<p>Mortgage &amp; Protection (or protection to cover a mortgage event) = Future mortgage payment must be included and consideration given to any increase in bills. This should be added to current expenditure to determine available funds.</p>
+<p>You must recommend within a client’s disposable income, but not to any limited budget figure they have provided.  Where the customer’s disposable income does not allow you to make a full/ideal recommendation, then you should reduce the cover being recommended accordingly.  Conversely, where there is ample disposable income to meet your recommendation, you must make that recommendation even where the customer is telling you they wish to pay less.  Within the Acre POS, the “Budget for Protection” should be the customer’s disposable income figure. Having made your ideal recommendation, where this exceeds the customer’s desired premium payment, you can then discuss options with the customer to help them achieve their chosen solution to partially cover their agreed need areas.</p>
+<p>Protection Requirements (formerly Aims and Views)</p>
+<p>It is mandatory that you attempt to discuss with a customer all of their protection requirements. If you are able to have this discussion then the Health &amp; Protection Needs section of Protection Sourcing must be completed with the client.  Then you must fully complete the Requirements fields in the Protection Sourcing section to reflect the customer needs, personal views, reasons for wanting or not wanting protection and the financial impact of not protecting themselves. Your Protection Suitability Report should confirm the Objectives boxes of the Requirements section back to the customer and so please take care to type full, grammatically correct, sentences which will be understood by the customer.</p>
+<p>You have to make your customers fully aware of the possible financial consequences of them not being adequately protected.</p>
+<p>You can produce indicative illustrations for the customer during your discussions so as to give a guide on potential premiums.  Indicative quotations do not form advice and so a Protection Suitability Report is not needed.</p>
+<p>Once the customer’s priorities have been expressed you can then provide recommendations and personalised illustrations accordingly within affordability.</p>
+<p>The areas of protection that need to be discussed with your customer are:</p>
+<ul class="mas-list">
+<li>Income protection – Permanent Cover and short term Temporary Cover</li>
+<li>Critical illness cover for the mortgage</li>
+<li>Life cover for the mortgage</li>
+<li>Critical illness cover for family/lifestyle</li>
+<li>Life cover for family/lifestyle</li>
+<li>Buildings and Contents Insurance</li>
+<li>Landlords Insurance</li>
+</ul>
+<p>Unemployment Cover – You must always consider the customer’s potential entitlement to redundancy pay from their employer prior to making a recommendation for unemployment. You must discuss with your customer the risk that any company can cease trading or restructure and the resulting discussions should help you form a view as to whether there is a need. It’s important that you document in the POS record any such discussions.</p>
+<p>Other ancillary products – We have further products available, which do not current sit within a standard product framework of Term, CIC and IP.  These products are from the likes of One Family with their Over 50s Plan , and from Met Life with their Mortgage Safe, Everyday Protect and Child Safe products.  Whilst each of these products might have merit for discussion and recommendation in certain instances, their discussion is not mandatory.  However, where you do discuss these products and make a subsequent recommendation, then this must follow the process for a fully advised sale.  (Please refer to Appendix 6 for more information on One Family’s Over 50s Plan, and to Appendix 7 for more information on Met Life’s three products.)</p>
+          </div>
+          <div id="pas-rules" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">3. General Rules of Recommendation</h2>
+<p>Your recommendation must result in the right outcome for the customer. Your POS record and Protection Suitability Report  must contain adequate information and explanation in order for FPG or regulatory bodies to understand the reason why your recommendation was suitable and how it met the needs of the customer.</p>
+<p>When sourcing a  protection product, you are required to do this through the POS (Acre) or you can manually source outside of Acre using either the Assureweb or Solution Builder sourcing systems. If you externally/manually source protection, ensure your required quotes and sourcing results are saved back to your POS record manually. (Sole Tie Advisers should manually save and upload all quotes to the POS record too, but there will be no sourcing list of differing insurers.)</p>
+<p>PRIOR to giving your recommendations, through discussions with your customer, you should ensure that their current circumstances will allow them to take out the policies that you are recommending. (For example, you should not recommend a CIC policy and find out on completing an application form that the client has had a major illness previously).</p>
+<p>You should also ensure that they do not have plans for the future that would affect their chances of a claim being successful. (For example, at the time of application the customer knows that they intend on working overseas).</p>
+<p>To assist you in matching your customer with an appropriate insurer where medical disclosures, or other unique circumstances, are presented by the customer, you may use the Underwrite Me tool to help with that application process, or you may contact the Protection Helpdesk for a steer.  In instances of extreme poor health, you may refer your customer to Cura who are a separate Protection Advice Firm who may be able to secure your customer with some cover from one of the specialist insurers on their bespoke panel.</p>
+<p>You must always give the customer the latest Key Features Documentation, a statement of price (personal illustration) and an Insurance Product Information Sheet (IPID) for any GI sale.  Also, any necessary supporting documentation to support your recommendation, in writing, prior to submission of any application(s) to the protection product provider. This also applies to any protection product the customer wishes to proceed with outside of your recommendations, for instance their differing chosen solution.</p>
+<p>You must verbally disclose to the customer the content of the relevant product Key Features Document and statement of price.</p>
+<p>Existing policies</p>
+<p>If sufficient existing policy details have been received, you must make a recommendation to the customer as to whether they should retain or cancel each policy. It’s not acceptable to sell a new policy and leave it for the customer to decide whether to cancel or retain.</p>
+<p>You must discuss what the customer values about the benefits within their existing policy e.g. illnesses, definitions, benefits. These discussions will help establish if the current policy will provide enhanced cover or benefits for the customer. You must also establish if the customer will be subject to any costs because of cancellation e.g. a deferred mortgage fee that may be invoked, or the ability to claim a mid-term refund of a general insurance premium.</p>
+<p>You must ensure that you have fully compared policy benefits between the existing cover and proposed cover prior to deciding on whether to recommend cancellation.</p>
+<p>If the existing policy fully covers a current customer need, you would normally recommend retention. Conversely, if the existing policy does not fit the need better than a new policy, then cancelling might be suitable.</p>
+<p>You must not rebroke a policy unless it is in the best interests of the customer (not the adviser). The reasons for re-broking must be fully explained in the Protection Suitability Report.</p>
+<p>You cannot make a recommendation to retain or cancel if you are only giving advice to one party on a joint life policy. You must speak to both parties, so if you are giving advice to only one then you must include a statement in the existing policy section of the Protection Suitability Report that you have been unable to advise both parties and that you have not taken the policy into account when giving advice.</p>
+<p>If your recommendations include cancellation of an existing policy, you must advise the customer to not cancel the existing policy until any new policy is on risk.</p>
+<p>You should only recommend the cancellation of a CIC policy if, when comparing to the new cover, the customer is unconcerned that they might lose cover for a particular illness (or alter their ability to claim) in comparison to their current cover.  For all CIC cancellations you must first obtain a CI Expert report and any definitions or illnesses being lost must be explained to the client.  This must be done with the customer before you advise on cancelling or retaining that existing CIC policy, and it must then be attached to the POS record.</p>
+<p>If you cannot access a customer’s existing 3rd party policy documents, then you must make it clear that you have not taken them into account during your recommendation and confirm this in the Protection Suitability Report.</p>
+<p>Conversely, retention may only be suitable if the existing policy terms are superior to that of the policies currently available.</p>
+<p>Where a type of cover or benefit is lost, or the ability to claim is affected because the cover gained from a replacement policy results in a more suitable policy overall, then any such loss of cover or benefit, or loss of ability to claim must be fully discussed and agreed with the customer before proceeding, and this must be documented in the Protection Suitability Report.</p>
+<p>Where an employed customer has existing Death-In-Service cover provided by their employer, then this type of cover should not be considered to meet their mortgage protection needs, as it is considered temporary cover because it is lost if the employee changes employer.  You should advise the client that this type of cover is meant for family protection purposes only.  Where you have a client who insistent on utilising their DIS to cover their mortgage, then their precise comments should be recorded in your POS record.</p>
+          </div>
+          <div id="pas-suitability" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">4. Policy Suitability &amp; Recommendations</h2>
+<p>A decreasing term policy must be recommended for a repayment mortgage.</p>
+<p>For decreasing policies the standard “policy assumed interest rate” used should be 8%, however, you can reduce this rate to as low as 5%. This rate is important to ensure there is always sufficient cover on a decreasing policy to repay a capital and repayment mortgage. Reducing the rate will have the effect of lowering the monthly premium.  You can only increase the “policy assumed interest rate” where you are protecting a loan with an interest rate greater than 8%.</p>
+<p>A level term policy must be recommended for an interest only mortgage.</p>
+<p>CIC to protect a joint mortgage &gt; recommend our preferred CIC provider joint life policy (or two single life CIC policies if this is preferred by the client, in which case please highlight the difference in cost in your Protection Advice Letter) with guaranteed premiums and sum assured to match the mortgage amount including fees that have been added to the loan, and a term to match the mortgage term. (Sole Tie Advisers should recommend the most comprehensive product from those available from your insurer, where applicable).</p>
+<p>CIC to protect a single mortgage &gt; recommend our preferred CIC provider single life policy with guaranteed premiums and sum assured to match the mortgage amount including fees that have been added to the loan, and a term to match the mortgage term. (Sole Tie Advisers should recommend the most comprehensive product from those available from your insurer, where applicable).</p>
+<p>Where an individual has a preference for serious illness cover over critical illness cover, then please refer to Appendix 1 for the process you are required to follow.</p>
+<p>Life cover to protect a joint mortgage &gt; recommend the cheapest joint policy payable first death, (or two single life policies if this is preferred by the client, in which case please highlight the difference in cost in your Protection Advice Letter), with a sum assured to match the mortgage amount plus any fees that have been added to the loan, and a term to match the mortgage term.</p>
+<p>Life cover to protect a single mortgage &gt; recommend the cheapest single life policy with a sum assured to match the mortgage amount plus any fees that have been added to the loan, and a term to match the mortgage term. You must have a clear reason in your factfind aims and views as to why a single person wants life cover and record those in your Protection Suitability Report.</p>
+<p>Shared equity loans may be better covered by a separate LTA policy for the amount and term of the equity loan. Where no term for the equity exists, then link it to the term of the mortgage. You must discuss with the client the merits of either level cover or index-linked cover to protect the equity loan as this loan will fluctuate with changes in the property price.</p>
+<p>For shared ownership mortgages it would be more suitable to recommend an LTA (and CIC if applicable) for the maximum share that can be purchased, less any deposit being provided by the customer. The mortgage can then be repaid and any surplus can be used to fund rental payments or buy all or some of the remaining share. You must discuss with the client the merits of either level cover or index-linked cover to protect the rented element of the property value as this element will fluctuate with changes in the property price.</p>
+<p>Single life policies may be more suitable than joint life but only when:</p>
+<p>Age restrictions on a policy stop you from recommending the full term to both customers</p>
+<p>Where customers are arranging their mortgage as tenants in common</p>
+<p>Customers consider that their future needs may be better served by the single policies (for example, where flexibility may be required.  Note – you will be required to specify in your Protection Suitability Report what flexibility it is that the customers require, and why)</p>
+<p>CIC is arranged as there is now a feeling within the industry that individuals having their own CIC policies might better serve their needs, given that in most instances a CIC payout is not being used to repay a mortgage debt.</p>
+<p>If recommending Life cover to protect any other form of liability, full details of that liability will need to be included in your finalised fact find, held in the POS system.</p>
+<p>Where you refer a customer to a second charge mortgage provider and you establish that they have a protection shortfall prior to the loan commencing, then you must make your protection recommendation immediately.  Additionally, the client will then have a need to protect the second charge mortgage being arranged, once it commences.</p>
+<p>Protection of a family or the lifestyle of the customer</p>
+<p>You must recommend protecting the customer or their family in the event of death or critical illness where the customer has indicated this area of protection as one of their priorities. Again, life cover only should be recommended based on price, whereas critical illness cover should be recommended based on our preferred CIC provider at the time.</p>
+<p>Taking into account continuing existing cover, employee benefits, or any other provisions or resources to be used to reduce the cover required, the cover recommended should then be:</p>
+<p>To protect a family  -  life cover and/or critical illness cover providing a monthly benefit in the event of death, sufficient to cover the need, for the term required</p>
+<p>To protect a Lifestyle need  -  life cover and/or critical illness cover to provide a lump sum or monthly benefit, sufficient to cover the need, for the term required</p>
+<p>You will need to establish the amount of cover required with your customer, and that discussion is likely to be focused on providing sufficient cover to replace a salary, covering the outgoings of the household, adapting the home to a change in circumstances, or the cost of replacing the essential duties of an individual. The required term is likely to provide cover until the youngest dependant will be self-sufficient or until all dependants cease to be financially reliant on the customer.</p>
+<p>A summary of this discussion and the reason for the amount and the term must be documented in the Protection Suitability Report.</p>
+<p>Where relevant, the following factors should be taken into account when establishing the amount of cover required:</p>
+<p>Existing savings and investments</p>
+<p>Costs that may cease during the term of the cover e.g. mortgage</p>
+<p>Other income streams that may commence during the term e.g. widow’s pensions, retirement income</p>
+<p>The customers aspirations for their future lifestyle</p>
+<p>The age and the needs of dependants</p>
+<p>Protection of an income</p>
+<p>When considering the amount of cover needed, each customer’s situation may be different and should be treated as such.</p>
+<p>You must firstly discuss the income that will be required in the event of long-term sickness or unemployment. Taking into account continuing existing cover, employee benefits, or any other provisions or resources to be used to reduce the cover required, the cover recommended should then be:</p>
+<p>Standard IP or a combination of standard IP/AS (or standard IP plus Met Life’s Mortgage Safe) to cover a period of sickness, until the customer intends to retire, covering the need in the most effective way, for the amount of income required to cover their need (not just the monthly mortgage repayment amount).</p>
+<p>To utilise stepped benefits for any period where payment is received from employers, continuing income from an employer or existing/new ASU/IP policies</p>
+<p>Cover for unemployment, where that need is agreed to be addressed.</p>
+<p>Income Protection must be recommended to your customer’s intended retirement age, and not the term of their mortgage.</p>
+<p>You must stress the importance of reviewing cover on a regular basis to ensure the cover and the term are appropriate to the customers need.</p>
+<p>Prior to making your recommendation you must decide the most effective and suitable solution to cover the need. This will be established in discussion with the customer and considering the following:</p>
+<p>The individual’s occupation type which may affect the recommended cover/insurer</p>
+<p>What deferred period is most suitable (and whether stepped benefits can provide the best outcome)</p>
+<p>What product or combination of products/options best meets the customer’s needs (cost isn’t necessarily the measure of this)</p>
+<p>Whether the customer can fund a period of sickness themselves</p>
+<p>Standard IP will be a more suitable recommendation than the low cost (1 year, 2 year, 5 year) alternatives</p>
+<p>BTDO cover on ASU could be more suitable than standard cover</p>
+<ul class="mas-list">
+<li>The inclusion of Fracture Cover in your solution where this is available</li>
+<li>Where Met Life products are discussed, that these are not to be recommended in place of IP (unless perhaps the client is ineligible for IP), as the Met Life products only offer temporary cover, and there are restrictions on when some benefits are payable</li>
+</ul>
+<p>Care must be taken where any combination of employers benefits, AS or IP result in a period where the customer receives no/reduced policy benefits in claim.</p>
+<p>You will need to discuss and decide whether the customer wants to adjust the recommended amount of cover downwards due to the possibility that they may receive some state benefits related to their sickness (e.g. Employment Support Allowance) and this could affect the IP benefit received in claim (if the benefit then means total income exceeds the maximum benefit receivable). Conversely, you will need to discuss the possibility that there may be a shortfall of cover if they are not awarded such benefits (if you are recommending the maximum). You must document all such discussions in the Protection Suitability Report.</p>
+<p>Please refer to Appendix 2 for further guidance when recommending income protection to certain employment types or an individual’s preferences on benefits.  Please also refer to Appendix 7 for further guidance when recommending Met Life products.</p>
+<p>Recommending ASU cover to protect income</p>
+<p>Where you identify a need to protect an individual’s income against being unable to work due to accident or sickness, then we would expect an Income protection product to be recommended in the first instance, rather than an AS policy, or a Met Life policy, due to the more permanent nature of the IP product.</p>
+<p>Because of rules around Prohibition Periods your AS, ASU or U recommendations linked to a ‘Mortgage Sale’ cannot be accepted/partially accepted/chosen/applied for until the LATER of:</p>
+<p>The 8th day after the mortgage offer is received by the customer (this date must be noted in your POS record</p>
+<p>The 8th day after you have given them a personalised illustration detailing your recommendation</p>
+<p>This period prohibits you from selling ASU policies as it is designed to allow the customer to make an informed decision about whether to proceed with your policy recommendation.</p>
+<p>Two additional days must be added to the time periods above if the illustration is posted (so replace 8th day with 10th day in the two bullet points above).</p>
+<p>Or:     The policy can be applied for but the customers must have requested to proceed by getting in contact with you (minimum of 24 hours after receiving their illustration) by phoning or putting in writing to you their intention to proceed without utilising the full prohibition seven day period. This exception process can be initiated by the customer at any point in the ‘Mortgage sale’ period but CANNOT be prompted by you in any way.</p>
+<p>On the 8th day after giving the personalised illustration (or 10th day if posting), you may contact the customer to further discuss your recommendation for AS, ASU or U and their intentions. At this point you may now apply for cover.</p>
+<p>You must not recommend joint ASU policies as they can inhibit the customers in achieving their desired level of cover. Single ASU policies will allow each party the flexibility to review their own cover.</p>
+<p>Definition of a Mortgage Sale</p>
+<p>‘Mortgage Sale’ means any mortgage activity occurring within seven days of an initial customer meeting or within 30 days following the issue of a mortgage offer. Mortgage activity is defined as being you, or a firm linked to you (including any introducer/lender) applying for a mortgage (regulated or non-regulated).</p>
+<p>Outside of these periods, no prohibition of the sale of ASU applies.</p>
+<p>No recommendation for unemployment cover should be made to a self-employed customer unless the customer fully understands the claims requirements and believes they would successfully claim in the circumstances.</p>
+<p>Recommending property and contents insurance</p>
+<p>If you identify a need to protect a property (whether residential or buy to let) and/or its contents, you must make a suitable recommendation for either home insurance or landlord’s insurance. You may quote using either a LV, Uinsure, or from Paymentshield. But you do not need to discount the alternative provider route. As with sourcing protection products, you will need to save your quote(s) and then upload them to the POS record.</p>
+<p>Please also ensure that you complete and save the Demands &amp; Needs Letter within the insurer’s portal, as there is not the functionality to complete a Buildings &amp; Contents Suitability Report within Acre.  Please then send that letter to the client and upload the document to Acre too.</p>
+<p>You are required to justify what you have recommended. You will also need to include with your justification any additional, costed, benefits that you have sold.</p>
+<p>You should be aware that FPG has not undertaken a comparison of features between the products available from LV, Uinsure or Paymentshield, as they are all considered by offer excellent cover.  Please also be aware that where you use Paymentshield or Uinsure to quote, then the cheapest insurer must be selected from the sourcing results, as all quotes are for exactly the same Paymentshield or Uinsure cover (because you are not choosing that insurer’s product, but rather that insurer to simply underwrite the Paymentshield / Uinsure product for that client.)</p>
+<p>Where there is a charge for credit, you must make customers aware that they can have a choice of paying the premium upfront, or via a credit option on a monthly basis. If customers decide to accept the credit option and pay monthly you must explicitly point out the cost of credit from the key facts illustration given to the customer, and encourage them to return to you should they have any questions until they receive their personalised credit agreement.</p>
+<p>Within our POS, Acre, there is now a hand-off process for Buildings &amp; Contents insurance.  It is with Uinsure who will then advise your client on their protection needs instead of you.  If you wish to consider using this facility, please speak with your Sales Manager in the first instance.</p>
+<p>Additional options available on all policies</p>
+<p>You must recommend the additional options that are available on any insurance plans that would benefit your customer, where your client expresses an interest in that additional option. Your Protection Suitability Report won’t need to justify each option recommended, but it will need to highlight that any additional benefits or options were contained within their personal illustration, where those additional costs can be found.</p>
+<p>Recommending Trusts</p>
+<p>You must recommend that all single life assurance (and CIC) policies chosen by the customer are placed in Trust and explain to the client the potential implications of not doing so. The exception to this rule is where two single life policies are held within one jointly owner plan, as the ownership of the benefits will automatically go to the survivor.</p>
+<p>An alternative to placing policies in Trust (for Royal London and Guardian policies) is to use the Royal London ‘nominated beneficiary’ or the Guardian ‘pay-out planner’ features when applying for the cover.  This too, will ensure the cover is paid out promptly to the intended beneficiary.  Also, a Trust can be subsequently set up, which will then simply over-ride the existing ‘nominated beneficiary’ form or ‘pay-out planner’ form.</p>
+<p>Where CIC cover is included you must take care to ensure the retained benefits section of the trust form is completed in accordance with the requirements of the policyholder.</p>
+<p>Life of another can be recommended in certain circumstances, but should not be used in preference to a</p>
+<p>trust for the following reasons:</p>
+<p>In the event of a critical illness claim the sum assured will be payable to the plan owner of the Trust and not to the life assured. Also, the plan owner is under no obligation to repay the mortgage.</p>
+<p>If the plan owner becomes bankrupt (prior to a claim being made), then any sums payable under a claim may form part of the bankruptcy</p>
+<p>Any monies paid in claim may form part of the plan owner’s estate for IHT purposes</p>
+<p>Recommendations to proceed on a life of another basis will need to be fully explained and appropriate warnings will be required in the Protection Suitability Report to reflect the above.</p>
+<p>We do not expect to see a recommendation to put joint life policies in Trust as it is rarely suitable to do so, but you can use the Royal London ‘nominated beneficiary’ or Guardian ‘pay-out planner’ features.</p>
+<p>You (the Adviser) must not be named a Trustee or Beneficiary on any policy that you arrange on behalf of a customer as this would be a conflict of interest.  However there may be instances where it is appropriate, i.e. where family is concerned, in which case you should seek approval from the FPG Compliance Department.</p>
+          </div>
+          <div id="pas-applying" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">5. Applying for Cover</h2>
+<p>When completing application forms you must verbally explain to the customer that they must answer all questions that we ask them honestly and accurately as any deliberate, reckless or careless misrepresentation of fact(s) may result in non-payment of a claim.</p>
+<p>You must not assume or guess the answers to any underwriting questions.</p>
+<p>Equally, you must ask all the underwriting questions fully in order that the customer can be given the opportunity to answer fully, honestly and accurately.  This must be completed in all cases, whether it is a new or existing customer.  Best practice is to then send the customer a copy of the questions and answers which have been recorded and submitted to the insurer, asking them to check the application for accuracy.  (We recommend this approach of sending the customer their answers, to help reduce the chances of any deliberate or accidental mis-representation of facts – which could ultimately lead to a claim being declined).</p>
+<p>You must ensure that you have either read to each customer, or printed and given to each customer, any protection application declarations that are required by the insurance provider.</p>
+<p>You must ensure that cover is placed on risk at the appropriate time. For mortgage protection and buildings insurance this should be on exchange of contracts. For all other policy types this should be decided with your customer.</p>
+<p>You must advise customers of their cancellation rights, 14 or 30 days depending on the product.</p>
+          </div>
+          <div id="pas-report" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">6. Suitability Report</h2>
+<p>Customers must receive a letter that clearly explains what your recommendation is (product detail, term etc.), why it is suitable and how it meets their needs.  It must also detail any shortfalls in cover, or any areas where claiming may be impacted.</p>
+<p>Whilst the Protection Suitability Letter in Acre lends itself to typing one word, or brief statements, in each box, we do not consider this approach acceptable as it is neither professional, nor is it keeping with the Customer Understanding outcome of Consumer Duty.  The purpose of the Protection Suitability Letter is to explain and justify your protection advice and so care should be taken to provide full and meaningful explanations in each box.  We have some suggested wording/paragraphs which can be used or adapted to suit the customer’s situation.</p>
+<p>Your Protection Suitability Report must be issued to the customers by the earliest of:</p>
+<p>Within 10 working days of their definite decision to proceed with a protection product</p>
+<p>The policy going on risk</p>
+<p>Mortgage exchange or missives in Scotland (where any mortgage protection for life assurance or critical illness are arranged)</p>
+<p>You must ensure that any existing policies, and your recommendations relating to them, are detailed in the Protection Suitability Report.</p>
+<p>Joint customers who reside at different addresses must both receive a Protection Suitability Report.</p>
+<p>Should two or more advisers be involved in making a recommendation to a customer (e.g. for different products) then each will need to issue a Protection Suitability Report for their part of the advice given.</p>
+<p>If you have sent a Mortgage Suitability Report to a customer that states protection will be discussed at a later date and the customer changes their mind or you have not been able to arrange a further meeting before exchange of the mortgage, then a letter or email confirming the situation has to be sent to the customer and a copy attached to the POS record.</p>
+<p>When to reissue your Protection Suitability Report</p>
+<p>You must re-issue your Protection Suitability Report if matters arise that cause you to reconsider the suitability of your recommendation or you re-visit your advice. For example, if:</p>
+<p>Rated cover affects the affordability of your recommendation, although this can also be covered by sending the client an appendix letter/email which confirms the changes</p>
+<p>You are made aware of a change in the customer’s circumstances affecting the suitability of a policy</p>
+<p>You are provided with any crucial additional information</p>
+<p>You do not need to re-issue your Protection Suitability Report if an underwriting decision results in an outright decline, postponement or exclusion of cover. However, you must verbally discuss the underwriting outcome with customers and make notes in the POS record accordingly to include time and date of notification to the customer.</p>
+<p>If an underwriting decision means you need to re-advise, then provide the client with a Protection Suitability Report addendum letter to confirm the changes from the initial advice, and also re-confirm affordability.</p>
+          </div>
+          <div id="pas-records" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">7. Record Keeping</h2>
+<p>All advice given to customers MUST be recorded on the POS system.</p>
+<p>You should never include sensitive data (such as religious or political beliefs) in your POS record or paper file. It is a breach of legislation to do so.</p>
+<p>Your fact find and the contents of the record of sale must show a complete record of the information received from customers, and your documented advice to them. In addition, you should record all discussions regarding the customer’s circumstances and preferences that support your recommendation.</p>
+<p>The following must be held within the record of sale within 10 working days of giving the advice:</p>
+<ul class="mas-list">
+<li>A copy of the Disclosure and GDPR document that was presented and explained to the customer, and signed (unless the client has signed previously in which case just attach the document you have just discussed)</li>
+<li>Finalised copy of the fact find, including a fully completed budget planner and requirements section of Acre</li>
+<li>Protection illustrations that were recommended by you, and also those chosen by the customer if different</li>
+<li>Sourcing results to evidence why you have arrived at the recommended insurer, and product</li>
+<li>Either a Protection Suitability Report or “no protection letter” (if relevant to a mortgage to confirm that the customer didn’t wish to proceed or has not yet confirmed acceptance of your recommendations).</li>
+</ul>
+<ul class="mas-list">
+<li>You must ensure that the status of your POS record is up to date and accurate with the correct product recommendation(s). This will also include the commission amount, policy number, start date and premium.  Some of these details will need to be entered manually where you have sourced your protection solutions outside of Acre and added a manual product.</li>
+</ul>
+<ul class="mas-list">
+<li>Any documents that support your advice given must be uploaded to the POS record.</li>
+</ul>
+          </div>
+          <div id="pas-glossary" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">8. Glossary</h2>
+<p>APER	             -		Approved Person</p>
+<p>ASU		-	Accident, Sickness and Unemployment Cover</p>
+<p>AR		-	Appointed Representative</p>
+<p>BTDO		-	Back to day one cover</p>
+<p>BTL		-	Buy to Let</p>
+<p>CIC		-	Critical illness cover</p>
+<p>IDD		-	Initial Disclosure Document</p>
+<p>DTA		-	Decreasing Term Assurance</p>
+<p>FCA		-	Financial Conduct Authority</p>
+<p>GI		-	General insurance</p>
+<p>IHT		-	Inheritance Tax</p>
+<p>IP		-	Income protection</p>
+<p>LTA		-	Level Term Assurance</p>
+<p>POS		-	Point of Sale (the system used to record and process sales – currently Acre)</p>
+<p>PRIN		-	Principles handbook published by the FCA</p>
+<p>Protection SR	-	Protection Suitability Report</p>
+          </div>
+          <div id="pas-app1" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">Appendix 1 – Serious Illness</h2>
+<p>IMPORTANT INTRODUCTION</p>
+<p>From discussions with clients Advisers decide whether they recommend critical illness cover (CIC) or SIC. When you recommend CIC to a client you must refer to Section 4 of the Protection Advice Standards. When you recommend SIC you must follow these requirements in Appendix 1 of the PAS.</p>
+<p>Rules for when recommending the Vitality Serious Illness Cover (SIC) product</p>
+<p>This version of the Vitality advice standards replaces the previous version issued in February 2017, and is being introduced following the release of the Vitality Mortgage Plan.  Where a client wishes to take out a policy that covers a range of medical conditions that are not covered under a standard critical illness cover policy advisers must recommend the Vitality Mortgage Plan.</p>
+<p>Whilst serious illness cover (SIC) is similar to a conventional critical illness policy (CIC) there are a number of differences between the two.   SIC covers a significantly larger number of medical conditions, but the basis of the cover is different for some of them.  In a ‘standard’ CIC contract, if any of the claims criteria are met, the policy will pay out in full.  With the Mortgage Plan 77 core conditions are guaranteed to pay out 100% of the sum assured, whilst with other conditions the amount received may be less than 100% depending on the cover provided for that condition, or the severity of it.  Vitality have therefore included Serious Illness Cover Booster within the product, and it is not available as an optional extra, and cannot be excluded.</p>
+<p>With CIC, if a successful claim is made, the sum assured is paid out, and the policy ends.  With SIC, if a claim is met with a partial pay out, cover will remain for the difference between the amount paid, and the amount of cover in the policy immediately before the claim was made.  If the severity of the condition increases, the client may be able to make further claims on the policy, up to the maximum permissible for the condition concerned.</p>
+<p>One of the main attractions of Vitality for clients is the arrangement they have that gives special offers from their business partners.  With the Mortgage Plan this cannot be added as an optional extra to a level premium contract.  In view of this, if a client wants to include the option, advisers must recommend clients include the Optimiser discount as this will give them access to these benefits.</p>
+<p>The Optimiser discount gives clients an up-front discount on their premiums based on the assumption that they will engage fully with Vitality’s Healthy Rewards Programme.  Should they not do so their premiums will increase over time.  Details of the potential increases in premiums are included in the illustrations produced from either SolutionBuilder/Assureweb, or the Vitality portal.</p>
+<p>If a client does not want to have access to the special offers, when creating a quote, advisers should select the Essentials option as this will give access to the level premium contract.</p>
+          </div>
+          <div id="pas-app2" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">Appendix 2 – Income Protection</h2>
+          </div>
+          <div id="pas-app3" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">Appendix 3 – Relevant Life Plan</h2>
+<ul class="mas-list">
+<li>Relevant Life Plans</li>
+</ul>
+<p>This document is to be read in conjunction with the Protection Advice Standards.</p>
+<ul class="mas-list">
+<li>The definition of a Relevant Life Plan</li>
+</ul>
+<p>A Relevant Life Plan (RLP) is a term assurance plan available to employers to provide an individual death in service benefit for an employee’s family and financial dependants.  It is designed to pay a lump sum if the person covered dies or is diagnosed with a terminal illness whilst employed during the term. The employer pays for the Relevant Life Plan.</p>
+<p>Relevant Life Plans aim to provide a tax efficient benefit provided by an employer for an employee. They are designed to comply with the conditions for Relevant Life Policies contained in section 393B(4) of the Income Tax (Earnings and Pensions) Act 2003.  In order for the payment of a RLP premium to be considered as allowable as a deductible business expense the usually “wholly and exclusively” principles apply.  As a result, the RLP should not be for use as a business protection policy (e.g. key person assurance, shareholder protection).</p>
+<p>Relevant Life Plans are similar to other types of life cover with a number of additional benefits:</p>
+<ul class="mas-list">
+<li>Terminal Illness</li>
+<li>Indexation</li>
+<li>GIO</li>
+<li>Continuation</li>
+</ul>
+<ul class="mas-list">
+<li>General Guidance</li>
+</ul>
+<ul class="mas-list">
+<li>You cannot advise on Relevant Life Plans without first having obtained a Licence to advise on this product.  A Licence is only granted by the Compliance Director once you have successfully completed the required training.</li>
+</ul>
+<ul class="mas-list">
+<li>All relevant Protection Advice Standards apply to Relevant Life Plans.</li>
+</ul>
+<p>A Relevant Life Plan can be recommended for family protection only as it is intended to provide a lump sum to replace the lost income from premature death.</p>
+<p>Relevant Life Plan advice is [currently] subject to 100% checking of cases and you should notify the compliance department whenever you advise on a Relevant Life Plan.  Any remedial work from the ‘case check’ will then need to be signed-off as satisfactory before the product can go into force.  Should you have any advice queries, please discuss these with Richard Hamley, in the first instance.</p>
+<ul class="mas-list">
+<li>Disclosure</li>
+</ul>
+<ul class="mas-list">
+<li>The standard Mortgage &amp; Insurance, or Insurance Only, disclosure documentation should be given to the client.  As per any other insurance sale, you cannot charge a client fee for your advice.</li>
+</ul>
+<ul class="mas-list">
+<li>Fact Find</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">4.1</span> Where The Employer is Effecting Cover For an Employee</h4>
+<p>The Key (point of sale software) should be used with minimal information about the employee, but with significant Notes to explain that this is a RLP sale and who in the Business has decided to effect the cover.</p>
+<h4 class="mas-h4"><span class="mas-num">4.2</span> Where The Client Happens To Be The Director In His Own Limited Company</h4>
+<p>The Key (point of sale software) should be used to record that the client has an ‘agreed need’ for family protection.</p>
+<p>5.	Quoting</p>
+<ul class="mas-list">
+<li>When quoting for an Insurer’s Relevant Life Plan you must indicate from the product drop down options that you are selecting the RLP product, rather than ordinary Term Assurance.</li>
+</ul>
+<p>6.	Your Recommendation</p>
+<ul class="mas-list">
+<li>To reiterate, RLP can only be recommended for family protection purposes.  RLP can provide life cover, with terminal illness as a rider benefit, but it must not include critical illness cover.</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">6.1</span> Where The Employer is Effecting Cover For an Employee</h4>
+<ul class="mas-list">
+<li>The RLP provides lump sum cover and you should recommend the maximum amount of cover that HMRC rules allow.  The client (in this instance the employer) can then elect the amount of cover they actually require for their employee, which will either be based on a multiple of salary or it will be premium driven.</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">6.2</span> Where The Client Happens To Be The Director In His Own Limited Company</h4>
+<ul class="mas-list">
+<li>Where you have a Licence to advise on both family protection and Relevant Life, it might be that the client’s family protection needs (here, the client being the employee of his own Business) can also be served with a RLP, paid for by his Business, rather than a Family Income Benefit policy.  In this instance, we would still expect your recommended product to meet any family protection needs to be FIB.  But, where a client does want to consider RLP then you should start by showing the cost of the maximum cover that the product can provide and the client may then discuss with you further quoting options, probably based on the premium they are prepared for their Business to pay.</li>
+</ul>
+<ul class="mas-list">
+<li>To reiterate, unless there is a specific need for lump sum cover, we would expect that your recommendation is still for FIB and the client’s chosen solution to then be either FIB or RLP.</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">6.3</span> The maximum cover available is:</h4>
+<ul class="mas-list">
+<li>Age 17 to 49 – up to 25 x remuneration</li>
+<li>Age 50 to 59 – up to 20 x remuneration</li>
+<li>Age 60 to 73 – up to 15 x remuneration</li>
+</ul>
+<p>Remuneration includes salary, bonuses, benefits in kind and regular dividends from shares in the employer’s company (or company within the employer’s group of companies)</p>
+<p>7.	Protection Reason Why Letter (PSUITABILITY REPORT)</p>
+<p>A specific Relevant Life Plan PSUITABILITY REPORT letter must be used.  This letter records a stand alone RLP sale only and where a RLP is being recommended alongside other personal protection then we recommend that two PSUITABILITY REPORTs are completed and issued to the client; one for the RLP and the other for your other protection recommendations. You must ensure each PSUITABILITY REPORT is client specific and that it covers the key risks/areas that may have affected your recommendation.</p>
+<p>8.	Trusts</p>
+<p>A Relevant Life Plan is designed to be written in a discretionary trust at outset, with the employee’s family and dependants as beneficiaries. If the plan is not placed in trust at outset, your client should seek expert legal and tax advice on the consequences of this.</p>
+<p>9.	Wills</p>
+<p>You must recommend that your client reviews their Will arrangements.  Where the client hasn’t made a Will, you must recommend that they do so.</p>
+<p>10.	Other Important Considerations</p>
+<p>There are some important issues when arranging cover through a Relevant Life Plan:</p>
+<h4 class="mas-h4"><span class="mas-num">10.1</span> Eligibility</h4>
+<p>Relevant Life Plans are not available where there is no employer/employee relationship.  For example, sole traders, equity partners of a partnership or equity members of a Limited Liability Partnership. You should check the employee eligibility and cover limits before making a recommendation.</p>
+<h4 class="mas-h4"><span class="mas-num">10.2</span> Independent Taxation Advice</h4>
+<p>An employer who wishes to treat Relevant Life Plan premiums as an allowable business expense should speak to their accountant, who may wish to liaise with the employer’s local inspector of taxes.</p>
+<h4 class="mas-h4"><span class="mas-num">10.3</span> Critical illness cover</h4>
+<p>Whilst there may be providers in the market promoting that their RLP product can be used to provide Critical illness cover, as well as life cover, our Advice Standards do not permit you to recommend or sell these products.  This is because we are yet to be convinced by HMRC that CIC benefits will be paid out without any repercussions on taxation for the individual.</p>
+<h4 class="mas-h4"><span class="mas-num">10.4</span> The target market includes:</h4>
+<ul class="mas-list">
+<li>Firms with too few employees (generally less than circa 50) for a group scheme</li>
+<li>Firms that wish to make arrangements specifically for director’s benefits only</li>
+<li>Firms that wish to set up bespoke arrangements for individual high earning individuals</li>
+<li>Employees who have significant pension benefits, as the RLP does not count towards the annual or lifetime allowances</li>
+<li>Individuals, for instance IT contractors or builders, who have set up their Business as a Ltd Co. Company</li>
+</ul>
+          </div>
+          <div id="pas-app4" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">Appendix 4 – Business Protection</h2>
+<ul class="mas-list">
+<li>Business Protection</li>
+</ul>
+<p>This document is to be read in conjunction with the Protection Advice Standards.</p>
+<ul class="mas-list">
+<li>The definition of Business Protection</li>
+</ul>
+<p>Business Protection is an umbrella term covering three different financial areas that may need cover.  These are in respect of Partners or Director’s Share Protection, Key Person insurance, and Commercial Debt insurance.</p>
+<p>Partners or Director’s Share Protection</p>
+<p>In the event of the death of an owner in a business it is likely his (or her) beneficiaries will want to withdraw their capital from it.  Similarly, from the remaining owners’ perspective it is unlikely they will want the deceased’s next of kin actively involved in the business.  Each owner will therefore take out insurance in trust for the estimated value of their holding in the company. They should also take out a Share Purchase Agreement which will detail how shares can be bought and sold.  This document, along with the trust means that in the event of any owner’s death their holding in the business can be bought by the remaining owners.</p>
+<p>Key Person Insurance</p>
+<p>Key Person insurance will protect a business against the financial impact of the serious illness, or death, of a vital employee.  For instance, where the relationship between the business and important clients would be jeopardised by the loss of the individual, it can also lead to potential financial loss.  But in fact a Key Person within a business could just as likely be someone instrumental in the running of the business, as it could be for a successful salesperson bringing a high level of revenue.  Key Person insurance would replace this lost income, or perhaps fund the replacement of any lost skills or knowledge.</p>
+<p>Business Loan Insurance</p>
+<p>With business loan insurance, owners, partners or directors can insure any outstanding debt, and in the event of their death the debt could be repaid.  It can be taken out to cover any of the following:-</p>
+<ul class="mas-list">
+<li>Overdrafts.</li>
+<li>Commercial loans.</li>
+<li>Commercial mortgages.</li>
+<li>Directors’ loans.</li>
+</ul>
+<p>NB.	A Relevant Life Plan (RLP) should not be confused with Business Protection.  RLP is a term</p>
+<p>assurance plan available to employers to provide an individual death in service benefit for an</p>
+<p>employee’s family and financial dependants.  It is designed to pay a lump sum if the person</p>
+<p>covered dies or is diagnosed with a terminal illness whilst employed during the term.</p>
+<ul class="mas-list">
+<li>General Guidance</li>
+</ul>
+<ul class="mas-list">
+<li>You cannot advise on Business Protection without first having obtained a Licence to advise on these products.  A Licence is only granted by the Compliance Director once you have successfully completed the required training.</li>
+</ul>
+<p>Business Protection advice is [currently] subject to 100% checking of cases and you should notify the compliance department whenever you advise on any aspect of Business Protection.  Any remedial work from the ‘case check’ will then need to be signed-off as satisfactory before the product can go into force.  Should you have any advice queries, please discuss these with Richard Hamley, in the first instance.</p>
+<ul class="mas-list">
+<li>Disclosure</li>
+</ul>
+<ul class="mas-list">
+<li>The standard Mortgage &amp; Insurance, or Insurance Only, disclosure documentation should be given to the client.  As per any other insurance sale, you cannot charge a client fee for your advice.</li>
+</ul>
+<ul class="mas-list">
+<li>Fact Find</li>
+</ul>
+<ul class="mas-list">
+<li>A paper fact find has been produced for business protection, and it is mandatory to use it.</li>
+</ul>
+<p>5.	Quoting</p>
+<ul class="mas-list">
+<li>Quotes for Business Protection should be done via Assureweb or Solution Builder as usual, however the results  will include Relevant Life Plans.  For Business Insurance ignore these.</li>
+</ul>
+<p>6.	   Your Recommendation</p>
+<h4 class="mas-h4"><span class="mas-num">6.1</span> Business Borrowings (e.g. Bank and Director’s Loans, Overdrafts)</h4>
+<ul class="mas-list">
+<li>To protect Business Borrowings, your recommendation should cover the full amount of the selected debt, or potential liability.  For decreasing liabilities (e.g. loans) decreasing term assurance should be recommended, and for level, or revolving liabilities (e.g. overdrafts) level term assurance should be recommended.</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">6.2</span> Key Person Insurance</h4>
+<p>For Key Person Insurance the recommendation should be equivalent to the value to the business of an employee.  It may be possible for companies to offset the cost of Key Person Insurance against Corporation Tax.  However, there are a number of factors to be taken into account, and you should recommend they speak to their accountants about these.</p>
+<p>The amount of cover you recommend can be calculated in one of two ways.  If a business is confident they can identify what proportion of their profits an individual is responsible for the calculation is as follows:-</p>
+<ul class="mas-list">
+<li>2 x gross annual profit, or 5 x net annual profit divided by the portion of profits attributable to the individual.</li>
+</ul>
+<p>To assist you in doing this Legal &amp; General have produced a calculator, and this together with calculators for Business Valuation and Premium Equalisation can be downloaded from the L&amp;G Adviser Centre website, and also from other insurers’ portals.</p>
+<p>For many businesses it will be difficult, if not impossible, to establish what proportion of profit is   	attributable to an individual.  In these cases the calculation is:-</p>
+<ul class="mas-list">
+<li>10 x employee annual salary for life cover, 6 x annual salary for Critical Illness.</li>
+</ul>
+<p>The business may of course decide on an entirely different set of figures, and the rationale for their 		sums should be recorded in your Business Protection SUITABILITY REPORT.</p>
+<h4 class="mas-h4"><span class="mas-num">6.3</span> Partnership/Shareholder Protection</h4>
+<p>For Partnership or Shareholders Protection the recommendation should be to cover the full value of each individual’s holding in the business.  Before making a recommendation for limited companies you need to check their Articles of Association as these will define the director’s responsibilities, the distribution of shares and business profits, as well as administrative arrangements.  In some instances, it may also cover what needs to happen in the event of the death of a director, or owner.</p>
+<p>For Limited Liability Partnerships (LLP’s) you need to see the partnership agreement as this contains similar information to the Articles of Association.  It sets out the rights and responsibilities of each partner, plus the distribution of any profits or debts.  It can also include future eventualities (such as death or retirement of a partner, and adding new partners etc.).  Please note whilst it is a legal requirement for LLP’s to have a partnership agreement, it is not for a traditional partnership.</p>
+<p>As mentioned before Legal &amp; General have provided a calculator to help you, in conjunction with the business, to assess the value of each owner’s holding.</p>
+<p>Your recommendation(s) should also be that the policies are set up in trust with the other owners as beneficiaries.  It is also important that you recommend the partners/directors set up a Share Purchase Agreement as this is a legal document detailing how the shares of the business are to be bought and sold by the other partners/directors.</p>
+<p>The most common form of Share Purchase Agreement is a Cross Option Agreement, and a number of the insurers on our panel can provide draft documents.  These may be provided to businesses for reference purposes, but you should always recommend they obtain legal advice on the agreements, and have these documents prepared by their solicitors.</p>
+<p>7.	Premium Equalisation</p>
+<p>The cost of protection for each of the parties will differ depending on their age, state of health etc.  Where one of the partners or directors is significantly older than the others the cost for any given amount of cover will be higher than for the younger ones.  The individual could then argue he is paying more than the others, and is less likely to benefit from any claim.  To offset this, we can apply a measure of Premium Equalisation, and Legal &amp; General have provided a calculator to enable us to do this.</p>
+<p>It is not mandatory to recommend equalizing premiums, but be aware that if the company is paying the premiums on behalf of the individuals, it is treated as a taxable benefit in kind by the Inland Revenue.  Therefore, if one individual’s premiums are much higher than the others it will reduce their personal allowance.</p>
+<p>8.	Business Protection Reason Why Letter (SUITABILITY REPORT)</p>
+<p>A specific Business Protection SUITABILITY REPORT letter must be used, and you must ensure each Business Protection SUITABILITY REPORT is business specific.  It must also cover the key risks/areas that may have affected your recommendation.</p>
+<p>9.	Trusts</p>
+<p>Where a Partnership or Shareholders protection recommendation is being made you must recommend placing it in trust. If the plan is not placed in trust, your client should seek expert legal and tax advice on the consequences of this.</p>
+<p>10.	Record Keeping</p>
+<p>So just to clarify, you will need to create a record on The Key and we suggest you input one or two</p>
+<p>business principal names as the client(s).  The remainder of the fact find on The Key does not need to be completed.  Instead you should add Notes to explain that this this case is a Business Protection sale and please include the full name and trading address of the legal entity.  You should then attach the following documentation.</p>
+<ul class="mas-list">
+<li>Business Fact Find</li>
+<li>Any relevant supporting information from the business, i.e. accounts or Articles of Association or structure chart</li>
+<li>Letterhead from the business</li>
+<li>Print outs or screen shots of any Calculators used</li>
+<li>Protection Illustrations</li>
+<li>Trust forms</li>
+<li>Business Protection SUITABILITY REPORT</li>
+<li>Cross Options Agreements (if applicable, and if copies provided by the firm’s solicitors)</li>
+</ul>
+          </div>
+          <div id="pas-app5" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">Appendix 5 – Whole of Life</h2>
+<ul class="mas-list">
+<li>Whole of Life</li>
+</ul>
+<p>This document is to be read in conjunction with the Protection Advice Standards.</p>
+<ul class="mas-list">
+<li>The definition of a Whole of  Life policy</li>
+</ul>
+<p>An alternative to Term Assurance, [here as the name implies] the Whole of Life cover has no end date. Whole of Life is similar to other types of life cover in respect of the additional benefits:-</p>
+<ul class="mas-list">
+<li>Terminal Illness</li>
+<li>Indexation</li>
+<li>Waiver</li>
+</ul>
+<ul class="mas-list">
+<li>General Guidance</li>
+</ul>
+<p>Our preferred option for life cover is to recommend Term Assurance for mortgage related protection, and family income benefit for family protection.  There are occasions however when neither of these products will fit the client’s needs, and therefore Whole of Life may be the appropriate solution.  The occasions when this may apply are as follows:-</p>
+<p>Funeral Costs</p>
+<p>This type of cover is currently available from a number of providers on a non-advised basis (Over 50’s cover).  However, for commission to be payable advice must be given to the client.</p>
+<p>Legacy</p>
+<p>Typically, this is where a client wishes to leave a specific amount of money to a nominated individual, or individuals (e.g. a grandparent wanting to leave money to a grandchild).</p>
+<p>Partner/Spousal Support</p>
+<p>The type of situation where this may be appropriate is if a client knows their spouse or partner is financially dependent on them and wants to leave them a lump sum when they die.</p>
+<p>Adult Dependents</p>
+<p>If a client has an adult dependent (e.g. a physically or mentally handicapped child) they may want to leave a lump sum to provide care for them when the client dies.  In these situations, it is the client’s decision on how much cover is required, and this will often be premium driven.</p>
+<p>Mortgage Protection</p>
+<p>There are an increasing number of clients who have interest only mortgages, with no repayment vehicle, and are approaching retirement.  These clients may be able to continue to pay the interest on the mortgage from retirement income, without the need to transfer to an Equity Release product.  In these situations, where the term of the product is open-ended, any associated life cover needs to be as well.</p>
+<p>Revolving Credit</p>
+<p>In situations where it is possible a client will continue with borrowing (e.g. a credit card) and does not plan to pay it off when retired, it may be appropriate to recommend whole of life to repay the debt on death.</p>
+<p>For both mortgage protection and revolving credit the adviser should recommend cover based on the current, or anticipated balance outstanding.</p>
+<p>Whole of Life Plan advice is [currently] subject to 100% checking of cases and you should notify the Compliance Department whenever you advise on a Whole of Life policy.  Any remedial work from the ‘case check’ will then need to be signed-off as satisfactory before the product can go into force.  Should you have any advice queries, please discuss these with Richard Hamley, in the first instance.</p>
+<ul class="mas-list">
+<li>Disclosure</li>
+</ul>
+<ul class="mas-list">
+<li>The standard Mortgage &amp; Insurance, or Insurance Only, disclosure documentation should be given to the client.  As per any other insurance sale, you cannot charge a client fee for your advice.</li>
+</ul>
+<ul class="mas-list">
+<li>Fact Find</li>
+</ul>
+<ul class="mas-list">
+<li>Please complete a fact find on The Key in the normal way.  Please make use of the Notes section to record why the client has expressed an interest in this product.</li>
+</ul>
+<p>5.	Quoting</p>
+<ul class="mas-list">
+<li>When quoting for an Insurer’s Whole of Life Plan you must indicate from the product drop down options that you are selecting the WOL product.  Sole Tie L&amp;G Advisers will do this using OLP and Multi Tie Advisers will use Assureweb or Solution Builder.</li>
+</ul>
+<p>6.	Your Recommendation</p>
+<ul class="mas-list">
+<li>There are a few instances, as mentioned in ‘Section 2 General Guidance’ of these Advice standards, where Whole of Life can be recommended over other forms of insurance.  The policies can be written on a single or joint life basis, but where joint life is recommended it must be ‘joint life first death’.</li>
+</ul>
+<p>7	Restrictions</p>
+<h4 class="mas-h4"><span class="mas-num">7.1</span> Inheritance Tax Planning</h4>
+<p>Under no circumstances should any advice be given, or recommendations made, around mitigating a potential Inheritance Tax Liability.</p>
+<h4 class="mas-h4"><span class="mas-num">7.2</span> Reviewable Premiums</h4>
+<p>Historically, whole of life policies sold with reviewable premiums have led to a considerable number of complaints.  This is because the first review takes place after 10 years, and inevitably means the premiums increase substantially to maintain the level of cover.  In view of this you should only recommend guaranteed premiums.</p>
+<p>8.	Protection Reason Why Letter (PSUITABILITY REPORT)</p>
+<p>The following paragraph will need to be included, and edited accordingly, in your Protection SUITABILITY REPORT.  As already mentioned, your case should then be sent to the Compliance Department for checking before the PSUITABILITY REPORT is issued to the client.</p>
+<p>I have recommended a Whole of Life policy with a sum assured of £INSERT, at a cost of £INSERT per month in the event that INSERT you/either of you died.  This policy has no end date, and will therefore pay out when you die.  I have recommended this rather than one with a fixed term because you advised me that you wanted to be able to leave a capital some of money when you die INSERT reason i.e. to help cover your funeral costs / to leave a legacy for your grandchildren / to help cover the cost of any debts you may have.  The sum assured recommended is based on our discussions and what you feel is an appropriate amount to leave for this purpose / on the monthly amount you wished to pay for this life insurance.</p>
+<p>-Waiver of premium:  I have included this as we agreed it was suitable, because you wanted to ensure if you/either of you were unable to work, due to accident or illness for a period of 26 weeks or more, cover would be maintained.  In this eventuality INSERT would, in effect, pay the premiums for you, thereby maintaining the life cover in place.</p>
+<p>You are also aware that Waiver of Premium comes at an additional cost to the standard cover, and this cost is included in the illustration I gave you.</p>
+<p>Whilst you have chosen to take out life cover of £INSERT, this does not cover the entire amount needed.  You will still have a shortfall of £INSERT which will be reviewed again when we next meet.</p>
+<p>9.	Trusts</p>
+<p>Any single life Whole of Life policies must be written in Trust, in much the same way that you would for a Term Assurance recommendation.</p>
+<p>10.	Wills</p>
+<p>You must recommend that your client reviews their Will arrangements.  Where the client hasn’t made a Will, you must recommend that they do so.</p>
+          </div>
+          <div id="pas-app6" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">Appendix 6 – Over 50s Plan</h2>
+<ul class="mas-list">
+<li>Over 50s Guaranteed Life Plan</li>
+</ul>
+<p>This document is to be read in conjunction with the Protection Advice Standards.</p>
+<ul class="mas-list">
+<li>The definition of the Over 50s Guaranteed Life Plan</li>
+</ul>
+<p>The Over 50s Guaranteed Life Plan is a type of Whole of Life cover which is not medically underwritten.  It is an alternative to either Term Assurance or conventional Whole of Life, and should not be confused with either.</p>
+<p>The only product of this type that you are permitted to sell is the One Family “Over 50s Life cover”.  No other insurers’ products can be sold.  The One Family product can be sold to individuals who are aged between 50 and 80, and who are UK resident.</p>
+<ul class="mas-list">
+<li>General Guidance</li>
+</ul>
+<p>Our preferred option for life cover is to still to recommend either Term Assurance or Whole of Life, depending on client needs, as the cover for those fully underwritten contracts will generally be cheaper.  However, this Over 50s Life cover may be recommended as an alternative where the client requires cover but they do not wish to go through the medical underwriting process.  Or, perhaps, where there has been a heavy rating or a decline with an insurer.</p>
+<p>The ‘need areas’ where we believe this product may be suitable are as follows:-</p>
+<p>Funeral Costs</p>
+<p>This is probably the most common reason for recommending this product, and the One Family product comes with a handy feature to assist the next of kin with a quick pay out, at claims stage.</p>
+<p>Legacy</p>
+<p>Typically, this is where a client wishes to leave a specific [small] amount of money to a nominated individual, or individuals (e.g. a grandparent wanting to leave money to a grandchild).</p>
+<p>The Over 50s Guaranteed Life Plan advice is [currently] subject to 100% checking of cases and you should notify the Compliance Department whenever you advise on the One Family “Over 50s Life cover” product.  Any remedial work from the ‘case check’ will then need to be signed-off as satisfactory before the product can go into force.  Should you have any advice queries, please discuss these with Richard Hamley, in the first instance.</p>
+<ul class="mas-list">
+<li>Disclosure</li>
+</ul>
+<ul class="mas-list">
+<li>The standard Insurance Only, disclosure documentation should be given to the client.  As per any other insurance sale, you cannot charge a client fee for your advice.</li>
+</ul>
+<ul class="mas-list">
+<li>Fact Find</li>
+</ul>
+<ul class="mas-list">
+<li>Please complete a fact find on The Key, but this can be limited to personal details, net income and a full budget planner to demonstrate affordability.</li>
+<li>It is then mandatory to use the Notes section to record how the client has expressed an interest in this product, what their specific need is, and how the sum assured was arrived at.</li>
+</ul>
+<p>5.	Quoting</p>
+<ul class="mas-list">
+<li>When quoting for the One Family product you can do this in Solution Builder or Assureweb, but it is much easier to access the One Family adviser portal.</li>
+</ul>
+<ul class="mas-list">
+<li>As with other life insurance quotes the required sum assured (the client need) will generate the necessary premium. Alternatively, the client may dictate a premium they wish to pay.</li>
+</ul>
+<p>6.	Your Recommendation</p>
+<ul class="mas-list">
+<li>There are a few instances, as mentioned in ‘Section 2 General Guidance’ of these Advice standards, where the ‘Over 50s Plan’ can be recommended.  The policies can only be written on a single life basis.  The level of cover sold should be a recommendation of the amount needed, or it can be based on the given sum assured from the maximum monthly premium the client is prepared to pay.</li>
+</ul>
+<p>7	Restrictions</p>
+<h4 class="mas-h4"><span class="mas-num">7.1</span> Inheritance Tax Planning</h4>
+<p>Under no circumstances should any advice be given, or recommendations made, around mitigating a potential Inheritance Tax Liability – by a housing Adviser.  You would need to make a referral to your wealth colleagues in Finance Planning Wealth Management for such client advice.</p>
+<h4 class="mas-h4"><span class="mas-num">7.2</span> Sole Tie Advisers</h4>
+<p>These One Family Life cover plans can only be sold by Multi Tie Advisers who have a specific One Family agency.  Sole Tie Advisers will need to make a referral to a Multi Tie colleague where there is a specific need for this product, and this is because L&amp;G do not allow their version of the ‘Over 50s Plan’ to be sold by Advisers.</p>
+<p>8.	Protection Reason Why Letter (PSUITABILITY REPORT)</p>
+<p>We have created a Protection SUITABILITY REPORT specifically for this new product.  Please only use this letter and please do not try to incorporate these recommendations into another letter.</p>
+<p>9.	Trusts</p>
+<p>All ‘Over 50s Plans’ must be written in Trust, in much the same way that you would for a Term Assurance recommendation.  This can be done on the One Family Over 50s adviser portal at the point of sale.</p>
+<p>10.	Wills</p>
+<p>You must recommend that your client reviews their Will arrangements.  Where the client hasn’t made a Will, you must recommend that they do so.</p>
+          </div>
+          <div id="pas-app7" class="pas-section" style="display:none;">
+<h2 class="mas-section-title">Appendix 7 – Met Life Products</h2>
+<ul class="mas-list">
+<li>Met Life’s 3 unique products:</li>
+<li>Mortgage Safe</li>
+<li>Everyday Protect</li>
+<li>Child Shield</li>
+</ul>
+<p>This document is to be read in conjunction with the Protection Advice Standards.</p>
+<ul class="mas-list">
+<li>The definition of these 3 very different Met Life products</li>
+</ul>
+<p>Mortgage Safe – This is a type of Pure Protection policy, a bit like a type of Mortgage Payment Insurance (MPI) which can cover the clients mortgage payments only.  There is a non-underwritten accident option, or a simplified underwritten product providing accident and sickness cover.</p>
+<p>Everyday Protect – This is a product which pays a small lump sum for the likes of broken bones or hospitalisation.</p>
+<p>Child Shield – This product is very similar to the Everyday Protect product, but provides cover for children.</p>
+<ul class="mas-list">
+<li>General Guidance</li>
+</ul>
+<p>Our preferred option to meet the needs of clients is to recommend Term Assurance, Critical Illness Cover or Income Protection based on the individual needs of the client.  This is because the cover for those fully underwritten contracts will provide the client with a good outcome based on their agreed needs.  Although we do not expect these Met Life products to be recommended in place of the aforementioned traditional products (Life, CIC, IP), we feel there is a place for the Met Life products as there may be instances where your client is uninsurable through the fully underwritten route, or where the client expresses an interest in protecting themselves against accidents, broken bones and hospital stays, etc.</p>
+<p>The ‘need areas’ where we believe these Met Life products may be suitable are as follows:-</p>
+<p>Mortgage Safe</p>
+<p>This product is suitable for clients looking to protect their monthly mortgage repayments in case they are unable to work due to accident and/or illness.  The monthly benefit is used to pay the mortgage for either 12 or 24 months, after a 4 week deferred period, and up to £1,500 per month benefit.  The accident only option has no underwriting, whereas the accident and sickness option has simple underwriting with just a few qualifying questions being asked.  To define an ‘accident’ it is a sudden event which happens by chance and couldn’t be expected.  Either option could be recommended after your client has been declined or heavily rated by an insurer offering normal Income Protection.</p>
+<p>Everyday Protect</p>
+<p>This product is suitable for clients looking to protect themselves or their dependents in the case of accidental injury or hospitalisation.  The lump benefits can be used to supplement a reduced or lost income, for example.  The amount of benefit is determined by the number of blocks of cover the client wishes to pay for.  And whilst this cover is not a replacement for critical illness cover, it can be recommended irrespective of whether the client already has critical illness cover, or not.  This product is not underwritten as the basis for cover is accident-based.  It could be suitable for anyone really, but in particular those who do not have sick pay, or who are unable to obtain critical illness cover, or those in more manual jobs or who play sports, and so are perhaps more susceptible to injury.</p>
+<p>Child Shield</p>
+<p>This product is suitable for clients looking for financial protection if their child suffers a broken bone, is hospitalised, or is diagnosed with a specified serious condition.  A lump sum of money is paid out to help with additional expenses.  This product can be recommended instead of Children’s Critical Illness Cover (which is sold as an add-on to CIC) where your client prefers the broader benefits offered by this Child Shield product.</p>
+<ul class="mas-list">
+<li>Disclosure</li>
+</ul>
+<ul class="mas-list">
+<li>The standard mortgage and protection disclosure documentation should be given to the client.  As per any other insurance sale, you cannot charge a client fee for your advice.  Despite the simplicity of these products, they do still need to be arranged on an ‘advised sale’ basis.</li>
+</ul>
+<ul class="mas-list">
+<li>Fact Find and Acre Completion</li>
+</ul>
+<ul class="mas-list">
+<li>Please complete a fact find on Acre, but this can be limited to personal details, net income and a full budget planner to demonstrate affordability.  It is then mandatory to use the Notes section to record how the client has expressed an interest in this product, what their specific need is, and how the level of cover was arrived at.</li>
+</ul>
+<ul class="mas-list">
+<li>When adding the protection ‘requirements’ to Acre you’ll need to select Income Protection for Mortgage Safe product, and Life &amp; CIC for both the Everyday Protect and Child Shield products.</li>
+</ul>
+<ul class="mas-list">
+<li>Then, when you add the manual product(s), you’ll see Met Life as a drop down insurer option and you should then select “core accident &amp; sickness” for the Mortgage Safe product, or “sports and lifestyle cover” for Everyday Protect, or “child accident &amp; sickness” for the Child Shield product.  You’ll be able to select the number of units required, from 1 to 5, where applicable.</li>
+</ul>
+<p>5.	Quoting</p>
+<ul class="mas-list">
+<li>When quoting for the Met Life products, this can only be achieved on the Met Life adviser portal.</li>
+</ul>
+<ul class="mas-list">
+<li>As with other insurance quotes the required level of cover (the client need) will generate the necessary premium.  Alternatively, the client may dictate a premium they wish to pay.</li>
+</ul>
+<p>6.	Your Recommendation</p>
+<ul class="mas-list">
+<li>There are a number of instances, as alluded to in ‘Section 2 General Guidance’ of these Advice Standards, where the Met Life products can be recommended.  The level of cover sold should be a recommendation of the amount needed, or it can be based on the given level of cover from the maximum monthly premium the client is prepared to pay.</li>
+</ul>
+<p>7	Restrictions</p>
+<h4 class="mas-h4"><span class="mas-num">7.1</span> Considerations to Term, CIC and IP</h4>
+<p>To reiterate, these Met Life products are not being made available to compete with the products already available from our insurer panel, but they are instead designed to compliment our existing panel.  These Met Life products can therefore be made available to clients where they either express an interest, or where our initial recommendation of Term, CIC or IP does not proceed because of underwriting or cost.</p>
+<h4 class="mas-h4"><span class="mas-num">7.2</span> Sole Tie Advisers</h4>
+<p>These Met Life products can only be sold by Multi Tie Advisers who have a specific Met Life agency.  Sole Tie Advisers will need to make a referral to a Multi Tie colleague where there is a specific need for this product.</p>
+<p>8.	Protection Suitability Report (SR)</p>
+<p>The Acre system can accommodate a Protection SR specifically for each of these new products.  However, in respect of your “reasons for recommendation” paragraph to go in the letter, here is some suggested wording for each of the three products:</p>
+<p>Mortgage Safe – I have made this recommendation because:</p>
+<p>You do not have enough insurance or other means to cover your mortgage repayments should you have an accident and be unable to work for at least 4 weeks.  This Met Life Mortgage Safe policy will help you meet your mortgage protection needs by providing a monthly benefit to pay for your mortgage.</p>
+<p>The monthly benefit, and premium, have been discussed and agreed with you.</p>
+<p>Risk.  As with any policy there are several exclusions, where Met Life would not pay a claim.  	We have discussed these, but you should also refer to the Met Life ‘policy summary’ and 	‘policy terms and conditions’.</p>
+<p>Everyday Protect – I have made this recommendation because:</p>
+<p>You do not have enough insurance to cover you should you have an accident that results in a 	temporary or permanent injury, hospitalisation, total permanent disablement or death.  This 	Met Life Everyday Protect policy will help you meet your accident protection needs by 	providing a cash sum in 	the event of you suffering a range of specified accidental injuries – 	from the less serious like breaking an arm, to being blinded or accidental death.</p>
+<p>It also covers you if you spend time in hospital due to an accident and, once you have held the	policy for 12 months it will also cover you if you must stay in hospital due to sickness.  It also 	provides a benefit if you should die from non-accidental causes, so there will be some money 	to help with funeral costs.</p>
+<p>The number of units (which gives a known monthly premium, and corresponding level of 	cover), was agreed with you after we read through the benefit amounts payable for each 	insured event.  You are aware that you could choose either 1, 2,3, 4 or 5 units of cover.</p>
+<p>Risk.  As with any policy there are several exclusions, where Met Life would not pay a claim.  	We have discussed these, but you should also refer to the Met Life ‘policy summary’ and 	‘policy terms and conditions’.</p>
+<p>Child Shield – I have made this recommendation because:</p>
+<p>You do not have enough insurance, or other means, to cover additional costs which may be 	incurred, if your child should suffer an injury resulting in a broken bone, hospitalisation, or is 	diagnosed with one of the specified serious conditions.  This Met Life Child Shield policy can 	help you cope financially and minimise disruption to normal family life by paying you a lump 	sum in the event of a successful claim.</p>
+<p>The amount of premium, and corresponding level of cover, was agreed with you after we 	read through the benefit amounts payable for each insured event.</p>
+<p>Risk.  As with any policy there are several exclusions, where Met Life would not pay a claim.  	We have discussed these, but you should also refer to the Met Life ‘policy summary’ and 	‘policy terms and conditions’.</p>
+<p>9.	Trusts</p>
+<p>It is not necessary, nor possible, to write these policies in Trust.</p>
+<p>10.	Wills</p>
+<p>You must recommend that your client reviews their Will arrangements.  Where the client hasn’t made a Will, you must recommend that they do so.</p>
+          </div>
+          <div id="pas-search-results" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
   <!-- ── Selling Zone tab ──────────────────────────────────── -->
   <div id="tab-selling-zone" class="tab-pane">
     <div class="coming-soon">
@@ -2869,7 +3581,7 @@ function switchTab(tab) {
   if (tab === 'compliance')       { if (!_cpdLoaded) loadCpd(); }
   if (tab === 'supervisor-zone')  { svInitDates(); loadSupervisorZone(); }
   if (tab === 'sales-process')    { showSpSection('sp-overview', document.getElementById('sp-nav-overview')); }
-  if (tab !== 'sales-process')   { stopMasTimer(); }
+  if (tab !== 'sales-process')   { stopMasTimer(); stopPasTimer(); }
 }
 
 // Hash routing — navigate on load (called directly, no event wrapper needed)
@@ -2947,19 +3659,18 @@ function loadRevalidationVideos() {
 
 // ── Sales Process sub-navigation ────────────────────────────────
 function showSpSection(id, el) {
-  ['sp-overview','mortgage-advice-standards'].forEach(function(s) {
+  ['sp-overview','mortgage-advice-standards','protection-advice-standards'].forEach(function(s) {
     var div = document.getElementById(s);
     if (div) div.style.display = s === id ? '' : 'none';
   });
   document.querySelectorAll('#sidebar-sales-process a').forEach(function(a) { a.classList.remove('active'); });
   if (el) el.classList.add('active');
   if (id === 'mortgage-advice-standards') {
-    masClearSearch();
-    _masSeconds = 0;
-    startMasTimer();
-  } else {
-    stopMasTimer();
-  }
+    masClearSearch(); _masSeconds = 0; startMasTimer();
+  } else { stopMasTimer(); }
+  if (id === 'protection-advice-standards') {
+    pasClearSearch(); _pasSeconds = 0; startPasTimer();
+  } else { stopPasTimer(); }
   return false;
 }
 
@@ -3083,6 +3794,112 @@ function logMasCpd(mins) {
     if (t) { t.textContent = 'CPD log failed – try again'; t.style.opacity = 1; setTimeout(function(){ t.style.opacity = 0; }, 3000); }
   });
 }
+
+// ── Protection Advice Standards ──────────────────────────────────
+function showPasSection(id, el) {
+  document.querySelectorAll('.pas-section').forEach(function(d) {
+    d.style.display = d.id === id ? '' : 'none';
+  });
+  document.querySelectorAll('#pas-nav a').forEach(function(a) { a.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  var sr = document.getElementById('pas-search-results');
+  var ca = document.getElementById('pas-content-area');
+  if (sr) sr.style.display = 'none';
+  if (ca) ca.scrollTop = 0;
+  return false;
+}
+
+var _pasSearchTimer = null;
+function pasSearch(q) {
+  clearTimeout(_pasSearchTimer);
+  _pasSearchTimer = setTimeout(function() { _pasDoSearch(q); }, 200);
+}
+function _pasDoSearch(q) {
+  var banner = document.getElementById('pas-search-banner');
+  var countEl = document.getElementById('pas-search-count');
+  var resultsEl = document.getElementById('pas-search-results');
+  var sections = document.querySelectorAll('.pas-section');
+  q = (q || '').trim();
+  if (!q) { pasClearSearch(); return; }
+  var term = q.toLowerCase();
+  var hits = [];
+  sections.forEach(function(sec) {
+    sec.querySelectorAll('p, li, h4, h5').forEach(function(el) {
+      var txt = el.textContent;
+      if (txt.toLowerCase().indexOf(term) >= 0) {
+        var titleEl = sec.querySelector('.mas-section-title');
+        var secTitle = titleEl ? titleEl.textContent : sec.id;
+        var highlighted = txt.replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi'), '<mark style="background:#fff3cd;border-radius:2px;">$1</mark>');
+        hits.push('<div style="padding:10px 0;border-bottom:1px solid #f0f3f5;"><div style="font-size:11px;color:#003768;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">' + secTitle + '</div><div style="font-size:13px;color:#2c3e50;line-height:1.5;">' + highlighted + '</div></div>');
+      }
+    });
+  });
+  sections.forEach(function(s) { s.style.display = 'none'; });
+  document.querySelectorAll('#pas-nav a').forEach(function(a) { a.classList.remove('active'); });
+  resultsEl.style.display = 'block';
+  resultsEl.innerHTML = hits.length > 0 ? hits.join('') : '<div style="padding:40px;text-align:center;color:#9baabb;"><p>No results for "' + q + '"</p></div>';
+  countEl.textContent = hits.length + ' result' + (hits.length !== 1 ? 's' : '') + ' for "' + q + '"';
+  banner.style.display = 'block';
+}
+function pasClearSearch() {
+  var banner = document.getElementById('pas-search-banner');
+  var resultsEl = document.getElementById('pas-search-results');
+  var srch = document.getElementById('pas-search');
+  if (banner) banner.style.display = 'none';
+  if (resultsEl) resultsEl.style.display = 'none';
+  if (srch) srch.value = '';
+  document.querySelectorAll('.pas-section').forEach(function(s, i) { s.style.display = i === 0 ? '' : 'none'; });
+  var firstNav = document.querySelector('#pas-nav a');
+  document.querySelectorAll('#pas-nav a').forEach(function(a) { a.classList.remove('active'); });
+  if (firstNav) firstNav.classList.add('active');
+}
+
+var _pasTimer   = null;
+var _pasSeconds = 0;
+function startPasTimer() {
+  if (_pasTimer) return;
+  var strip = document.getElementById('pas-cpd-strip');
+  if (strip) strip.style.display = 'flex';
+  _pasTimer = setInterval(function() {
+    _pasSeconds++;
+    var mins = Math.floor(_pasSeconds / 60);
+    var secs = _pasSeconds % 60;
+    var label = document.getElementById('pas-cpd-label');
+    if (label) label.textContent = 'Reading time: ' + mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }, 1000);
+}
+function stopPasTimer() {
+  clearInterval(_pasTimer);
+  _pasTimer = null;
+  var mins = Math.floor(_pasSeconds / 60);
+  _pasSeconds = 0;
+  var strip = document.getElementById('pas-cpd-strip');
+  if (strip) strip.style.display = 'none';
+  if (mins >= 1) logPasCpd(mins);
+}
+function logPasCpd(mins) {
+  var today = new Date().toISOString().split('T')[0];
+  fetch('/api/cpd', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      activity: 'Protection & GI Advice Standards – Reading',
+      date:      today,
+      minutes:   mins,
+      category:  'Technical Knowledge',
+      cpdType:   'Protection',
+      learned:   'Read and reviewed FPG Protection & GI Advice Standards V5'
+    })
+  }).then(function() {
+    var t = document.getElementById('toast');
+    if (t) { t.textContent = '✓ ' + mins + ' min Protection CPD logged'; t.style.opacity = 1; setTimeout(function(){ t.style.opacity = 0; }, 4000); }
+  }).catch(function() {
+    var t = document.getElementById('toast');
+    if (t) { t.textContent = 'CPD log failed – try again'; t.style.opacity = 1; setTimeout(function(){ t.style.opacity = 0; }, 3000); }
+  });
+}
+
+// ── Add pas-nav styling (same as mas-nav) ────────────────────────
 
 function showLvSection(id, el) {
   ['weekly-recordings','induction-recordings','revalidation-recordings'].forEach(function(s) {
