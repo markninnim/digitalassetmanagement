@@ -95,6 +95,9 @@ function requireAdmin(req, res, next) {
 // Public assets are gated — we serve them via a route, not express.static
 app.use('/static', express.static(path.join(__dirname, 'public/static')));
 
+// ── Newsletters (auth-gated PDF + cover serving) ────────────
+app.use('/newsletters', requireAuth, express.static(path.join(__dirname, 'public/newsletters')));
+
 // ── Public logo (for display only) ──────────────────────────
 app.get('/public-logo', (req, res) => {
   const p = require('path').join(__dirname, 'public/assets/logos/web/FPG-Logo-Transparent.png');

@@ -174,6 +174,7 @@ html { height: 100%; }
     <a href="#" id="lv-nav-weekly" onclick="return showLvSection('weekly-recordings',this)">Weekly Recordings</a>
     <a href="#" id="lv-nav-induction" onclick="return showLvSection('induction-recordings',this)">Induction Recordings</a>
     <a href="#" id="lv-nav-revalidation" onclick="return showLvSection('revalidation-recordings',this)">Revalidation Recordings</a>
+    <a href="#" id="lv-nav-newsletters" onclick="return showLvSection('monthly-newsletters',this)">Monthly Newsletters</a>
     <div style="margin:16px 0 4px;padding:0 18px;"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#fcb034;">KNOWLEDGE QUIZ</span></div>
     <a href="#" id="lv-nav-kt" onclick="return showLvSection('knowledge-tests',this)">All Tests</a>
     <a href="#" id="lv-nav-mas" onclick="return ktNavLoad('mas',this)">Mortgage Advice Standards</a>
@@ -895,6 +896,76 @@ html { height: 100%; }
         <p style="color:#6b7c8f;font-size:13.5px;margin:0 0 20px;line-height:1.6;">Complete all 10 modules as part of your annual revalidation.</p>
       </div>
       <div id="rv-grid" style="padding:0 32px 32px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;"></div>
+    </div>
+
+    <!-- Monthly Newsletters -->
+    <div id="monthly-newsletters" style="display:none;">
+      <div style="padding:32px 32px 0;">
+        <h2 style="color:#003768;font-size:20px;margin:0 0 6px;">Monthly Newsletters</h2>
+        <p style="color:#6b7c8f;font-size:13.5px;margin:0 0 20px;line-height:1.6;">Read the latest CPD Round-up newsletters. Opening a newsletter logs <strong>30 minutes CPD</strong> — 15 minutes Mortgage and 15 minutes Protection.</p>
+      </div>
+      <div style="padding:0 32px 32px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
+        <!-- Jun 2026 -->
+        <div onclick="openNewsletter('/newsletters/jun-2026.pdf','June 2026 CPD Round-up','June 2026')" style="cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.16)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.1)'">
+          <div style="position:relative;padding-bottom:75%;background:#003768;overflow:hidden;">
+            <img src="/newsletters/cover.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;">
+          </div>
+          <div style="padding:11px 14px;background:#fff;border-top:1px solid #f0f2f5;">
+            <div style="font-size:10px;font-weight:700;color:#00A99D;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">June 2026</div>
+            <div style="font-size:13px;font-weight:700;color:#1a2a3a;line-height:1.3;">CPD Round-up</div>
+          </div>
+        </div>
+        <!-- May 2026 -->
+        <div onclick="openNewsletter('/newsletters/may-2026.pdf','May 2026 CPD Round-up','May 2026')" style="cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.16)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.1)'">
+          <div style="position:relative;padding-bottom:75%;background:#003768;overflow:hidden;">
+            <img src="/newsletters/cover.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;">
+          </div>
+          <div style="padding:11px 14px;background:#fff;border-top:1px solid #f0f2f5;">
+            <div style="font-size:10px;font-weight:700;color:#00A99D;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">May 2026</div>
+            <div style="font-size:13px;font-weight:700;color:#1a2a3a;line-height:1.3;">CPD Round-up</div>
+          </div>
+        </div>
+        <!-- Apr 2026 -->
+        <div onclick="openNewsletter('/newsletters/apr-2026.pdf','April 2026 CPD Round-up','April 2026')" style="cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.16)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.1)'">
+          <div style="position:relative;padding-bottom:75%;background:#003768;overflow:hidden;">
+            <img src="/newsletters/cover.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;">
+          </div>
+          <div style="padding:11px 14px;background:#fff;border-top:1px solid #f0f2f5;">
+            <div style="font-size:10px;font-weight:700;color:#00A99D;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">April 2026</div>
+            <div style="font-size:13px;font-weight:700;color:#1a2a3a;line-height:1.3;">CPD Round-up</div>
+          </div>
+        </div>
+        <!-- Mar 2026 -->
+        <div onclick="openNewsletter('/newsletters/mar-2026.pdf','March 2026 CPD Round-up','March 2026')" style="cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.16)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.1)'">
+          <div style="position:relative;padding-bottom:75%;background:#003768;overflow:hidden;">
+            <img src="/newsletters/cover.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;">
+          </div>
+          <div style="padding:11px 14px;background:#fff;border-top:1px solid #f0f2f5;">
+            <div style="font-size:10px;font-weight:700;color:#00A99D;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">March 2026</div>
+            <div style="font-size:13px;font-weight:700;color:#1a2a3a;line-height:1.3;">CPD Round-up</div>
+          </div>
+        </div>
+        <!-- Feb 2026 -->
+        <div onclick="openNewsletter('/newsletters/feb-2026.pdf','February 2026 CPD Round-up','February 2026')" style="cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.16)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.1)'">
+          <div style="position:relative;padding-bottom:75%;background:#003768;overflow:hidden;">
+            <img src="/newsletters/cover.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;">
+          </div>
+          <div style="padding:11px 14px;background:#fff;border-top:1px solid #f0f2f5;">
+            <div style="font-size:10px;font-weight:700;color:#00A99D;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">February 2026</div>
+            <div style="font-size:13px;font-weight:700;color:#1a2a3a;line-height:1.3;">CPD Round-up</div>
+          </div>
+        </div>
+        <!-- Jan 2026 -->
+        <div onclick="openNewsletter('/newsletters/jan-2026.pdf','January 2026 CPD Round-up','January 2026')" style="cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 6px 24px rgba(0,0,0,.16)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.1)'">
+          <div style="position:relative;padding-bottom:75%;background:#003768;overflow:hidden;">
+            <img src="/newsletters/cover.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;">
+          </div>
+          <div style="padding:11px 14px;background:#fff;border-top:1px solid #f0f2f5;">
+            <div style="font-size:10px;font-weight:700;color:#00A99D;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">January 2026</div>
+            <div style="font-size:13px;font-weight:700;color:#1a2a3a;line-height:1.3;">CPD Round-up</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Knowledge Tests -->
@@ -4331,8 +4402,28 @@ function initShareButtons() {
 
 // ── Add pas-nav styling (same as mas-nav) ────────────────────────
 
+function openNewsletter(url, title, monthLabel) {
+  window.open(url, '_blank');
+  var today = new Date().toISOString().split('T')[0];
+  var toast = document.getElementById('toast');
+  // Log 15 min Mortgage CPD
+  fetch('/api/cpd', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ activity: title, date: today, minutes: 15, category: 'Technical Knowledge', cpdType: 'Mortgage', learned: 'Read FPG ' + monthLabel + ' CPD Round-up newsletter' })
+  });
+  // Log 15 min Protection CPD
+  fetch('/api/cpd', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ activity: title, date: today, minutes: 15, category: 'Technical Knowledge', cpdType: 'Protection', learned: 'Read FPG ' + monthLabel + ' CPD Round-up newsletter' })
+  }).then(function() {
+    if (toast) { toast.textContent = '✓ 30 min CPD logged (15 Mortgage + 15 Protection)'; toast.style.opacity = 1; setTimeout(function(){ toast.style.opacity = 0; }, 5000); }
+  }).catch(function() {
+    if (toast) { toast.textContent = 'CPD log failed – try again'; toast.style.opacity = 1; setTimeout(function(){ toast.style.opacity = 0; }, 3000); }
+  });
+}
+
 function showLvSection(id, el) {
-  ['weekly-recordings','induction-recordings','revalidation-recordings','knowledge-tests'].forEach(function(s) {
+  ['weekly-recordings','induction-recordings','revalidation-recordings','monthly-newsletters','knowledge-tests'].forEach(function(s) {
     var div = document.getElementById(s);
     if (div) div.style.display = s === id ? '' : 'none';
   });
@@ -6185,7 +6276,7 @@ function ktNavLoad(id, el) {
   document.querySelectorAll('#sidebar-learning a').forEach(function(a){a.classList.remove('active');});
   if(el) el.classList.add('active');
   // Ensure the knowledge-tests section is visible
-  ['weekly-recordings','induction-recordings','revalidation-recordings','knowledge-tests'].forEach(function(s){
+  ['weekly-recordings','induction-recordings','revalidation-recordings','monthly-newsletters','knowledge-tests'].forEach(function(s){
     var d=document.getElementById(s);if(d) d.style.display=s==='knowledge-tests'?'':'none';
   });
   ktLoadTest(id);
