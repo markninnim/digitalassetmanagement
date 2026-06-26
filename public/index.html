@@ -2866,9 +2866,15 @@ function renderSvDashboard(data) {
     if (worstPct < 100) behind.push(obj); else onTrack.push(obj);
   });
 
+  // Supervisor sub-totals (needed for sidebar + stats bar)
+  var svBehind  = supervisorCards.filter(function(s){ return s.visible.length > 0 && s.worstPct < 100; }).length;
+  var svOnTrack = supervisorCards.filter(function(s){ return s.visible.length === 0 || s.worstPct >= 100; }).length;
+  var totalBehind  = behind.length  + svBehind;
+  var totalOnTrack = onTrack.length + svOnTrack;
+
   // Update sidebar count
   var sbCount = document.getElementById('sv-sidebar-count');
-  if (sbCount) sbCount.textContent = onTrack.length + '/' + members.length;
+  if (sbCount) sbCount.textContent = totalOnTrack + '/' + members.length;
 
   // Update subtitle
   var subtitleEl = document.getElementById('sv-subtitle');
@@ -2885,11 +2891,7 @@ function renderSvDashboard(data) {
     }
   }
 
-  // Stats bar — include supervisors in counts
-  var svBehind  = supervisorCards.filter(function(s){ return s.visible.length > 0 && s.worstPct < 100; }).length;
-  var svOnTrack = supervisorCards.filter(function(s){ return s.visible.length === 0 || s.worstPct >= 100; }).length;
-  var totalBehind  = behind.length  + svBehind;
-  var totalOnTrack = onTrack.length + svOnTrack;
+  // Stats bar
   var totalMins = members.reduce(function(s,m){ var c = cpdByMember[m.email]||{}; return s+(c.total||0); }, 0);
   document.getElementById('sv-stats').innerHTML =
     '<div style="background:#fff;border-radius:12px;border:1.5px solid #e8ecf0;padding:16px 0;display:flex;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.05);width:100%;">' +
