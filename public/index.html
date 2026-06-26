@@ -159,6 +159,9 @@ html { height: 100%; }
     <a href="#" id="lv-nav-weekly" onclick="return showLvSection('weekly-recordings',this)">Weekly Recordings</a>
     <a href="#" id="lv-nav-induction" onclick="return showLvSection('induction-recordings',this)">Induction Recordings</a>
     <a href="#" id="lv-nav-revalidation" onclick="return showLvSection('revalidation-recordings',this)">Revalidation Recordings</a>
+    <div style="margin:16px 0 4px;padding:0 18px;"><span style="font-size:10px;font-weight:800;color:#e8650a;letter-spacing:.08em;">KNOWLEDGE TESTS</span></div>
+    <a href="#" id="lv-nav-mas-test" onclick="return showLvSection('knowledge-tests',this);ktLoadTest('mas')">MAS Knowledge Test</a>
+    <a href="#" id="lv-nav-pas-test" onclick="return showLvSection('knowledge-tests',this);ktLoadTest('pas')">PAS Knowledge Test</a>
   </div>
   <!-- Sales Process sidebar -->
   <div id="sidebar-sales-process" style="display:none">
@@ -859,6 +862,80 @@ html { height: 100%; }
         <p style="color:#6b7c8f;font-size:13.5px;margin:0 0 20px;line-height:1.6;">Complete all 10 modules as part of your annual revalidation.</p>
       </div>
       <div id="rv-grid" style="padding:0 32px 32px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;"></div>
+    </div>
+
+    <!-- Knowledge Tests -->
+    <div id="knowledge-tests" style="display:none;padding:32px;">
+      <!-- Test selection landing -->
+      <div id="kt-landing">
+        <h2 style="color:#003768;font-size:20px;margin:0 0 6px;">Knowledge Tests</h2>
+        <p style="color:#6b7c8f;font-size:13.5px;margin:0 0 24px;line-height:1.6;">Test your knowledge of FPG advice standards. 20 questions, 75% passmark. Passing logs 30 minutes CPD.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:700px;">
+          <div onclick="ktLoadTest('mas')" style="background:#fff;border:1.5px solid #e8ecf0;border-radius:12px;padding:24px;cursor:pointer;transition:box-shadow .15s,border-color .15s;" onmouseover="this.style.borderColor='#003768';this.style.boxShadow='0 4px 16px rgba(0,55,104,.1)'" onmouseout="this.style.borderColor='#e8ecf0';this.style.boxShadow='none'">
+            <div style="font-size:28px;margin-bottom:12px;">🏠</div>
+            <div style="font-size:15px;font-weight:700;color:#003768;margin-bottom:4px;">Mortgage Advice Standards</div>
+            <div style="font-size:12px;color:#6b7c8f;margin-bottom:16px;">20 questions covering MAS and Lifetime Mortgages appendix</div>
+            <div id="kt-mas-badge" style="font-size:11px;color:#6b7c8f;"></div>
+            <button style="margin-top:12px;background:#003768;color:#fff;border:none;padding:8px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Start Test →</button>
+          </div>
+          <div onclick="ktLoadTest('pas')" style="background:#fff;border:1.5px solid #e8ecf0;border-radius:12px;padding:24px;cursor:pointer;transition:box-shadow .15s,border-color .15s;" onmouseover="this.style.borderColor='#003768';this.style.boxShadow='0 4px 16px rgba(0,55,104,.1)'" onmouseout="this.style.borderColor='#e8ecf0';this.style.boxShadow='none'">
+            <div style="font-size:28px;margin-bottom:12px;">🛡️</div>
+            <div style="font-size:15px;font-weight:700;color:#003768;margin-bottom:4px;">Protection Advice Standards</div>
+            <div style="font-size:12px;color:#6b7c8f;margin-bottom:16px;">20 questions covering PAS and all 8 appendices</div>
+            <div id="kt-pas-badge" style="font-size:11px;color:#6b7c8f;"></div>
+            <button style="margin-top:12px;background:#003768;color:#fff;border:none;padding:8px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Start Test →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active test UI (replaces landing) -->
+      <div id="kt-test-wrap" style="display:none;max-width:700px;">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div>
+            <button onclick="ktBackToLanding()" style="background:none;border:none;color:#6b7c8f;font-size:13px;cursor:pointer;font-family:inherit;padding:0;margin-bottom:4px;">← Back to tests</button>
+            <h2 id="kt-test-title" style="color:#003768;font-size:18px;margin:0;font-weight:800;"></h2>
+          </div>
+          <div style="text-align:right;">
+            <div id="kt-progress-label" style="font-size:12px;color:#6b7c8f;margin-bottom:4px;"></div>
+            <div style="width:160px;height:6px;background:#e8ecf0;border-radius:3px;overflow:hidden;">
+              <div id="kt-progress-bar" style="height:100%;background:#003768;border-radius:3px;transition:width .3s;width:0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question panel -->
+        <div id="kt-question-panel" style="background:#fff;border:1.5px solid #e8ecf0;border-radius:12px;padding:28px;">
+          <div id="kt-q-num" style="font-size:11px;font-weight:700;color:#e8650a;letter-spacing:.06em;margin-bottom:10px;"></div>
+          <div id="kt-q-text" style="font-size:15px;font-weight:600;color:#1a2a3a;line-height:1.6;margin-bottom:20px;"></div>
+          <div id="kt-options" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
+        <!-- Navigation -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">
+          <button id="kt-prev-btn" onclick="ktNav(-1)" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">← Previous</button>
+          <span id="kt-answered-count" style="font-size:12px;color:#6b7c8f;"></span>
+          <button id="kt-next-btn" onclick="ktNav(1)" style="background:#003768;color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Next →</button>
+        </div>
+      </div>
+
+      <!-- Review screen -->
+      <div id="kt-review-wrap" style="display:none;max-width:700px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <button onclick="ktBackToTest()" style="background:none;border:none;color:#6b7c8f;font-size:13px;cursor:pointer;font-family:inherit;padding:0;">← Back to questions</button>
+        </div>
+        <div style="background:#fff;border:1.5px solid #e8ecf0;border-radius:12px;padding:24px;margin-bottom:20px;">
+          <h3 style="font-size:16px;font-weight:800;color:#003768;margin:0 0 4px;">Review Your Answers</h3>
+          <p style="font-size:13px;color:#6b7c8f;margin:0 0 16px;">Check all questions are answered before submitting.</p>
+          <div id="kt-review-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;"></div>
+        </div>
+        <button onclick="ktSubmit()" id="kt-submit-btn" style="background:#003768;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;">Submit Test</button>
+      </div>
+
+      <!-- Results screen -->
+      <div id="kt-results-wrap" style="display:none;max-width:700px;">
+        <div id="kt-results-inner"></div>
+      </div>
     </div>
 
   </div>
@@ -4132,7 +4209,7 @@ function initShareButtons() {
 // ── Add pas-nav styling (same as mas-nav) ────────────────────────
 
 function showLvSection(id, el) {
-  ['weekly-recordings','induction-recordings','revalidation-recordings'].forEach(function(s) {
+  ['weekly-recordings','induction-recordings','revalidation-recordings','knowledge-tests'].forEach(function(s) {
     var div = document.getElementById(s);
     if (div) div.style.display = s === id ? '' : 'none';
   });
@@ -4140,6 +4217,7 @@ function showLvSection(id, el) {
   if (el) el.classList.add('active');
   if (id === 'induction-recordings')   loadInductionVideos();
   if (id === 'revalidation-recordings') loadRevalidationVideos();
+  if (id === 'knowledge-tests')         ktShowLanding();
   return false;
 }
 
@@ -5697,6 +5775,255 @@ async function confirmImport() {
     document.getElementById('admin-import-preview').style.display = 'none';
     loadAdminUsers();
   }, 2000);
+}
+
+// ── Knowledge Tests ───────────────────────────────────────────
+
+var KT_TESTS = {
+  mas: {
+    title: 'Mortgage Advice Standards',
+    cpdType: 'Mortgage',
+    passmark: 15,
+    questions: [
+      { q: 'FPG is authorised by the FCA for which of the following activities?',
+        o: ['Regulated residential mortgages only','Regulated residential mortgages, consumer buy to let, non-investment insurance and certain consumer credit','All mortgage types including commercial only','Investment mortgages and residential mortgages'], a: 1 },
+      { q: 'What is the occupancy requirement within the definition of a regulated mortgage contract?',
+        o: ['100% of the land must be used as a dwelling','At least 51% must be used as a dwelling','At least 40% must be used as a dwelling','The borrower must personally occupy the property'], a: 2 },
+      { q: 'Which of the following is classed as a Consumer Buy to Let (CBTL) mortgage?',
+        o: ['A buy to let where the borrower has never lived in the property and it is a business letting','A buy to let where a related person has lived in or intends to live in the property','All buy to let mortgages over £500,000','All buy to let mortgages regardless of occupancy'], a: 1 },
+      { q: 'What is FPG\'s policy on execution only mortgage business?',
+        o: ['Permitted for experienced clients on request','Permitted for remortgages only','Permitted for professional clients only','Not permitted under any circumstances'], a: 3 },
+      { q: 'An adviser who wishes to arrange a residential mortgage for themselves on a sole basis may:',
+        o: ['Advise themselves and complete a self-declaration','Go direct to the lender on an execution only basis as a client','Use an approved packager to arrange it','Obtain a waiver from the Compliance Director'], a: 1 },
+      { q: 'What must be attached to the customer POS record when a DIP/AIP is provided for a customer with no specific property in mind?',
+        o: ['Nothing — a DIP is not part of the formal advice process','A full Key Facts Illustration','A copy of the DIP/AIP','A completed suitability report'], a: 2 },
+      { q: 'Which of the following would NOT be classified as a non-regulated Business Buy to Let (BBTL) mortgage?',
+        o: ['A buy to let where the borrower has never occupied the property','A property let on the basis of a rental agreement only','A let to buy where the borrower previously occupied the property','A purely commercial rental property with no residential element'], a: 2 },
+      { q: 'Regarding lender codes, which statement is correct?',
+        o: ['Codes can be shared with trusted administrative staff','Administrators may submit under a separate code if the lender system allows','Codes may be shared to improve processing efficiency','Senior advisers can use codes on behalf of junior colleagues'], a: 1 },
+      { q: 'When a client insists on staying with their existing lender, what must the MRWL confirm?',
+        o: ['That the whole of market was sourced and the existing lender was cheapest','That whole of market was not sourced because of the client\'s overriding preference','That three alternative products were also considered','Nothing additional is required where the client insists'], a: 1 },
+      { q: 'What is the minimum reflection period on a binding mortgage offer under the MCD?',
+        o: ['3 days','5 days','7 days','14 days'], a: 2 },
+      { q: 'A foreign currency loan is defined as one denominated in:',
+        o: ['Any currency other than sterling','A currency other than the customer\'s income currency or the currency of assets used to repay the credit','Euros or US dollars only','Any non-EEA currency'], a: 1 },
+      { q: 'When a deposit is gifted by a third party from overseas, what is required?',
+        o: ['A signed letter confirming relationship, that the gift is unencumbered, plus a recent bank/investment statement from the third party','Just a bank statement from the third party','A statutory declaration from a solicitor','No specific evidence if the gift is under £50,000'], a: 0 },
+      { q: 'FPG does NOT permit mortgage funds to be placed into which of the following?',
+        o: ['Home improvements','Investments (other than buy to let purchases)','Debt consolidation','Purchase of a vehicle'], a: 1 },
+      { q: 'DIPs and AIPs are considered:',
+        o: ['Informal pre-application tools with no regulatory significance','Part of the formal advice process requiring a POS record','Outside the scope of FCA regulation','Only required for first-time buyers'], a: 1 },
+      { q: 'When can an off-panel lender be recommended?',
+        o: ['Never — only panel lenders may be recommended','Only with prior FCA approval','Where justified in terms of price, value and suitability','Only for remortgages over £500,000'], a: 2 },
+      { q: 'What is the minimum income evidence required for a Consumer Buy to Let mortgage?',
+        o: ['Six months bank statements only','One month\'s payslip and corresponding bank statement, or one year\'s accounts as a minimum','No income evidence required for buy to let','Latest P60 only'], a: 1 },
+      { q: 'Under MAS Appendix 1, Lifetime Mortgages are defined as:',
+        o: ['Any mortgage for borrowers aged over 55','MCD-exempt mortgages where the lender does not require capital repayment until a specified life event','Interest-only mortgages with an indefinite term','Equity release schemes available only to those over 70'], a: 1 },
+      { q: 'In a shared equity scheme, the MRWL must confirm:',
+        o: ['Only the monthly payment and interest rate','How the customer will repay the second charge','The builder\'s financial rating','Local authority approval of the scheme'], a: 1 },
+      { q: 'All DIPs, AIPs and applications must be:',
+        o: ['Submitted by an administrator under the adviser\'s code','Completed and submitted by the adviser under their own individual codes','Submitted by the AR firm principal only','Counter-signed by a supervisor before submission'], a: 1 },
+      { q: 'Where a client wishes to consolidate debt onto a BBTL loan, the credit agreement will be regulated under:',
+        o: ['MCOB','ICOB','CONC','MCD'], a: 2 }
+    ]
+  },
+  pas: {
+    title: 'Protection Advice Standards',
+    cpdType: 'Protection',
+    passmark: 15,
+    questions: [
+      { q: 'Self-sales of protection policies are not permitted without:',
+        o: ['FCA approval','Authorisation from your Sales Manager prior to any application','Compliance Director sign-off after the application','Supervisor approval after the policy is in force'], a: 1 },
+      { q: 'What must be provided on first contact when anticipating a personal recommendation on a protection policy?',
+        o: ['Policy illustrations only','A budget planner','Disclosure Documentation','A Protection Suitability Report'], a: 2 },
+      { q: 'Where a customer does not know their sick pay entitlement under their employment contract, you should recommend:',
+        o: ['No income protection until entitlement is confirmed','Income protection with a long deferred period','Income protection with a short deferred period','ASU cover only'], a: 2 },
+      { q: 'A full budget section is NOT required where:',
+        o: ['Life cover only is being discussed','Critical illness cover is the main recommendation','Buildings and/or contents insurance is the only protection being discussed','Income protection is not required'], a: 2 },
+      { q: 'Why must the FPG Disclosure Document be used rather than just the Acre IDD?',
+        o: ['The Acre IDD is no longer FCA-compliant','The Acre IDD does not cover keeping in contact with clients in the future','The FPG version includes GDPR wording the Acre version lacks','FPG require dual disclosure in all cases'], a: 1 },
+      { q: 'What type of life assurance product is preferred for family protection under the Protection Advice Standards?',
+        o: ['Level term assurance','Whole of Life','Family Income Benefit','Decreasing term assurance'], a: 2 },
+      { q: 'In the first instance, what is the preferred recommendation to protect a client\'s income against inability to work?',
+        o: ['Accident, Sickness and Unemployment (ASU) policy','Short-term Income Protection (1–2 year)','Met Life Mortgage Safe','Standard Income Protection product'], a: 3 },
+      { q: 'Under Appendix 3, what is the maximum cover multiple for a Relevant Life Plan for someone aged 17–49?',
+        o: ['10x remuneration','15x remuneration','20x remuneration','25x remuneration'], a: 3 },
+      { q: 'A Relevant Life Plan is designed to be written in which type of trust?',
+        o: ['Bare trust','Interest in possession trust','Discretionary trust','No trust is required'], a: 2 },
+      { q: 'Which of the following is explicitly prohibited as a need area for recommending Whole of Life cover?',
+        o: ['Funeral costs','Inheritance Tax Planning','Leaving a legacy to a grandchild','Covering a financially dependent adult with disabilities'], a: 1 },
+      { q: 'Under Appendix 6, the only permitted Over 50s Guaranteed Life Plan product at FPG is:',
+        o: ['Aviva Over 50s Plan','Legal & General Over 50s','One Family "Over 50s Life cover"','Vitality Over 50s Plan'], a: 2 },
+      { q: 'The PMI insurers on the FPG panel are:',
+        o: ['Aviva, AXA, Bupa and Legal & General','AXA, Bupa, Vitality and Zurich','Aviva, AXA, Bupa and Vitality','Aviva, Bupa, Legal & General and Vitality'], a: 2 },
+      { q: 'Under Appendix 1, Vitality Serious Illness Cover guarantees 100% payout for how many core conditions?',
+        o: ['50','65','77','90'], a: 2 },
+      { q: 'For Business Protection Key Person Insurance where profit attribution is NOT identifiable, the life cover amount should be:',
+        o: ['5x annual salary','6x annual salary','8x annual salary','10x annual salary'], a: 3 },
+      { q: 'Under Appendix 5, which type of Whole of Life premiums must always be recommended?',
+        o: ['Reviewable premiums as they start lower','Guaranteed premiums','Indexed premiums only','The choice is at the adviser\'s discretion'], a: 1 },
+      { q: 'Under Appendix 8, a Self Sale protection policy must be transacted on what basis?',
+        o: ['Fully advised basis','Simplified advice basis','Execution Only basis','Partial advice basis'], a: 2 },
+      { q: 'For a Self Sale, the Sales Manager Note to The Key must confirm:',
+        o: ['Only that the Own Life Sale has been agreed','That the sale is agreed and the position regarding commission (indemnity or non-indemnity)','The premium amount only','That the FCA has been notified'], a: 1 },
+      { q: 'Under Appendix 4, Business Protection Partnership/Shareholder Protection must be:',
+        o: ['Written without trust to maintain flexibility','Written on a joint life basis','Placed in trust','Subject to annual review by the compliance team'], a: 2 },
+      { q: 'Which adviser type can sell One Family Over 50s Guaranteed Life Plans?',
+        o: ['Sole Tie Advisers only','All FPG advisers','Multi Tie Advisers with a specific One Family agency','Only advisers with a separate Whole of Life licence'], a: 2 },
+      { q: 'Under Appendix 3, which of the following correctly describes eligibility for a Relevant Life Plan?',
+        o: ['Available to all self-employed individuals including sole traders','Not available to sole traders, equity partners or equity members of an LLP','Available to all limited company directors regardless of structure','Available to any employee including equity partners in an LLP'], a: 1 }
+    ]
+  }
+};
+
+var _kt = { id: null, cur: 0, answers: {}, phase: 'landing' };
+
+function ktShowLanding() {
+  _kt = { id: null, cur: 0, answers: {}, phase: 'landing' };
+  var l = document.getElementById('kt-landing');
+  var tw = document.getElementById('kt-test-wrap');
+  var rw = document.getElementById('kt-review-wrap');
+  var res = document.getElementById('kt-results-wrap');
+  if (l) l.style.display = '';
+  if (tw) tw.style.display = 'none';
+  if (rw) rw.style.display = 'none';
+  if (res) res.style.display = 'none';
+}
+
+function ktLoadTest(id) {
+  _kt = { id: id, cur: 0, answers: {}, phase: 'test' };
+  var test = KT_TESTS[id];
+  if (!test) return;
+  document.getElementById('kt-landing').style.display = 'none';
+  document.getElementById('kt-review-wrap').style.display = 'none';
+  document.getElementById('kt-results-wrap').style.display = 'none';
+  document.getElementById('kt-test-title').textContent = test.title;
+  document.getElementById('kt-test-wrap').style.display = '';
+  ktRenderQ();
+}
+
+function ktRenderQ() {
+  var test = KT_TESTS[_kt.id];
+  var qi = _kt.cur;
+  var q = test.questions[qi];
+  var total = test.questions.length;
+  document.getElementById('kt-q-num').textContent = 'QUESTION ' + (qi + 1) + ' OF ' + total;
+  document.getElementById('kt-q-text').textContent = q.q;
+  document.getElementById('kt-progress-label').textContent = (qi + 1) + ' / ' + total;
+  document.getElementById('kt-progress-bar').style.width = (((qi + 1) / total) * 100) + '%';
+  document.getElementById('kt-prev-btn').style.visibility = qi > 0 ? 'visible' : 'hidden';
+  var isLast = qi === total - 1;
+  var nb = document.getElementById('kt-next-btn');
+  nb.textContent = isLast ? 'Review & Submit →' : 'Next →';
+  nb.onclick = isLast ? ktShowReview : function(){ ktNav(1); };
+  // Options
+  var labels = ['A','B','C','D'];
+  var opts = document.getElementById('kt-options');
+  opts.innerHTML = '';
+  q.o.forEach(function(opt, ai) {
+    var selected = _kt.answers[qi] === ai;
+    var div = document.createElement('div');
+    div.onclick = function() { ktSelect(qi, ai); };
+    div.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:8px;cursor:pointer;border:1.5px solid ' + (selected ? '#003768' : '#e8ecf0') + ';background:' + (selected ? '#eef3f8' : '#fff') + ';transition:all .1s;';
+    div.innerHTML = '<div style="flex-shrink:0;width:24px;height:24px;border-radius:50%;background:' + (selected ? '#003768' : '#e8ecf0') + ';color:' + (selected ? '#fff' : '#6b7c8f') + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">' + labels[ai] + '</div><div style="font-size:13.5px;color:#1a2a3a;line-height:1.5;padding-top:2px;">' + opt + '</div>';
+    opts.appendChild(div);
+  });
+  // Answered count
+  var answered = Object.keys(_kt.answers).length;
+  document.getElementById('kt-answered-count').textContent = answered + ' of ' + total + ' answered';
+}
+
+function ktSelect(qi, ai) {
+  _kt.answers[qi] = ai;
+  ktRenderQ();
+}
+
+function ktNav(dir) {
+  _kt.cur = Math.max(0, Math.min(KT_TESTS[_kt.id].questions.length - 1, _kt.cur + dir));
+  ktRenderQ();
+}
+
+function ktBackToLanding() { ktShowLanding(); }
+
+function ktBackToTest() {
+  document.getElementById('kt-review-wrap').style.display = 'none';
+  document.getElementById('kt-test-wrap').style.display = '';
+}
+
+function ktShowReview() {
+  document.getElementById('kt-test-wrap').style.display = 'none';
+  document.getElementById('kt-review-wrap').style.display = '';
+  var test = KT_TESTS[_kt.id];
+  var grid = document.getElementById('kt-review-grid');
+  grid.innerHTML = '';
+  test.questions.forEach(function(q, qi) {
+    var answered = _kt.answers[qi] !== undefined;
+    var btn = document.createElement('button');
+    btn.textContent = qi + 1;
+    btn.onclick = function() {
+      _kt.cur = qi;
+      document.getElementById('kt-review-wrap').style.display = 'none';
+      document.getElementById('kt-test-wrap').style.display = '';
+      ktRenderQ();
+    };
+    btn.style.cssText = 'padding:8px;border-radius:6px;border:1.5px solid ' + (answered ? '#003768' : '#e8650a') + ';background:' + (answered ? '#eef3f8' : '#fff9f5') + ';color:' + (answered ? '#003768' : '#e8650a') + ';font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+    grid.appendChild(btn);
+  });
+  var unanswered = test.questions.length - Object.keys(_kt.answers).length;
+  var sb = document.getElementById('kt-submit-btn');
+  if (unanswered > 0) {
+    sb.textContent = unanswered + ' question' + (unanswered > 1 ? 's' : '') + ' unanswered — click orange to go back';
+    sb.style.background = '#6b7c8f';
+    sb.onclick = null;
+  } else {
+    sb.textContent = 'Submit Test';
+    sb.style.background = '#003768';
+    sb.onclick = ktSubmit;
+  }
+}
+
+function ktSubmit() {
+  var test = KT_TESTS[_kt.id];
+  var score = 0;
+  test.questions.forEach(function(q, qi) { if (_kt.answers[qi] === q.a) score++; });
+  var total = test.questions.length;
+  var passed = score >= test.passmark;
+  document.getElementById('kt-review-wrap').style.display = 'none';
+  document.getElementById('kt-results-wrap').style.display = '';
+  var pct = Math.round(score / total * 100);
+  var colour = passed ? '#16a34a' : '#dc2626';
+  var wrongItems = '';
+  test.questions.forEach(function(q, qi) {
+    if (_kt.answers[qi] !== q.a) {
+      wrongItems += '<div style="margin-bottom:10px;padding:10px 14px;background:#fff;border:1.5px solid #fee2e2;border-radius:8px;">' +
+        '<div style="font-size:12px;font-weight:600;color:#1a2a3a;margin-bottom:4px;">Q' + (qi+1) + ': ' + q.q + '</div>' +
+        '<div style="font-size:12px;color:#dc2626;">✗ Your answer: ' + (_kt.answers[qi] !== undefined ? q.o[_kt.answers[qi]] : '(not answered)') + '</div>' +
+        '<div style="font-size:12px;color:#16a34a;">✓ Correct: ' + q.o[q.a] + '</div></div>';
+    }
+  });
+  document.getElementById('kt-results-inner').innerHTML =
+    '<div style="text-align:center;padding:24px 0 32px;">' +
+      '<div style="font-size:52px;font-weight:900;color:' + colour + ';">' + pct + '%</div>' +
+      '<div style="font-size:16px;font-weight:700;color:' + colour + ';margin:4px 0 8px;">' + (passed ? '✓ PASSED' : '✗ FAILED') + '</div>' +
+      '<div style="font-size:13px;color:#6b7c8f;">You scored ' + score + ' out of ' + total + ' (passmark: ' + test.passmark + '/20)</div>' +
+      (passed ? '<div style="margin-top:12px;font-size:13px;color:#16a34a;font-weight:600;">30 minutes CPD logged ✓</div>' : '<div style="margin-top:8px;font-size:13px;color:#6b7c8f;">No CPD logged for a failed attempt. Review and try again.</div>') +
+    '</div>' +
+    (wrongItems ? '<div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:700;color:#1a2a3a;margin-bottom:10px;">Questions to review (' + (total - score) + '):</div>' + wrongItems + '</div>' : '<div style="text-align:center;padding:12px;font-size:14px;color:#16a34a;font-weight:600;">Perfect score! 🎉</div>') +
+    '<div style="display:flex;gap:12px;margin-top:16px;">' +
+      '<button onclick="ktLoadTest(\'' + _kt.id + '\')" style="flex:1;background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Retake Test</button>' +
+      '<button onclick="ktShowLanding()" style="flex:1;background:#003768;color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Back to Tests</button>' +
+    '</div>';
+  // Log CPD
+  fetch('/api/test/result', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ testName: test.title, score: score, total: total, passed: passed, cpdType: test.cpdType })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.ok && passed) {
+      var t = document.getElementById('toast');
+      if (t) { t.textContent = '✓ 30 min ' + test.cpdType + ' CPD logged'; t.style.opacity = 1; setTimeout(function(){ t.style.opacity = 0; }, 4000); }
+    }
+  });
 }
 </script>
 </body>

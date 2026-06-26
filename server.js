@@ -717,6 +717,34 @@ app.post('/api/cpd', requireAuth, async (req, res) => {
   }
 });
 
+
+// POST /api/test/result — log a knowledge test attempt as CPD
+app.post('/api/test/result', requireAuth, async (req, res) => {
+  const { testName, score, total, passed, cpdType } = req.body;
+  if (!testName || score === undefined || !total) return res.status(400).json({ error: 'Missing fields' });
+  const pct = Math.round(score / total * 100);
+  const minutes = passed ? 30 : 0;
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const data = await cpdFetch('', {
+      method: 'POST',
+      body: JSON.stringify({ records: [{ fields: {
+        [CPD_ACTIVITY]: testName + ' – Knowledge Test',
+        [CPD_EMAIL]:    req.session.user.email,
+        [CPD_DATE]:     today,
+        [CPD_MINUTES]:  minutes,
+        [CPD_CATEGORY]: 'Technical Knowledge',
+        [CPD_SOURCE]:   'Knowledge Test',
+        [CPD_TYPE]:     cpdType || 'Mortgage',
+        [CPD_LEARNED]:  'Scored ' + score + '/' + total + ' (' + pct + '%) – ' + (passed ? 'PASSED' : 'FAILED')
+      }}], returnFieldsByFieldId: true })
+    });
+    res.json({ ok: true, entry: cpdRecordToEntry(data.records[0]) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // POST /api/cpd/video — auto-log a Learning Zone video (supports 50/50)
 app.post('/api/cpd/video', requireAuth, async (req, res) => {
   const { videoTitle, cpdType } = req.body;
