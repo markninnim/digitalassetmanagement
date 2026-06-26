@@ -94,6 +94,18 @@ html { height: 100%; }
 .coming-soon svg { opacity:.15; margin-bottom:24px; }
 .coming-soon h2 { color:#003768; font-size:22px; margin:0 0 10px; }
 .coming-soon p { color:#6b7c8f; font-size:14px; max-width:360px; line-height:1.7; margin:0; }
+/* ── Mortgage Advice Standards ─────────────────────────────── */
+#mas-nav a { display:block; padding:9px 18px; font-size:13px; color:#3a4a5a; text-decoration:none; border-left:3px solid transparent; transition:background .15s, color .15s; line-height:1.4; }
+#mas-nav a:hover { background:#f5f7fa; color:#003768; }
+#mas-nav a.active { background:#eef3f8; color:#003768; font-weight:700; border-left-color:#003768; }
+.mas-section-title { font-size:18px; font-weight:800; color:#003768; margin:0 0 16px; padding-bottom:10px; border-bottom:2px solid #e8ecf0; }
+.mas-h4 { font-size:14px; font-weight:700; color:#1a2a3a; margin:20px 0 6px; display:flex; align-items:baseline; gap:8px; }
+.mas-h5 { font-size:13px; font-weight:700; color:#2c3e50; margin:16px 0 4px; }
+.mas-num { background:#003768; color:#fff; font-size:11px; font-weight:700; padding:2px 6px; border-radius:4px; white-space:nowrap; }
+#mas-content-area p { font-size:13px; color:#2c3e50; line-height:1.7; margin:0 0 10px; }
+.mas-list { margin:8px 0 12px 0; padding-left:20px; }
+.mas-list li { font-size:13px; color:#2c3e50; line-height:1.7; margin-bottom:4px; }
+#mas-search:focus { border-color:#003768; box-shadow:0 0 0 3px rgba(0,55,104,.08); }
 </style>
 </head>
 <body>
@@ -151,7 +163,8 @@ html { height: 100%; }
   <!-- Sales Process sidebar -->
   <div id="sidebar-sales-process" style="display:none">
     <h2 style="margin-top: 8px;">Sales Process</h2>
-    <a href="#" class="active">Overview</a>
+    <a href="#" id="sp-nav-overview" class="active" onclick="return showSpSection('sp-overview',this)">Overview</a>
+    <a href="#" id="sp-nav-mas" onclick="return showSpSection('mortgage-advice-standards',this)">Mortgage Advice Standards</a>
   </div>
   <!-- Selling Zone sidebar -->
   <div id="sidebar-selling-zone" style="display:none">
@@ -851,10 +864,717 @@ html { height: 100%; }
 
   <!-- ── Sales Process tab ─────────────────────────────────── -->
   <div id="tab-sales-process" class="tab-pane">
-    <div class="coming-soon">
-      <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <h2>Sales Process</h2>
-      <p>Step-by-step sales process documentation, scripts, and workflow guides will appear here. This section is coming soon.</p>
+    <div id="sp-overview">
+      <div class="coming-soon">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <h2>Sales Process</h2>
+        <p>Step-by-step sales process documentation, scripts, and workflow guides will appear here.</p>
+      </div>
+    </div>
+    <div id="mortgage-advice-standards" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 28px 0;gap:12px;flex-wrap:wrap;">
+        <div>
+          <h2 style="margin:0;font-size:20px;font-weight:800;color:#003768;">Mortgage Advice Standards</h2>
+          <p style="margin:4px 0 0;font-size:13px;color:#6b7c8f;">FPG Mortgage Advice Standards V3 - July 2021</p>
+        </div>
+        <div style="position:relative;flex-shrink:0;">
+          <input id="mas-search" type="text" placeholder="Search standards..." oninput="masSearch(this.value)"
+            style="padding:8px 12px 8px 36px;border:1.5px solid #d1d9e0;border-radius:8px;font-size:13px;width:240px;outline:none;color:#1a2a3a;">
+          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9baabb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+      </div>
+      <div id="mas-search-banner" style="display:none;padding:8px 28px;background:#fff9e6;border-bottom:1px solid #ffe69c;font-size:13px;color:#6b4f00;">
+        <span id="mas-search-count"></span> &nbsp;<a href="#" onclick="masClearSearch();return false;" style="color:#003768;font-weight:600;">Clear search</a>
+      </div>
+      <div style="display:flex;gap:0;min-height:500px;">
+        <div id="mas-nav" style="width:220px;flex-shrink:0;border-right:1px solid #e8ecf0;padding:16px 0;">
+          <a href="#" data-mas="mas-intro" onclick="return showMasSection('mas-intro',this)" class="active">1. Introduction</a>
+          <a href="#" data-mas="mas-permitted" onclick="return showMasSection('mas-permitted',this)">2. Permitted Activities</a>
+          <a href="#" data-mas="mas-initial" onclick="return showMasSection('mas-initial',this)">3. Initial Disclosure</a>
+          <a href="#" data-mas="mas-kyc" onclick="return showMasSection('mas-kyc',this)">4. Knowing Your Customer</a>
+          <a href="#" data-mas="mas-designing" onclick="return showMasSection('mas-designing',this)">5. Designing Your Recommendation</a>
+          <a href="#" data-mas="mas-sourcing" onclick="return showMasSection('mas-sourcing',this)">6. Sourcing a Mortgage</a>
+          <a href="#" data-mas="mas-illustrations" onclick="return showMasSection('mas-illustrations',this)">7. Mortgage Illustrations</a>
+          <a href="#" data-mas="mas-mrwl" onclick="return showMasSection('mas-mrwl',this)">8. Reasons Why Letter</a>
+          <a href="#" data-mas="mas-records" onclick="return showMasSection('mas-records',this)">9. Record Keeping</a>
+          <a href="#" data-mas="mas-annex-a" onclick="return showMasSection('mas-annex-a',this)">Annex A</a>
+          <a href="#" data-mas="mas-annex-b" onclick="return showMasSection('mas-annex-b',this)">Annex B</a>
+          <a href="#" data-mas="mas-annex-c" onclick="return showMasSection('mas-annex-c',this)">Annex C - Glossary</a>
+        </div>
+        <div id="mas-content-area" style="flex:1;padding:24px 32px;overflow-y:auto;max-height:75vh;">
+          <div id="mas-intro" class="mas-section" style="">
+<h2 class="mas-section-title">1. Introduction</h2>
+<p>FPG is authorised by the FCA for regulated residential mortgages and consumer buy to let mortgages, non-investment insurance contracts (including general insurance) and certain consumer credit activities.</p>
+<p>The Mortgage Advice Standards reflect the requirements of the Financial Conduct Authority (FCA) and Finance Planning Group (FPG) for advising on mortgage business as set out in the Mortgage Conduct of Business Sourcebook (MCOB), Mortgage Credit Directive (MCD), Consumer Credit Sourcebook (CONC) and the principles of Treating Customers Fairly (TCF).</p>
+<p>Advising and/or arranging sales of regulated mortgages and consumer credit agreements are regulated activities which have specific definitions and require the appropriate FCA permissions.  Arranging is a broad term and can include introducing, referring, transacting on an execution only basis, or simply assisting a customer to complete an application form.</p>
+<p>If you engage in a regulated activity and do not have the correct permissions, you will be breaching the Financial Services and Markets Act (FSMA).  It is therefore important that you fully understand what you can and cannot do.</p>
+<p>As your Principal, FPG has FCA permissions for a number of regulated activities and via our contract with your AR Firm, we delegate some of these permissions to you, via these Mortgage Advice Standards.  Detailed within these standards are the products that you can and cannot give advice or make a recommendation in, and those which you are permitted to refer.  You must familiarise yourself with these details as if you go outside of the delegated permissions then you will breach either FCA and/or FPG rules.</p>
+<p>These standards provide guidance and minimum requirements on what FPG expects from AR Firms when dealing with customers.  They are not exhaustive and should be tailored to individuals considering their financial awareness.</p>
+<p>You must always act in the customer&#x27;s best interests.  APERs or Senior Managers within your firm have a regulatory responsibility to ensure that you follow these standards.  Where no specific ruling or guidance exists within these advice standards, we expect that an AR Firm, or one of its Advisers, will take a pragmatic view that is in the best interest of the customer, and not seek to exploit any apparent omissions.</p>
+<p>If you intend transacting mortgages that are individually negotiated, e.g. from private banks and not sourced via the usual channels, you should contact Pete Burgess in the Compliance Department prior to the submission of the mortgage.</p>
+<p>The key rule books that are relevant to the regulated business undertaken in AR Firms are:</p>
+<ul class="mas-list">
+<li>MCOB for residential and consumer buy to let mortgages under the Mortgage Credit Directive (MCD)</li>
+</ul>
+<p>CONC for Consumer Credit activities</p>
+<p>ICOBs for non-investment insurance contracts including general insurance</p>
+<p>The information on the following pages details the regulated activity and includes:</p>
+<p>The definitions</p>
+<p>The products</p>
+<p>Whether you can or cannot transact the business</p>
+<p>Whether you can make or receive introductions</p>
+          </div>
+          <div id="mas-permitted" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">2. Permitted Activities</h2>
+<p>&amp; GENERAL GUIDANCE.</p>
+<h4 class="mas-h4"><span class="mas-num">2.1</span> Definition of a regulated mortgage contract (RMC):</h4>
+<p>A contract which meets the following conditions:</p>
+<p>A lender provides credit to an individual or trustees (the ‘borrower’), and</p>
+<p>The obligation of the borrower to repay is secured by a mortgage on land in the EEA, and</p>
+<p>At least 40% of which is used, or is intended to be used, as or in connection with a dwelling by an individual (or, where trustees are the borrower, by an individual who is a beneficiary of the trust) or by a related person</p>
+<h4 class="mas-h4"><span class="mas-num">2.1.1</span> Related person definition:</h4>
+<p>A related person is defined in relation to a borrower or, in the case of credit provided to trustees, a beneficiary of the trust, as:</p>
+<p>The borrower’s/ beneficiary’s spouse or civil partner,</p>
+<p>A person (whether or not of the opposite sex) whose relationship with the borrower/ beneficiary has the characteristics of the relationship between husband and wife, or</p>
+<p>The borrower’s/ beneficiary’s parent, brother, sister, child (including stepchildren and adopted children), grandparent or grandchild</p>
+<h4 class="mas-h4"><span class="mas-num">2.1.2</span> Occupancy requirement</h4>
+<p>Within the definition of a regulated mortgage, the most obvious example is a loan made to an individual to enable them to buy a home for themselves where the loan is secured on that home.  However, there is no requirement that the borrower should occupy the property.  There is a requirement that at least 40% of the land should be used as a house but no requirement that it is the borrower who uses it as a house.  So, for example:</p>
+<p>A loan may be regulated if the property is to be occupied by the borrower’s relatives as their home (see the definition of a related person)</p>
+<p>A loan may be regulated if the borrower does not occupy the property and instead intends to sell the property to a third party, with the mortgage remaining on the house until then</p>
+<p>A loan may be regulated if made to a trustee acting for a large commercial company</p>
+<h4 class="mas-h4"><span class="mas-num">2.2</span> Consumer buy to let (CBTL) mortgage contracts</h4>
+<p>The following are classed as CBTL agreements and are regulated under the MCD:</p>
+<p>A buy to let credit agreement which is not entered into by the borrower for the purposes of a business, or</p>
+<p>The borrower or a related person has lived in the property or intends to live in the property in the future</p>
+<h4 class="mas-h4"><span class="mas-num">2.3</span> Products not regulated by the FCA:</h4>
+<p>Variations made to mortgage contracts entered into before 31 October 2004, if there is no increase in the original loan amount (unless the variation results in the original loan being replaced).</p>
+<p>Overseas mortgages on land outside the EEA.</p>
+<p>Business buy to let (BBTL) mortgages that are to be occupied as a dwelling on the basis of a rental agreement and have not/will not at any time be occupied as a dwelling by the borrower, beneficiary of a trust or by a related person.</p>
+<h4 class="mas-h4"><span class="mas-num">2.4</span> Business buy to let (BBTL) credit agreements</h4>
+<p>Since the implementation of MCD, BBTL mortgages have been taken out of regulation.</p>
+<p>Whilst FCA rules do not cover the advice and sales process you adopt in relation to non-regulated BBTLs, professional indemnity insurance cover is in place and a Point of Sale (POS) record must be retained.  You must apply the same standards and sales practices as you would for regulated business.</p>
+<p>In order to be classified as a non-regulated BBTL mortgage, the requirements are that the land, or existing or projected building (as applicable):</p>
+<p>Cannot at any time be occupied as a dwelling by the borrower or by a related person; and</p>
+<p>Is to be occupied as a dwelling on the basis of a rental agreement</p>
+<p>In the above cases, the mortgage will be deemed to be a BBTL mortgage unless any person acting on behalf of the creditor (e.g. lender, adviser, surveyor, solicitor/ conveyancer) knows or has reasonable cause to suspect that the agreement is not entered into by the borrower wholly or predominantly for the purpose of a BBTL.</p>
+<h4 class="mas-h4"><span class="mas-num">2.5</span> Business buy to let (BBTL) credit agreements with debt consolidation</h4>
+<p>Where a client wishes to consolidate debt onto a BBTL loan, the credit agreement will be regulated under CONC.</p>
+<h4 class="mas-h4"><span class="mas-num">2.6</span> Foreign currency loans</h4>
+<p>The definition of a foreign currency loan is one where the credit is denominated in a currency other than that in which the customer receives the income or holds the assets from which the credit is to be repaid.</p>
+<p>For example:</p>
+<p>Customer A – who is resident in the UK, employed by an American company and paid in US dollars.  He purchases a UK property, with a part and part mortgage.  He intends to repay the interest only mortgage by the sale of shares he holds in his company, which is listed on the American stock exchange.</p>
+<p>Foreign currency lenders will need to ensure that the customer has a right to convert the mortgage into an alternative currency under specified conditions or, alternatively, that there are other arrangements in place to limit the exchange rate risk to which the customer is exposed under the mortgage.  For example, a cap or a risk warning to limit the exchange rate risk to which the customer is exposed.</p>
+<p>The above should be included within the mortgage illustration and offer letter.</p>
+<h4 class="mas-h4"><span class="mas-num">2.7</span> POS (Point of Sale) record</h4>
+<p>The POS record must make it clear whether the case is a regulated or non-regulated mortgage.</p>
+<p>If you are unsure as to whether the loan will be regulated or not, you should contact the Compliance Department before you contract the business.</p>
+<h4 class="mas-h4"><span class="mas-num">2.8</span> Permitted activities</h4>
+<h4 class="mas-h4"><span class="mas-num">2.8.1</span> FCA MCOB regulated products</h4>
+<p>All residential mortgages, including further advances and consumer buy to let mortgages, where they satisfy the definition conditions in Section 2.1.  This includes:</p>
+<p>Consumer buy to let mortgages, which have been used, or will be used, as a dwelling by the borrower e.g. let to buy mortgages.</p>
+<p>Commercial mortgages, secured on commercial property, subject to the definition conditions.</p>
+<p>Business loans secured against a residential property, subject to the definition conditions, and the business is not a large business (group annual turnover of less than £1m).</p>
+<p>MCD exempt lifetime mortgages, where customers release equity from their main residence and the lender does not require repayment of the capital until the occurrence of one or more of the specified life events (when the customer dies, moves into long term residential care, moves their main residence, sells the property or the lender repossesses the property).</p>
+<p>Foreign currency loans, where an agreement is: (a) denominated in a currency other than that in which the customer receives the income or holds the assets from which the credit is to be repaid, or (b) denominated in a currency other than that of the EEA state in which the customer is resident</p>
+<p>Mortgages for land in the UK or an EEA state, subject to the definition conditions</p>
+<h4 class="mas-h4"><span class="mas-num">2.8.2</span> FCA CONC regulated products</h4>
+<p>Consumer credit activities listed in the table below are regulated by the FCA and relate to activities which are carried out in respect of consumer credit agreements.  A consumer credit agreement is essentially any kind of loan, deferment of repayment of any loan or interest on any loan, and any other kind of accommodation or facility in the nature of credit.</p>
+<p>This includes: hire purchase agreements, pay day loans, bridging loans not regulated under MCOB and insurance products with a home premium finance element where annual premiums can be deferred and paid monthly.</p>
+<h4 class="mas-h4"><span class="mas-num">2.8.3</span> Description of Consumer Credit Activities</h4>
+<p>Consumer credit activities listed in the table below are regulated by the FCA and relate to activities which are carried out in respect of consumer credit agreements.  A consumer credit agreement is essentially any kind of loan, deferment of repayment of any loan or interest on any loan, and any other kind of accommodation or facility in the nature of credit.</p>
+<p>This includes: hire purchase agreements, pay day loans, bridging loans not regulated under MCOB and insurance products with a home premium finance element where annual premiums can be deferred and paid monthly.</p>
+<h4 class="mas-h4"><span class="mas-num">2.9</span> Mortgage panels</h4>
+<h4 class="mas-h4"><span class="mas-num">2.9.1</span> Panel usage</h4>
+<p>FPG operates and offers your AR Firm a panel of lenders representative of the market.  When selecting products from the panel, advisers must provide clear evidence that the product selected and recommended is the cheapest from those most suitable to meet your customers’ requirements.</p>
+<p>Whilst a panel of lenders is in place, your AR Firm will be able to recommend products from ‘off-panel’ lenders to provide the most suitable advice to customers, subject to justification in terms of price, value and suitability.</p>
+<p>If you intend transacting mortgages that are individually negotiated (e.g. not sourced via usual channels) you must contact pete.burgess@financeplanning.co.uk in the first instance for approval.</p>
+<h4 class="mas-h4"><span class="mas-num">2.9.2</span> Purpose of the panel</h4>
+<p>MCOB rules state that authorised firms must ensure the product selection is appropriate to a customer’s needs and circumstances on the facts disclosed by the customer.</p>
+<p>FPG ensures that its panel caters for the vast majority of your AR Firm’s regulated residential and buy to let mortgage contract requirements.  The panel also:</p>
+<p>Acts as a benchmark to assist Advisers in making recommendations in line with FPG’s expectations</p>
+<p>Provides useful indications of where more focused risk monitoring might be required for transactions both on and off panel</p>
+<p>Reflects factors relevant to advice criteria which are not indicated by sourcing systems, e.g. service standards, underwriting</p>
+<h4 class="mas-h4"><span class="mas-num">2.10</span> Packagers</h4>
+<p>An approved packager panel has been developed to assist you in the administration of mortgage cases and the placement of cases that do not fit the product range of FPG’s comprehensive proposition.  Only FPG approved packagers can be used, details of those can be found on the FPG’s Knowledge Hub website, or L&amp;G’s Mortgage Club website.</p>
+<p>The approved panel provides your AR Firm with the flexibility to select a packager that can provide a product which best fits the needs of the client, and gives you the confidence of dealing with creditable packagers.</p>
+<p>The appointment of these packagers is based around existing relationships, but new packagers can be appointed to the panel subject to credit standing, quality of service, range of lenders and geographical cover.  All packagers will need to successfully pass a stringent application process and reach the minimum acceptance criteria defined by FPG.  The panel is reviewed on an ongoing basis.</p>
+<h4 class="mas-h4"><span class="mas-num">2.10.1</span> Pure packagers</h4>
+<p>The pure packagers provide an administration only service.  They are not authorised to give advice to or have contact with the client.  The advice given to the client, when using a pure packager, remains the full responsibility of you and your AR Firm.</p>
+<h4 class="mas-h4"><span class="mas-num">2.11</span> Hand-Offs and Referrals</h4>
+<p>FPG has negotiated terms with certain third party providers with whom we have existing relationships, or where we have undertaken due diligence to be satisfied that these providers have controls in place to offer a professional and reliable service.</p>
+<ul class="mas-list">
+<li>FPG has in place panels for the following products:</li>
+</ul>
+<ul class="mas-list">
+<li>Second charge mortgages, secured loans and unsecured loans</li>
+<li>All bridging finance</li>
+<li>Commercial mortgages</li>
+</ul>
+<ul class="mas-list">
+<li>You cannot transact the above business and you are only permitted to refer to the approved FPG providers.</li>
+</ul>
+<ul class="mas-list">
+<li>The following process must be adhered to in all cases:</li>
+</ul>
+<ul class="mas-list">
+<li>Obtain your customer’s consent to pass their details to a third party</li>
+<li>Explain what service you are referring the customer to and why, and that you can’t/don’t offer advice in this area.</li>
+</ul>
+<p>Disclose that you will receive a fee from the provider as a result of the referral</p>
+<p>Confirm that the provider, not you, will be responsible for any advice or information they provide</p>
+<p>Provide the client with a letter confirming the above</p>
+<p>Any letters you issue must be attached to the POS system record and issued to the customer at the point of referral.</p>
+<p>It is important that this process is followed because whilst you may not be responsible for advice or information other providers may give, unless your customer is aware of the basis of referral they may not understand this and in the event of a complaint, believe you are responsible as you referred them.</p>
+<h4 class="mas-h4"><span class="mas-num">2.12</span> Decision in Principle (DIP) / Application in Principle (AIP)</h4>
+<p>Where a customer has no particular property in mind to purchase, and you don’t anticipate giving advice or a recommendation until they are in a better position to proceed, you can give an indication of their borrowing capacity by using a website calculator or tool.  Alternatively, you can provide a lender DIP/AIP. Note: DIPs and AIPs are considered part of the formal advice process and you are required by the FCA to retain a record of all advice.</p>
+<p>Providing a DIP which steers a customer towards a particular lender or product will be seen as advice by the FCA.  Therefore, for customers with no specific property in mind or completion is some time off e.g. new build:</p>
+<p>Create a POS record with the customer’s name and details required for the DIP, as a minimum.</p>
+<p>Source for a suitable lender (you should be reasonably certain that the customer will meet the chosen lender’s criteria).</p>
+<p>Inform the customer of the implications of using this facility, e.g. credit scoring and footprint.</p>
+<p>Get the customer’s explicit agreement to proceed with the DIP.</p>
+<p>Read to the customer the specific lender’s Data Protection/Use of information disclaimer.</p>
+<p>Attach a copy of the DIP/AIP to the customer record.</p>
+<p>Ensure the customer is aware that this is not a recommendation to use this lender or its products but only an indication of borrowing.</p>
+<p>Advise them that you will re-source from the whole of market when they find a suitable property to ensure you recommend the most suitable lender/product at that time.</p>
+<p>Where the customer has found a suitable property, you should follow the full sales and advice process, source and obtain the DIP from the lender you intend submitting the formal application to.</p>
+<h4 class="mas-h4"><span class="mas-num">2.13</span> Submitting Business to Lenders</h4>
+<p>All DIPs, AIPs and applications must be completed and submitted by the adviser under their individual codes.  Lender codes MUST NOT be shared under any circumstances.</p>
+<p>If advisers rely on administrators and the lender’s system allows administrators to submit under a separate code on behalf of the adviser, this is acceptable.  The adviser remains responsible for the advice and should check the application before submission.  Where the lender does not allow separate administrator access, the adviser must submit the DIP/AIP/application themselves.</p>
+<p>An application to secure a particular product can only be made when you have evidenced all the required paperwork that supports the case (bank statements, evidence of income, proof of address and identity).</p>
+<h4 class="mas-h4"><span class="mas-num">2.14</span> Staying With The Existing Lender</h4>
+<p>In all cases, you must follow the full sales process, including sourcing the whole of market, to ensure that the existing lender’s product is the best available, as well as demonstrating suitability and affordability.  The only exception to this is where the client is insistent on staying with their present lender and in such circumstances you will need to confirm to the client (in the MRWL) that the whole of market hasn’t been sourced because of their overriding preference.</p>
+<h4 class="mas-h4"><span class="mas-num">2.15</span> Direct Products</h4>
+<p>You cannot give advice or make a recommendation on Direct products (which are offered to consumers by a bank directly).</p>
+<p>You can only recommend the most suitable product from those available to you.  You can suggest your customer approach a lender direct but you cannot steer them to any particular lender or product.</p>
+<h4 class="mas-h4"><span class="mas-num">2.16</span> Execution only</h4>
+<p>FPG does not permit any mortgage business to be conducted on any basis other than fully advised.  Execution only is not permitted.</p>
+<h4 class="mas-h4"><span class="mas-num">2.17</span> Selling to yourself</h4>
+<p>If you wish to arrange a Residential mortgage, a CBTL mortgage or consolidate debt to a BBTL mortgage for yourself on a sole basis, you can either:</p>
+<p>Go direct to the lender and transact the mortgage on an execution only basis as a client (no proc fee), or</p>
+<p>Arrange the mortgage via another adviser within your AR Firm on a fully advised basis</p>
+<p>For joint applications, you should arrange the mortgage via another adviser within the AR Firm on a fully advised basis.  The reason for this is to ensure that the conflict between adviser and partner/spouse is managed, and for non-mortgage professional individuals the route to advice is offered.</p>
+<h4 class="mas-h4"><span class="mas-num">2.18</span> Use of funds raised by a mortgage</h4>
+<p>FPG does not permit money to be released from a property to be placed into:</p>
+<p>Investments (for any purpose other than buy to let purchases)</p>
+<p>Defined investment schemes</p>
+<p>Company schemes</p>
+<p>Investment in land</p>
+<p>Overseas land/ property where the customer will be reliant on income from the land/ property to repay the mortgage</p>
+<h4 class="mas-h4"><span class="mas-num">2.19</span> Overseas Deposits</h4>
+<h4 class="mas-h4"><span class="mas-num">2.19.1</span> Overseas Deposits - guidance</h4>
+<p>Your customers may wish to purchase a property and pay the deposit from an overseas source.  This may be a gift from a family member or from their own funds.  Overseas being defined as any territory outside of the UK, Republic of Ireland, the Channel Islands and Isle of Man.  This guidance is designed to help you make sure you have as much evidence of your due diligence as possible.</p>
+<p>The mortgage lender takes the risk of accepting potentially illegitimate deposit payments but as the intermediary, you have a responsibility for the business you are placing with them.  A mortgage lender is likely to hold you responsible for any business that they discover to be from an illegitimately sourced deposit.</p>
+<p>It is important you are able to evidence this source of deposit to ensure, as best you can, that it is from a legitimate source:</p>
+<ul class="mas-list">
+<li>Is there a clear link between the source of funds and your customer?</li>
+<li>Based on what you know of the customer’s circumstances is the deposit amount plausible?</li>
+<li>Have they built up the funds over time or have they arrived in a lump sum?</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">2.19.2</span> Customer’s Own Money – evidencing the deposit</h4>
+<p>With regard to evidence, if the deposit is the customer’s own, the following are good examples of what you can request:</p>
+<p>Bank statements – preferably the funds have already entered the UK, therefore, by requesting copies of UK and overseas statements you can see trail the money has followed and clearly link it to the customer.</p>
+<p>Investment statements – if the customer has stated they are liquidating investments obtaining these statements backs up this story.</p>
+<p>Property sale – where the sale of a property abroad has provided the deposit, documentary evidence of this would be useful.  Ensure the customer’s name is clear on any documents you obtain.</p>
+<p>With regard to statements they should always clearly show the account holder’s name, address, sort code, account number and identify the bank or financial institution concerned.  Print outs from ATM machines are not acceptable.</p>
+<p>If after collecting the necessary information, you are comfortable with the situation, proceed as normal with the chosen lender.  Only refer a case to our MLRO  pete.burgess@financeplanning,co.uk  if you have concerns over the customers’ story, following the normal Suspicious Activity Referral process.</p>
+<h4 class="mas-h4"><span class="mas-num">2.19.3</span> Money gifted by a third party – gifted deposits</h4>
+<p>If the deposit is a gift or from a third party, further work is required:</p>
+<p>Evidence the link between the customer and the person gifting the funds. This is often by way of a gifted deposit letter confirming the relationship and must also state their name, address and details of the property to be purchased to demonstrate they know what the money is for.  It should also be as recent as possible i.e. within the preceding three months.</p>
+<p>Most lenders require this money to be an unencumbered gift to ensure that the third party has no rights over the property.  This should be confirmed in the letter but you should check with the lender first.</p>
+<p>A copy of the third party’s bank / investment statement should be requested to show the funds in situ.  As above, it is easier to see the audit trail if the funds have already been transferred into the UK so statements show the journey the funds have taken.</p>
+<p>All details of any foreign accounts, related address and third parties (gifting parents / relatives etc.) should be recorded in the notes section on the POS system.</p>
+<p>Provided that the above guidance is followed there is no requirement to refer the documentation to our MLRO, Pete Burgess, unless you have concerns over the customer’s story, in which case a Suspicious Activity Referral should be raised.</p>
+<p>Finally, in every case, speak to the chosen lender directly and explain everything you are able to obtain.   From a lender’s perspective, clarity and transparency are key.</p>
+<p>If you have any queries please contact pete.burgess@financeplanning.co.uk for further information.</p>
+<h4 class="mas-h4"><span class="mas-num">2.20</span> Binding Mortgage Offers</h4>
+<p>All mortgage offers are binding and they provide the customer with a seven day (minimum) reflection period.  The customer has the right to waive the reflection period, but they must liaise with their solicitor where this is required.</p>
+<h4 class="mas-h4"><span class="mas-num">2.21</span> Consumer Buy To Let (CBTL) Mortgages – General Guidance</h4>
+<p>Consumer buy to let (CBTL) mortgages became regulated on 21 March 2016.</p>
+<p>These Mortgage Advice Standards apply to all CBTL mortgages, together with the additional requirements detailed below:</p>
+<h4 class="mas-h4"><span class="mas-num">2.21.1</span> Let to buy (and accidental landlords / inherited property)</h4>
+<p>Where customers intend to buy another property in which to live and let out their existing property (known as let to buy), any mortgage on the current residential property will become a regulated CBTL mortgage.  (See Section 2.2)</p>
+<h4 class="mas-h4"><span class="mas-num">2.21.2</span> Customer information and risk warnings</h4>
+<p>When completing the fact find, you should use the “Buy To Let Factsheet” with all CBTL customers and give them a copy.  You may wish to use the Factsheet with your BBTL customers too, but this is at your discretion and may depend on the financial awareness of the customer and familiarity with the buy to let process.</p>
+<p>You should advise the customer to seek professional advice with regards to any tax implications on letting a property.</p>
+<p>The customer also needs to know that if property prices fall, or if the property can’t be let profitably, this could prove very costly to them.  These risks should be reiterated in the MRWL.</p>
+<p>CBTL customers need to understand:</p>
+<p>That the return may not be what they expected as house prices can fall in value</p>
+<p>That they may need to fund the mortgage when there are no tenants</p>
+<p>That deposits are higher</p>
+<p>The tax implications for let properties differ from residential properties and you should advise those of your customers who are inexperienced in buy to let property investments, to seek professional advice.  You should also direct them to the following websites, as they provide valuable information for landlords, including the tax implications for buy to let properties:</p>
+<p>Government website - https://www.gov.uk/renting-out-a-property/paying-tax</p>
+<p>Inland Revenue website - http://www.hmrc.gov.uk/cgt/property/reliefs.htm#2</p>
+<p>National Landlords Association website - National Landlords Association</p>
+<p>You should also advise your customers to seek expert guidance from an accountant.</p>
+<h4 class="mas-h4"><span class="mas-num">2.21.3</span> Income</h4>
+<p>Proof of income must be obtained from all customers.  Whilst this will not be required by all lenders, it is still a requirement of FPG.  You must endeavour to obtain three month’s payslips and corresponding bank statements where possible, but always have a minimum of one month’s payslip and corresponding bank statement, or one year’s accounts, and you must assess the customer for affordability in the same way that you would for a residential mortgage, i.e. you must not proceed if the mortgage appears unaffordable.</p>
+<p>You must also obtain evidence that any profits on existing BTL properties are declared for Land &amp; Property Tax on their most recent tax return.</p>
+<p>You should also recommend that customers set aside/build up an emergency fund to help pay the monthly mortgage payments in the event that their tenants fail to pay any/all rental income when due.</p>
+<h4 class="mas-h4"><span class="mas-num">2.22</span> Shared Equity and Shared Ownership Schemes</h4>
+<h4 class="mas-h4"><span class="mas-num">2.22.1</span> Builders Incentive Schemes</h4>
+<p>Some builders offer initiatives called ‘shared equity schemes’ where the purchaser buys a percentage of the property by way of a mortgage and the builder takes a second charge on the remaining percentage.</p>
+<p>The second charge becomes payable at the prevailing open market value within a specified period, e.g. 10 years or earlier upon the sale of the property, redemption of the mortgage, or death.  Some schemes have interest free loans for the full period, whilst others have deferred interest for a number of years.</p>
+<p>The MRWL should confirm the following:</p>
+<ul class="mas-list">
+<li>How the customer will repay the second charge loan</li>
+<li>That you have not provided advice on the second charge</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">2.22.2</span> Government Schemes</h4>
+<p>The Government have various low cost home ownership schemes to help individuals onto the property ladder.  The advice standards apply to all schemes, which include:</p>
+<p>Right to buy / acquire</p>
+<p>Shared ownership</p>
+<p>Help to Buy - equity loans, mortgage guarantees, etc</p>
+<p>Where the lender recommended is not at the top of the sourcing list, you must add notes to clarify why e.g. the first two lenders do not lend on to customers borrowing on Government schemes to demonstrate that the recommended product is the most suitable / least expensive for the customer’s needs and preferences.</p>
+<h4 class="mas-h4"><span class="mas-num">2.22.2</span> a   For shared equity mortgages:</h4>
+<p>You must also discuss with the customer and document how they are going to repay the equity loan at the end of the specified loan period.  You will also need to assess affordability when the deferred interest charge becomes payable in year six.</p>
+<p>You should consider and discuss whether the customer can afford to purchase a property using their own resources, rather than by borrowing under a shared equity credit agreement.   The result of this discussion must be included within the MRWL.</p>
+<h4 class="mas-h4"><span class="mas-num">2.22.2</span> b  For shared ownership mortgages:</h4>
+<p>The rental payment for shared ownership properties must be included in the expenditure section.</p>
+<h4 class="mas-h4"><span class="mas-num">2.22.2</span> c  For Help to Buy mortgage guarantee loans:</h4>
+<p>These should be treated as any other mortgage as the customer is responsible for the full amount of the loan.</p>
+<h4 class="mas-h4"><span class="mas-num">2.22.3</span> Mandatory record keeping requirements for all schemes</h4>
+<p>For all of the above schemes, you must:</p>
+<p>Document full details of the scheme within the POS record, including the amount of deferred interest that will become payable during the term and when.</p>
+<p>Confirm in the MRWL how the mortgage will remain affordable when any deferred interest payments become due.</p>
+<p>Discuss and document in the MRWL how the customer will repay the equity loan at the end of the specified loan period.</p>
+<p>Include within the MRWL the appropriate risk warnings detailed in the template letter</p>
+<p>You should also refer to the Protection Advice Standards, which require you to consider the customers’ protection needs for all liabilities directly linked to the mortgage, such as Builders Incentive Schemes and Government Schemes.</p>
+<p>SALES PROCESS</p>
+          </div>
+          <div id="mas-initial" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">3. Initial Disclosure to Customers</h2>
+<h4 class="mas-h4"><span class="mas-num">3.1</span> General guidance for residential and all BTL mortgages:</h4>
+<p>If your discussion with a customer is about mortgages and the possibilities of obtaining a mortgage in general, then you must make them aware you are not giving specific recommendations at this stage, and that you will need to do a full review of their circumstances before advice can be given.  You must make it clear to the client at what point advice is being given as opposed to generic information.</p>
+<p>You must give the customer the “Disclosure Documentation” on first contact where you make, or anticipate making, a personal recommendation or where you give, or anticipate giving, personalised information to a customer.</p>
+<p>You must fully explain all sections of the “Disclosure Documentation” to the customer:</p>
+<p>If the mortgage falls through, or the customer decides to go direct to a lender, you will still need to review the customer’s protection arrangements as detailed in your “Disclosure Documentation” scope of service.</p>
+<p>Where you have provided a “Disclosure Documentation” but don’t intend to provide protection advice until a later date e.g. when the mortgage offer has been received, you must add the appropriate paragraph to your MRWL.  This same rule (adding an appropriate paragraph) applies where the client has told you that they specifically do not wish to review their protection needs as part of this process.  As you have disclosed that you will be providing advice for both the mortgage and protection needs, you must ensure that protection advice has been given before exchange of contracts.</p>
+<h4 class="mas-h4"><span class="mas-num">3.2</span> Express Consent &amp; GDPR</h4>
+<p>The FCA does not allow cold calling for mortgages so before you contact any customer, you must have obtained permission via express consent (known as our GDPR form as it also covers off what we do with a customer’s personal information).</p>
+<p>What is it?</p>
+<p>It is the customer’s explicit permission to receive contact in respect of regulated MCOB / CONC mortgage advice.</p>
+<p>Why do we need to get it?</p>
+<p>The FCA enforces a ban on cold calling for mortgage business.  Your file needs to show that you received consent to make contact, whether that contact be made by telephone, email or by referral (via estate agents or other referral processes).  You will also need it for future contact, e.g. where your customer contacted you initially, you will need a signed GDPR form on file for any future contact with them.</p>
+<p>Who should obtain this consent?</p>
+<p>All introducers should get the consent verbally from the customer in order to pass a referral to you.  You will then need to ask the customer to sign a GDPR form early in your sales process.</p>
+<p>It is a breach of FCA rules to commence an appointment without verbal express consent.  It is also your responsibility to maintain evidence of compliance with these requirements, by way of a signed GDPR form for your customer.</p>
+<h4 class="mas-h4"><span class="mas-num">3.3</span> Additional Guidance for all telephone sales</h4>
+<p>All relevant advice standards for mortgage sales apply to telephone sales.  Where you have a telephone based sales operation, you will need to ensure that the following high-level standards are also met:</p>
+<p>You must have the customer’s express consent prior to contact.</p>
+<p>All calls must be carried out in a way that is clear, fair and not misleading.</p>
+<p>You must recognise and respect that the customer can end a call at any time and refuse another appointment.</p>
+<p>You must not call at an unsocial hour or on an unlisted telephone number unless previously agreed.</p>
+<p>You must give an idea of the length of time the call is likely to take at the start of your introduction.</p>
+<p>If calls are recorded, you must inform the customer of this as early in the call as is feasible and reasonable to do so.</p>
+<h4 class="mas-h4"><span class="mas-num">3.3.1</span> Telephone disclosure</h4>
+<p>When making the initial call you must explain the content of the “Disclosure Documentation”.</p>
+<p>Once you have completed the call, and within three business days, the following must be issued via email or post, depending on how the customer wishes to receive the information:</p>
+<p>The “Disclosure Documentation”</p>
+<p>The fee agreement (if applicable)</p>
+<p>Your Mortgage &amp; Protection  brochure (for First Time Buyers)</p>
+<p>The Mortgage Illustration (if applicable)</p>
+          </div>
+          <div id="mas-kyc" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">4. Knowing Your Customer</h2>
+<h4 class="mas-h4"><span class="mas-num">4.1</span> General guidance for regulated mortgages</h4>
+<p>You should explain to your client the process that you will take them through and approximately how long each step will take.  For example, from initial disclosure and fact finding through to completion of the mortgage, explaining the relevance of the information the customer provides (i.e. their credit history), the lending decision process, and the application and underwriting process.</p>
+<p>You must complete a comprehensive fact find to enable you to know your customer, so you understand their circumstances, preferences, and needs.  Your record should provide a clear picture of the customer’s current circumstances, as well as their needs and objectives, and should show how your recommendation meets those needs and objectives to provide the right outcome.</p>
+<p>If you identify anything which might suggest either customer to be vulnerable, you must record this in the find find and then take reasonable steps to help mitigate any issues because of their vulnerability.  Please refer to our separate Vulnerable Persons guidance notes.</p>
+<p>You must stress to customers the importance of them providing full and accurate information in order that you can make a suitable recommendation.  You must speak to all parties of the mortgage to confirm the accuracy of the information.  Customers omitting to provide full information risk a lender identifying this and rejecting applications further down the process.</p>
+<p>When completing the fact find, you must use the “Your Mortgage &amp; Protection” brochure with your “first time buyer” customers and give them a copy.  You may wish to use the brochure with other customers, but this is at your discretion and may depend on the financial awareness of the customer and familiarity with the mortgage process.</p>
+<p>Where you carry out customer reviews, e.g. at rate expiration, you should check past records to refresh your memory on discussions held at previous meetings.  For example, referring back to any debt consolidation or interest only repayment plans.  If a fact find from a previous case is used for a new case, then it must be thoroughly checked and updated where applicable, to fully reflect the customer’s current circumstances.</p>
+<p>Minimum requirements for fact find completion for all regulated mortgage contracts</p>
+<h4 class="mas-h4"><span class="mas-num">4.2</span> Employment details</h4>
+<p>Full details must be included, and the record should be clear as to the customer’s employment status, for example employed (if part time, how many hours per week), self-employed (sole trader, partner, director and % shareholding should be fully explained in notes) or contract worker (length and type of contract, start and end dates).</p>
+<h4 class="mas-h4"><span class="mas-num">4.3</span> Retirement age</h4>
+<p>You must document the customer’s intended retirement age and assess whether this is reasonable.  For example, a police officer or scaffolder is unlikely to work to 70, whereas a self-employed solicitor or accountant may.  If the customer is expecting to change employment from their current profession at retirement, you must detail this and consider any potential reduction in salary.</p>
+<h4 class="mas-h4"><span class="mas-num">4.4</span> Liabilities</h4>
+<p>You must document full details of the customer’s liabilities (e.g. loans, credit cards, overdrafts) including whether there are any payment arrears or shortfalls.  Payments made on liabilities should be included within the expenditure section.  If any liabilities are being consolidated to the mortgage, the fact find and MRWL must reflect this.</p>
+<h4 class="mas-h4"><span class="mas-num">4.5</span> Income</h4>
+<p>You must record full details of all income, including non-salaried income such as pension, investment income, state benefits, savings, or rental income etc.  You must satisfy yourself that the income is reasonable and evidence this in all cases from original documents, attaching copies to the POS record.</p>
+<p>The employer details shown on the bank statements should reflect that of the evidence provided (employer name and amount).</p>
+<p>If the customer is self-employed, you must take tax and National Insurance into account when assessing their net income.  For fact find and sourcing purposes, net profit equates to gross income.  If self-employed customers are unable to produce accounts, you must still seek to obtain some form of documentation, for example, bank statements, plus tax returns, accountant’s letter etc.</p>
+<p>If the customer can’t evidence the required income then you should assume they don’t earn it.  You may also conclude this is suspicious, in which case it should be reported.  You must submit a Suspicious Activity Referral (SAR) immediately and withdraw from the sale without tipping the customer off.</p>
+<p>You must ask the customer whether they are aware of any expected changes to income or expenditure within the next five years (minimum) that are likely to affect their ability to meet the mortgage payments.  These must be detailed in the fact find and MRWL.  Uncertain changes cannot be taken into account, e.g. improved economic prospects or assumed pay increases.</p>
+<p>You should validate the authenticity of the documents provided.  FPG will provide guidance from time to time on fraud controls and you should ensure, via your Sales Manager, you are fully briefed on these to protect yourself.</p>
+<h4 class="mas-h4"><span class="mas-num">4.6</span> Expenditure</h4>
+<p>The expenditure section must be fully completed to reflect anticipated personal outgoings after the mortgage completes (excluding the monthly mortgage payment).  You must ensure these are realistic and check on-going liabilities against bank statements to ensure accuracy.  If the bank statements do not detail the usual monthly expenditure as customers pay via credit cards, the latest credit card statement(s) will also be required. This includes credit card statements where the balance is paid in full every month.</p>
+<p>Any payments made to savings or investment plans supporting the repayment of interest only residential mortgages must be reflected in expenditure.</p>
+<p>For shared ownership mortgages, the rental payment must be included in expenditure.  If the customer does not yet know the actual monthly payment, this is typically between 2.5% to 3% of the capital value of the unsold share, and this calculation can be used for affordability purposes.</p>
+<p>Any expected changes to expenditure should be discussed and noted.</p>
+<h4 class="mas-h4"><span class="mas-num">4.7</span> Existing mortgage details</h4>
+<p>Full details must be recorded, including the existing lender, repayment method, interest rate and type, amount outstanding, current monthly repayment amount, term remaining, current property value, any penalties payable, the penalty end date and details of any mortgage payment arrears or shortfalls.</p>
+<p>Details of any buy to let properties must include number of properties, total current value, total outstanding mortgages, total rental income, and total monthly mortgage payments.  This information can either be documented in notes or detailed on an attached spreadsheet.</p>
+<p>If the client is responsible for any other mortgage or properties, details must be recorded in your fact find.</p>
+<h4 class="mas-h4"><span class="mas-num">4.8</span> Mortgage deposit, requirements and preferences</h4>
+<p>The source of deposit must be recorded, and the feasibility should be assessed.  Evidence of the deposit must be obtained and attached to the record.  If evidence cannot be obtained then notes must be added explaining why, and consideration given to a SAR being reported.</p>
+<p>Where you are advising a customer on a regulated or non-regulated mortgage and the source of deposit isn’t from a UK bank account then you must refer to Section 2.19 for guidance.</p>
+<p>When discussing preferences with customers, you should probe and challenge these before designing your recommendation.  Customers may have pre-determined preferences, such as a 2 year tracker rate or 25 year term, when alternative options may be more suitable to their needs and circumstances.</p>
+<p>You must record the customer’s specific preferences and the reason for those preferences.  You must make them aware that preferences for product features reduce the products available to them.</p>
+<p>If customers prefer an initial benefit period, the reason for the length of that period must be recorded.  You must not automatically assume the customer should have a two year rate because they want the lowest monthly payment without fully discussing the implications of continually re-mortgaging.  For example, depending on market conditions, a five year rate might cost slightly more but taking into account the fees involved in re-mortgaging every two years, the longer benefit period could be a better outcome for the customer.  Your MRWL should refer to your discussions around longer benefit periods and the implications to the customer.</p>
+<p>The customer’s preference for the term of the mortgage should be fully discussed and recorded.  Your discussions should include the impact of interest rate rises and whether the customer is disciplined enough to be able to make overpayments which can then be reduced if rates rise to ensure the monthly payment remains affordable.  Whilst interest rates remain low, it may not provide the right customer outcome to recommend the shortest term.</p>
+<p>You should not predict, nor ask customers to predict, future interest rates.  You should ensure during discussions and fact finding with customers that the impact of rate rises is fully considered and noted.</p>
+<p>You must not assume that any fees are to be added to the loan.  You should discuss with your customer whether they intend to add fees to the loan or pay these upfront.  Where your customer opts to add fees to the loan this positive opt in must be recorded in the fact find and the MRWL must explain the implications of interest charges.</p>
+<h4 class="mas-h4"><span class="mas-num">4.9</span> Credit history</h4>
+<p>Full details of the customer’s credit history for a minimum of six years must be recorded.  You should make your customer aware that that this will assist in the lending decision process and that where they fail to disclose, this will be identified and potentially result in the application being declined.</p>
+<p>In some instances, you may find it prudent to advise the customer to obtain their own credit history report which you can use to assist with their application.</p>
+<p>Some customers will be classed as ‘credit impaired’.  The definition is a customer who:</p>
+<p>Within the last two years has owed overdue payments, in an amount equivalent to three months’ payments, on a mortgage or other loan (whether secured or unsecured) except where the amount overdue reached that level because of late payment caused by errors by a bank or other third party; or</p>
+<p>Has been the subject of one or more County Court Judgements, with a total value greater than £500, within the last three years; or</p>
+<p>Has been subject to an individual voluntary arrangement or bankruptcy order which was in force at any time within the last three years</p>
+<h4 class="mas-h4"><span class="mas-num">4.10</span> Debt Consolidation</h4>
+<p>If the customer wishes to consolidate debts and has consolidated before, you must document the full history, e.g. the purpose, amount and number of times (please use the fact find “notes” section).</p>
+<p>Where the customer has previously consolidated debts to fund necessary bills, this suggests affordability issues and therefore it raises serious doubt for them to continue consolidating.  There’s a clear difference between consolidating debts for a specific/one off purpose, e.g. home improvements, as opposed to funding lifestyle and necessary bills.</p>
+<p>You should apply extreme caution where customers are consolidating debt and whose situation may indicate affordability issues that challenge the suitability, e.g. consolidating coupled with interest only and/or term into retirement.</p>
+<p>Conversely, where the customers can comfortably afford their current debt commitments, you will need to establish a need for consolidation, and your record will need to reflect this. If the customer can afford to continue to pay the debts, they should not consolidate to the mortgage and should seek an alternative approach.</p>
+<p>You should investigate whether it would be more suitable to consolidate to a loan NOT secured on their property, and then refer them as necessary to our panel of “2nd charge mortgage brokers”.</p>
+<p>If you think it is unsuitable for the customer to consolidate, they should be referred to the Citizen’s Advice Bureau and you should not transact the business.</p>
+<h4 class="mas-h4"><span class="mas-num">4.11</span> Repayment method</h4>
+<p>You should discuss whether a repayment, interest only or part repayment/interest only mortgage would be more suitable for your customer.  Where customers do not have any existing credible repayment strategies that are acceptable to lenders, then a repayment mortgage would be the only suitable option.</p>
+<p>Details of all interest only repayment strategies must be recorded in the fact find “notes” section.</p>
+<p>All plans must be reiterated back to the customer, including why you have recommended interest only in the MRWL, plus any applicable risks.</p>
+<p>You must always provide the customer with a comparable repayment illustration when recommending either interest only or a part repayment/interest only mortgage.</p>
+<p>Savings should also be detailed within the fact find “notes” and considered when discussing preferences such as whether offset would be suitable.</p>
+<h4 class="mas-h4"><span class="mas-num">4.12</span> Deposits</h4>
+<p>For purchase mortgages you must ensure that the customer has sufficient funds available to fund the deposit and associated moving costs.  Evidence of these funds must be obtained and checked for plausibility.  For instance, if the deposit has been saved up over a period of time, then you will need to see monthly contributions being added to the fund and be comfortable that this has been afforded from their disposable income, whereas if large sums have been added to the deposit account then you must establish where these monies have originated from.</p>
+<p>With regard to evidencing the customer’s own deposit, the following is required</p>
+<p>Bank statements – showing the money on deposit, and sufficient in period to satisfy you of how it has been accumulated,</p>
+<p>Investment statements – if the customer has stated they are liquidating investments, obtaining these statements supports this story,</p>
+<p>Property sale – where a previous sale of property is contributing towards the deposit, documentary evidence of this is required.  Ensure the customer’s name is clear on any documents you obtain,</p>
+<p>Inheritance – if the customer has inherited money, then a letter from the solicitor or executor of the estate should support these monies.</p>
+<p>Please also refer to Section 2.19, and sub-sections, of this document.</p>
+<p>If after collecting the necessary information, you are comfortable with the situation, proceed as normal with the chosen lender.</p>
+<p>If the customer has told you that an element of the deposit is held in crypto-currency, then you must refer to case to our MLRO who will provide you with further guidance.  As an indication of additional requirements, this will include statements showing the client money buying crypto-currency, as well as discussions with the proposed lender and conveyancer to check that they are comfortable with the source of funds.</p>
+<p>Aside from crypto-currency deposits, if you have any concerns over the customers’ deposit scenario, please refer the customer to our MLRO  pete.burgess@financeplanning,co.uk, following the normal Suspicious Activity Referral process.</p>
+<p>For gifted deposits, please refer to Section 2.19.3 of these Advice Standards.</p>
+<h4 class="mas-h4"><span class="mas-num">4.13</span> Loans with more than two applicants</h4>
+<p>For cases where there are three or more applicants you will need to complete two fact finds (one for the first two clients and then a further fact find for the third, and if applicable, the fourth client).  You should then add some notes to cross-reference the two cases.  All product(s) recommended, Reasons Why Letters and supporting documentation can be added/attached to just one of the two cases.</p>
+<h4 class="mas-h4"><span class="mas-num">4.14</span> Guarantors</h4>
+<p>You must confirm in both the fact find and MRWL if this is a guarantor mortgage and that the guarantor has been advised to seek independent legal advice.</p>
+<p>You must speak to the guarantor to satisfy yourself that they understand the implications of being named a guarantor and are happy to proceed.  Guarantors must be given copies of the illustration and MRWL.</p>
+          </div>
+          <div id="mas-designing" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">5. Designing Your Recommendation</h2>
+<h4 class="mas-h4"><span class="mas-num">5.1</span> General guidance</h4>
+<p>You must ensure your recommendation results in the right outcome for the customer.</p>
+<p>It is not sufficient just to inform the customer of facts and risks (although you must do this as well).  In addition, you must assess whether it is right that they take that risk and whether your recommendation is therefore the right outcome.</p>
+<p>For example, if you recommend an interest only residential mortgage, it is not sufficient to only inform the customer that they need a clearly understood and credible repayment strategy and advise them of the associated risks.  In addition, you should consider whether the customer should be taking this risk.  If a repayment mortgage is affordable, given that the majority of repayment strategies are not guaranteed and/or may not be acceptable to the lender, this might be the better outcome for the customer.</p>
+<p>Retaining comprehensive records of advice to demonstrate that you have understood your customer’s circumstances and that the customer is aware of all facts and risks is critical.</p>
+<p>You cannot recommend a mortgage that is not affordable, even if it puts the customer in a better position than they are now.  If customers are experiencing difficulties, they must be referred to their existing lender.</p>
+<h4 class="mas-h4"><span class="mas-num">5.2</span> Lender criteria</h4>
+<p>All mortgage applications must meet the recommended lender’s published criteria; this includes obtaining, scrutinising and the submission of documentation required to support the application.  If a lender agrees to transact outside criteria, your record must contain an email from the lender with details of what was agreed, who you spoke to and when.</p>
+<p>If a lender rejects an application, you must fully record their reason for doing so in notes.</p>
+<p>For BBTL customers who have multiple properties, you must obtain details of all properties and existing mortgages, to ensure the total number of properties meet lender criteria.</p>
+<h4 class="mas-h4"><span class="mas-num">5.3</span> Affordability</h4>
+<p>You must ensure that your mortgage recommendation is affordable to the customer and your record of sale should reflect the customer discussions that support affordability.</p>
+<p>The fact find must evidence that the customer can afford the mortgage recommended both during and after any initial benefit period.  You cannot rely on old or historical information when assessing affordability.</p>
+<p>You must take account of the impact of likely future interest rate increases on affordability for a minimum period of five years from commencement of the mortgage.  Regardless of the fact that lenders must consider and factor in an interest rate increase, we would expect you to consider the impact and risk to the customer on affordability from a broader perspective.</p>
+<p>If ‘benefits’ or ‘maintenance’ are being taken into account, the POS record needs to explain how the mortgage will remain affordable when they cease, if they’re of a nature where they’re likely to stop.  For example, if they are linked to a child’s age.</p>
+<p>For right to buy customers, you must ensure they are made fully aware of their responsibilities after completion, which previously would have been the responsibility of the Council.  For freehold properties, this will include property repairs, maintenance and buildings insurance; for leasehold properties, this will include service charges and any known works of improvement for the first five years.  Details should be included in the Council’s right to buy offer letter, which you should request from the customer.  The cost of these must be reflected in the expenditure section and included in your affordability assessment.</p>
+<p>Where reliance is placed upon non-salaried income such as investment income, you must make the customer aware that you are unable to provide advice in respect of these arrangements regarding the level of income, maturity values and level of guarantees, unless you are qualified and licensed to advise on such products.</p>
+<p>You must satisfy yourself that your recommendation is affordable to the customer and allow funds to cover their protection needs.</p>
+<p>The information obtained from customers and input to application forms must be accurate, and reflective of the information within the fact find, to enable an assessment of affordability to be carried out by lenders.</p>
+<h4 class="mas-h4"><span class="mas-num">5.3.1</span> Affordability into retirement</h4>
+<p>Where the term extends beyond retirement, you must be satisfied that the mortgage payments will remain affordable, and the customer’s plans must meet the lender’s criteria.</p>
+<p>This may be by way of pension, investment income or where one party remains in employment and will be able to afford the repayments on a sole income.</p>
+<p>The source of the post retirement income must be recorded in the MRWL.  If the source is pension or investments, you must not give advice on the potential return they may provide unless you are licensed in these areas.  However, you must still have a discussion with the customer to establish whether they believe it to be feasible.  If the customer is unsure of the return, you must recommend they seek independent advice.</p>
+<p>Where the customer has some time to retirement and the lender requires evidence of post retirement income, copies must be attached to the POS record.</p>
+<p>If the customer already receives pension or investment income as part or all of their income, then this must be evidenced and recorded and form part of the normal income and expenditure affordability assessment.</p>
+<h4 class="mas-h4"><span class="mas-num">5.4</span> Loan amount</h4>
+<p>You must ensure that the customer only borrows the amount required to meet their current needs to avoid paying unnecessary interest.  The POS record must be clear how you reached the amount applied for and include comprehensive notes of your discussions with the customer.</p>
+<p>You may not know the exact amount as up to date figures have not yet been obtained for redeeming the existing mortgage or liabilities that are being consolidated.  However, throughout the advice process sufficient information should be obtained to arrive at the amount needed prior to application.</p>
+<p>For home movers wishing to retain equity, you must make the customer aware that they will pay interest on the extra amount over the term of the mortgage and by reducing the amount of borrowing, cheaper products may have been available.</p>
+<p>You must consider ERCs as well as other costs to determine if it is suitable for the customer to switch lender or remain with their existing lender.  If it is not suitable, you should recommend that the customer does not proceed.</p>
+<p>Where a customer is looking to increase the borrowing already secured on the property, you must inform them that alternative finance options may be available and may be more appropriate, although you do not need to consider suitability of the options as listed below:</p>
+<p>Obtain a further advance from their existing lender (unless the adviser knows that the existing lender will not provide further funds)</p>
+<p>Re-mortgage to a new lender</p>
+<p>A second charge mortgage</p>
+<p>Unsecured lending</p>
+<p>If the customer’s preference is to reduce their monthly outgoings by switching to a lower-rate product with a new lender, you should source the whole of market to check that this is financially suitable.  You should explain that the customer is prepared to pay the ERCs to meet their objective and confirm why this is suitable in the MRWL.  You must carry out a calculation to show the financial loss or gain in paying the ERCs upon switching to a new product (use fact find “notes”), and this figure must also be replayed to the customer and explained in your MRWL.</p>
+<h4 class="mas-h4"><span class="mas-num">5.5</span> Consideration of existing assets</h4>
+<p>It is not a requirement to consider whether existing assets should be used to increase the deposit in order to reduce the mortgage amount.  However, where applicable, you must point out to the customer the fact that realising such assets may reduce the overall cost of borrowing.</p>
+<p>If the customer is able to provide a higher deposit that would result in a lower interest rate being available to them, this must be brought to their attention.</p>
+<h4 class="mas-h4"><span class="mas-num">5.6</span> Repayment method</h4>
+<p>If the repayment strategy is credible and the customer fully understands the risks, e.g. if the intention is to downsize and there is sufficient equity to fulfill this plan, then it may be appropriate to recommend interest only or part and part.  You must make the customer aware that they will need to demonstrate and evidence to the lender, and to yourself, all repayment strategies.</p>
+<p>You will need to ensure that the repayment strategy meets the recommended lender&#x27;s criteria and obtain evidence, as required by the lender and for record keeping purposes.</p>
+<p>The following are examples of repayment strategies that are not permitted:</p>
+<p>An inheritance that is expected but uncertain.</p>
+<p>Reliance on house price increases.</p>
+<p>Downsizing, where the lender considers there will be insufficient equity in the property to repay the loan and purchase another property mortgage free.</p>
+<p>The above examples are not exhaustive and up to date knowledge of lender criteria is key.</p>
+<p>Affordability may be assessed on an interest only basis where there is a credible repayment strategy.  The cost of all repayment plans must be included as committed expenditure within the budget planner.</p>
+<p>You cannot give investment advice unless you are licensed to do so.  If your customer needs advice on investments, you must refer them to a financial adviser.</p>
+<h4 class="mas-h4"><span class="mas-num">5.7</span> Debt consolidation</h4>
+<p>Debt consolidation should only be considered when you can evidence suitability and affordability and your record clearly shows the right customer outcome.</p>
+<h4 class="mas-h4"><span class="mas-num">5.7.1</span> Debt consolidation – guidance for credit impaired customers</h4>
+<p>For customers who fall into the definition of credit impaired as per Section 4.9 and who wish to consolidate debts, you will need to assume that the debts will remain outstanding for the purposes of assessing affordability.  You must therefore take this into account when making your recommendation.  This also applies to further advances for credit impaired and debt consolidation purposes.  You will need to make your customer aware that this may reduce the number of lenders and products available to them.</p>
+<p>Debt consolidation should only be considered when you can evidence suitability and affordability and your record clearly shows the right customer outcome.</p>
+<h4 class="mas-h4"><span class="mas-num">5.7.2</span> Debt consolidation – guidance for all other customers:</h4>
+<p>You must advise customers to speak to their existing lender or credit provider(s), prior to advising them on consolidation, as this may be cheaper.</p>
+<p>You should investigate whether it would be more suitable to take a loan not secured on their property, and then refer them as necessary (see Section 2 for permissible referral activities)</p>
+<p>If the customer has existing deposit based savings, you must recommend that the customer use the savings in the first instance, and where this is declined, document the reason for not using these funds</p>
+<p>You must evidence all debts / loans / credit cards prior to any consolidation and attach copies to the record, or document why they could not be obtained and instead get the debt consolidation disclaimer signed by the client and added to the record.</p>
+<p>If the customer has consolidated before and you deem it suitable to recommend further consolidation, you must explain why in the MRWL.</p>
+<p>You must explain any potential consequences e.g. that if they continue to consolidate, their LTV increases and this can impact the deals available in the future in terms of rates and eligibility.</p>
+<p>You must inform the customer of the potential overall cost of paying liabilities if they are consolidated to the mortgage.  Whilst the mortgage interest rate may be lower, the term is likely to be longer and will increase the overall cost.</p>
+<p>Many lenders will not permit debt consolidation on properties that have been bought under the right to buy scheme and are still within the right to buy period.  You must therefore determine whether a property has been bought under the right to buy scheme and when this period ends.</p>
+<p>Debt consolidation is not permitted in the following circumstances:</p>
+<p>Short-term debts with less than 6 months to run</p>
+<p>Small debts of less than £500</p>
+<p>Interest free debts, unless the interest free period ends before drawdown of the mortgage and isn’t likely to be available again</p>
+<p>Student Loans</p>
+<p>The customer is consolidating debts to fund necessary expenditure, as this suggests affordability issues</p>
+<p>Debts being consolidated to an interest only mortgage where there is no existing repayment strategy</p>
+<p>Where a customer is consolidating debt and stretching term and switching part of the loan to interest only with no credible repayment strategy</p>
+<p>The figures above are not limited to these minimums.  In all instances you must consider the customer’s individual circumstances and exercise appropriate judgement.  If you think it is unsuitable for the customer to consolidate debts, they must be referred to the Citizens Advice Bureau.</p>
+<p>To ensure the customer is fully aware of the implications of consolidation, you must show the cost of consolidating debt by using either of the following options:</p>
+<p>Produce, print and discuss two illustrations with/without the increased debt, or</p>
+<p>Calculate the additional cost of borrowing by using the cost per £1 borrowed example in the Mortgage Illustration and multiplying by the additional amount required</p>
+<h4 class="mas-h4"><span class="mas-num">5.7.3</span> Debt consolidation – demonstrating cost</h4>
+<h4 class="mas-h4"><span class="mas-num">5.8</span> Rejected advice</h4>
+<p>Where you cannot source a product that is suitable in meeting lender criteria and/or FPG minimum standards, you must inform your customer that you are unable to assist them.</p>
+<p>If a customer rejects your advice, you cannot facilitate them proceeding with something else and you must not assist them, on any basis, in applying direct (i.e. what could be described as execution only).</p>
+<h4 class="mas-h4"><span class="mas-num">5.9</span> Term</h4>
+<p>You should assess the customer’s situation to ensure that their needs, circumstances and preferences are considered to determine the term of the new mortgage.  You should fully discuss with your customer the impact of future interest rate increases prior to recommending an appropriate term.</p>
+<p>Rather than recommending the shortest term, it may be more suitable to recommend a term that allows the customer to overpay, which will reduce the overall term of the mortgage.  If interest rates rise, the customer could then choose to stop the overpayments to ensure the mortgage remains affordable.  This may be more practical, providing the customer is disciplined enough to make overpayments when funds allow.  Your notes should contain all discussions held with the customer relating to the term of the mortgage, which should be reiterated in the MRWL.</p>
+<h4 class="mas-h4"><span class="mas-num">5.10</span> Existing Lender Arrangements – General Guidance</h4>
+<p>Some existing residential mortgage lender arrangements include further advances, porting products (whether maintaining the existing loan or borrowing additional funds) and retention products/rate switches (where terms other than the interest rate remain unchanged, and this includes mortgage products that offer a feature which allows the customer to change rates at some time in the future, e.g. from tracker to fixed).</p>
+<h4 class="mas-h4"><span class="mas-num">5.10.1</span> Further advances</h4>
+<p>Where a customer is looking to increase the borrowing already secured on the property, you must inform them that alternative finance options may be available and may be more appropriate, although you do not need to consider suitability of the options as listed below:</p>
+<p>A second charge mortgage</p>
+<p>Unsecured lending</p>
+<p>If, after sourcing, the most suitable product is not recommended due to the customer’s overriding preference to stay with their existing lender, this must be fully explained in notes and the MRWL.</p>
+<p>The Mortgage Illustration provided must be based on the amount of the further advance only.</p>
+<h4 class="mas-h4"><span class="mas-num">5.10.2</span> Rate switches and ported products</h4>
+<p>For existing lender products such as rate switch and ported products where the illustration has to be obtained direct from the lender, you must attach a copy to the POS record.</p>
+<h4 class="mas-h4"><span class="mas-num">5.10.3</span> Evidencing suitability and affordability</h4>
+<p>Where the advice is to stay with the existing lender, FPG requirements for evidencing affordability may be reduced where the following requirements can be satisfied</p>
+<p>The adviser or AR Firm gave the initial advice</p>
+<p>The adviser confirms with the customer there have been no significant changes in lifestyle, income or expenditure</p>
+<p>The new mortgage payments are not higher than the lenders SVR.</p>
+<p>In the instances where the above criteria is met, the evidence can be reduced to a minimum of the following</p>
+<p>Evidencing that no mortgage payments have been missed in the last twelve months,</p>
+<p>A recent bank statement showing the income going in and the expenditure going out, as this will confirm affordability and that the customer’s income has not reduced since the last advice,</p>
+<p>If a BTL, then you must also obtain evidence that any profits are declared to HMRC for taxation</p>
+<p>Notes must be added to the POS record to confirm the above criteria have been met.  Lender requirements must also be adhered to.</p>
+<p>Please note that where there is an increase in payment then affordability must be fully assessed using 3 months’ bank statements, as with any other residential mortgage.</p>
+          </div>
+          <div id="mas-sourcing" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">6. Sourcing a Mortgage</h2>
+<h4 class="mas-h4"><span class="mas-num">6.1</span> General guidance</h4>
+<p>Advisers must ensure that they undertake sufficient fact finding before sourcing products and should apply their market knowledge and professional judgement alongside the output from sourcing systems.</p>
+<p>You cannot access a lender or special rate through any other mortgage club or network other than the Legal &amp; General Mortgage Club or a FPG approved packager.</p>
+<p>You must ensure that your mortgage sourcing system, Mortgage Brain, is always updated with the current release of lender deals.</p>
+<p>You must disclose to the customer the impact that filtering their preferences will have, e.g. this will mean that some products are removed, which may or may not be cheaper.</p>
+<p>You must attach a product list to the POS record for every recommendation.  If you’re aware of a more suitable product that doesn’t appear on the sourcing list, the list must still be stored to support that your recommendation is more suitable / cheaper and a Mortgage Illustration should be obtained direct from the lender and attached to the POS record.</p>
+<p>The FCA’s rules around Cheapest Deal mean that we require you to retain your sourcing results, ordered by total to pay in the introductory period, or by the FCA total pay.  These results must be attached to the POS record to show that the mortgage recommended is the cheapest for the customer.  Sourcing filters must match the fact find preferences, with any discrepancies fully explained in the fact find “notes”.</p>
+<p>Where more than one mortgage contract is identified as being suitable, the least expensive should be recommended, taking into account other features that may be important to the customer e.g. quality of service or level of arrangement fees.</p>
+<p>If the recommended product is not the top of the product list, notes must be added to the POS record explaining why the product(s) higher up the list weren’t suitable. For example, the customer doesn’t comply with lender criteria and why.  This explanation should be replayed to the customer in your MRWL.</p>
+<p>If the loan was not available via the sourcing system, your POS record must include a detailed explanation of why a particular lender/bank has been recommended, whether any other lending institutions were considered and, if so, why these were not progressed.</p>
+<h4 class="mas-h4"><span class="mas-num">6.2</span> Ensuring your customer is eligible</h4>
+<p>Sourcing results may include products that the customer is not eligible for.  It is your responsibility to ensure that the customer is eligible for the mortgage recommended according to the published lender criteria at the time of application.  Where you utilise a ‘criteria tool’ or an ‘affordability tool’ then you can attach this system output to your POS to help evidence your justification of lender.</p>
+          </div>
+          <div id="mas-illustrations" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">7. Mortgage Illustrations</h2>
+<h4 class="mas-h4"><span class="mas-num">7.1</span> General guidance</h4>
+<p>In most instances a lender should provide an ESIS (European Standardised Information Sheet), however in certain circumstances a KFI may still be produced.  The phrase “Mortgage Illustration” will be used in these standards and refer to the KFI or ESIS.</p>
+<p>Where the customer only wants a general idea of what is available in the marketplace or an idea of cost before you have commenced the full advice process, you cannot provide a “Mortgage Illustration” which shows that ‘advice and recommendation’ has been given.  Therefore, you must make it clear that you are providing generic information only, and not advice.</p>
+<p>A Mortgage Illustration must be provided to customers in the following circumstances:</p>
+<ul class="mas-list">
+<li>If you advise the customer to enter into or vary a regulated MCOB or CONC mortgage contract with debt consolidation.</li>
+<li>On payment of a product related fee (e.g. valuation or booking fee).</li>
+<li>Before an application is submitted.</li>
+</ul>
+<p>It is an FCA requirement that before an application is made, you must give the Mortgage Illustration to the customer and provide an adequate explanation of each section, and what this means to them.</p>
+<p>When submitting the mortgage application, you must inform the chosen lender of any broker fee payable by the customer, in order that the lender can correctly calculate the APRC which will appear in the offer letter.</p>
+<p>Care should be taken to ensure all Mortgage Illustrations are correct.  Details should match those contained in the mortgage offer letter (which should be checked against the Mortgage Illustration) and any discrepancies investigated with the lender.</p>
+<p>The Mortgage Illustration should show the date that the document was produced.</p>
+<p>It is a regulatory requirement that the POS record must show the following:</p>
+<p>The date that the Mortgage Illustration was provided to the customer, and</p>
+<p>The date the application was submitted, and</p>
+<p>Details of how the Mortgage Illustration was provided (e.g. face to face, email, post etc.)</p>
+<h4 class="mas-h4"><span class="mas-num">7.2</span> ESIS Section 4  (or KFI Section 8)</h4>
+<p>Where you charge a fee as a percentage of the loan, this must be converted in to £’s in the fees section of the Mortgage Illustration (to show the actual fee charged).</p>
+<p>For example, your Disclosure Documentation discloses that you charge 1% of the loan.  For £100,000 this means you will be able to charge up to £1,000.  Therefore, it is the £1,000 figure (not the 1%) that must be disclosed within the appropriate section of the Mortgage Illustration (and your fee agreement).</p>
+<p>In all cases, the Mortgage Illustration must only be obtained from the sourcing system or direct from the lender.</p>
+<h4 class="mas-h4"><span class="mas-num">7.3</span> ESIS Section 4  (or KFI Section 13)</h4>
+<p>It is a requirement that the procuration fee details within the illustrations shows that this will be payable to FPG and the AR Firm, if applicable.</p>
+<h4 class="mas-h4"><span class="mas-num">7.4</span> Reduction in property value post submission</h4>
+<p>If a property is down valued post submission, you must check that the new mortgage is still the most suitable and affordable.</p>
+<p>If you believe the product applied for is still the most appropriate, you should attach a copy of the illustration showing the new loan and purchase price/house value to the POS record.</p>
+<p>If the product is no longer available, or if you think a different product is more suitable, a new product list and illustration should be attached.</p>
+<p>You must also issue either a new MRWL, or a MRWL addendum, for the revised recommendation.  A new MRWL will be required where the customer’s circumstances have changed sufficiently for the original advice to be re-visited, for instance a property and lender change (so a completely new transaction) or it could be that the client has separated, got a new partner, had a child, changed jobs or taken on a financial commitment.  However, where the change is not sufficiently significant for the advice to be re-visited, for instance a change in borrowing amount, or lender, or product, then you may prefer to issue a MRWL addendum instead.  In both situations, you are required to confirm that it is still affordable during and post any initial benefit period.</p>
+<p>Where the customer asks you to challenge the valuer’s decision then this can be done, however you must first obtain any required comparables of recently sold properties, or other evidence, and you must also make this appeal via the lender, and not to the valuer directly.  Where a lender does not accept appeals to valuations then no challenge can be made.  It is important that no contact is made with the valuer as we cannot be seen to be influencing their decision.</p>
+<h4 class="mas-h4"><span class="mas-num">7.5</span> Re-issuing an illustration</h4>
+<p>If there is a change to the product terms or an increase/decrease in the loan of more than 5% after the last illustration was given to the customer, the advice must be re-visited and a new illustration issued.</p>
+<p>If the change is less than 5% and the product terms remain the same, you do not have to provide a new illustration unless requested by the customer, as this will be confirmed in the lender’s offer letter.  Notes should be added to explain the change.</p>
+<h4 class="mas-h4"><span class="mas-num">7.6</span> Manual Mortgage Illustration</h4>
+<p>The sourcing system will not always support the production of Mortgage Illustrations, and where this is the case then a Mortgage Illustration should be obtained from the lender directly and attached to the POS record.  A manual Mortgage Illustration will need to be added with the key information in order to produce a MRWL and update the case status.  Sourcing results (which will not include your recommended product) are still required in these instances.</p>
+          </div>
+          <div id="mas-mrwl" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">8. Mortgage Reasons Why Letter</h2>
+<h4 class="mas-h4"><span class="mas-num">8.1</span> When to issue</h4>
+<p>You must give the customer a MRWL for all regulated mortgage advice within ten working days of making the mortgage application, or by exchange of contracts if this occurs earlier.</p>
+<p>Where an application has been made but does not proceed to completion, a MRWL must still be issued as advice has been given.</p>
+<p>If customers reside at different addresses, you must send a MRWL to each customer.</p>
+<p>With your customer’s consent, you must also issue a MRWL to the guarantor(s), recommending that they seek independent legal advice.</p>
+<h4 class="mas-h4"><span class="mas-num">8.2</span> When to re-issue</h4>
+<p>You will need to issue the MRWL Addendum letter, or if you prefer actually re-issue the MRWL if, after submission of the application:</p>
+<p>The mortgage increases by more than 5% of the original amount</p>
+<p>There is a material change, an explained in Section 7.4 of these Advice Standards</p>
+<p>In addition, you must re-visit your advice to check that the product is still the best available.</p>
+<p>For changes of less than 5% of the borrowing amount, or for changes concerning the lender, product, or term, etc, a MRWL Addendum letter can be sent to the customer, confirming the changes and the reasons why.  A copy should be attached to your POS record.</p>
+<p>If the lender has increased the recommended term, the MRWL should be amended and re-issued, or an addendum letter sent, explaining that the lender will only accept the application on a longer term.  This means that the overall cost of the mortgage will be greater if the loan is kept to full term.  Where overpayments can be made, this should be pointed out to the customer as an option to reducing the increased term.</p>
+<p>If the mortgage decreases by more than 5%, everything else remains the same and your recommendation is still the best advice, then you do not need to re-issue the MRWL.</p>
+<p>When completing the MRWL, you should ensure it is customer specific, summarises their circumstances, preferences, and objectives, and clearly details how your recommendation provides the right customer outcome.</p>
+<h4 class="mas-h4"><span class="mas-num">8.3</span> MRWL Key Points</h4>
+<p>The following describes the fundamental key points that should be covered in the MRWL where applicable:</p>
+<ul class="mas-list">
+<li>If you’ve recommended a product transfer or retention product, you must explain why this is suitable, e.g. it may be due to the customer’s circumstances that another lender will not lend, or it’s the customer’s preference to remain with their existing lender.</li>
+<li>Why you have recommended a particular lender and confirmation that from those suitable it’s the least expensive from those available.  If not, a clear explanation must be given in the MRWL as to why, such as the customer’s overriding preferences.  If the more expensive recommended product is preference-based rather than criteria-based, e.g. the client is eligible for the cheaper product, then the difference in cost must be replayed to the customer in the MRWL.</li>
+<li>Confirmation that the customer accepts your recommendation and that you have checked they meet the lender’s criteria before submission of the application.</li>
+<li>Where the customer is moving home and retaining equity, the reason why and the relevant risk warnings.</li>
+<li>If you have recommended a switch of lender, including where ERCs are applicable, you must explain why this was more suitable than staying with their existing lender, having taken into account all associated costs.  Your calculation of the difference in cost must be retained in the fact find “notes” and you can also include this calculation in the MRWL if you wish.</li>
+<li>Why you have recommended a specific repayment method.  For all or part interest only, you also need to detail how the customer intends to repay the loan, together with the associated risk warnings.  Your MRWL should contain sufficient personalisation to evidence feasibility/plausibility, plus the reasons for your interest only recommendation.</li>
+<li>Why you have recommended a specific mortgage term, including the ages at which the customers intend to retire.</li>
+<li>Why you have recommended an impaired credit mortgage, together with the risk warning that these may not be the most competitive products.</li>
+<li>Why you have recommended the interest rate type, any initial benefit period or end date, and why this is suitable.  You should add any applicable risk warnings.  Note - if you inform a client you will contact them before the end of their initial rate benefit period, you must ensure that you do so.</li>
+<li>Where the initial benefit period is less than five years, confirmation that the implications and costs of re-broking have been fully discussed.</li>
+<li>Whether you have recommended an offset facility and any associated risk warning.</li>
+</ul>
+<ul class="mas-list">
+<li>Where the property is to be rented out, the MRWL should confirm all the risk warnings under a BTL heading.</li>
+</ul>
+<h4 class="mas-h4"><span class="mas-num">8.3.1</span> Affordability</h4>
+<p>You must confirm the loan is affordable and the basis on which you have assessed this.</p>
+<p>You must detail:</p>
+<p>Full details of all income and the evidence provided to support this.</p>
+<p>That you have concluded that the mortgage is affordable both during and post benefit period.</p>
+<p>Any expected changes to the customer’s circumstances that support affordability.</p>
+<p>If the mortgage term extends beyond intended retirement, then how the mortgage payments will remain affordable must be confirmed.</p>
+<p>For Government HTB type equity schemes with deferred interest payments, confirmation that the increased payments from year six will be affordable.</p>
+<p>Confirmation as to how the Government shared equity loan will be repaid.</p>
+<h4 class="mas-h4"><span class="mas-num">8.3.2</span> Mortgage Term</h4>
+<p>You must detail why you have recommended a specific term and include the discussions held with your client in relation to the impact of future interest rates rises on affordability.</p>
+<p>Where the lender has stretched the term you must explain this.  Where the customer has the ability to make overpayments, this should be detailed as this will enable the customer to reduce the term of the loan, as well as the overall cost.</p>
+<p>Whether a split term arrangement has been recommended and why.</p>
+<p>For mortgages with a split term, whilst the interest only element may match the term of the repayment strategy, for the repayment element the shortest term must be recommended unless there is an overriding preference.  Both terms must be explained within the MRWL.</p>
+<p>Whether you’ve recommended that all or part of the mortgage term extends beyond intended retirement, and if so, why this has been done and how payments will remain affordable.</p>
+<h4 class="mas-h4"><span class="mas-num">8.4</span> Other information that must be included within the MRWL, where applicable:</h4>
+<h4 class="mas-h4"><span class="mas-num">8.4.1</span> Debt consolidation</h4>
+<p>You need to confirm what has been consolidated and why this is suitable.</p>
+<p>In the MRWL you must:</p>
+<p>Record your recommendation for the debt consolidation and the customer’s chosen course of action, together with the impact.</p>
+<p>Explain why debt consolidation is suitable.  In particular:</p>
+<p>If the customer has consolidated before, you must fully explain why you believe it is suitable for them to do so again.  For example, the previous consolidation related to one-off costs for home improvements.</p>
+<p>Where the customer has a reasonable level of disposable income and has no real need to consolidate for financial reasons – the letter needs to explicitly explain why they want to consolidate.</p>
+<p>Include risk warnings:</p>
+<p>That the overall cost will be higher</p>
+<p>Adding unsecured debts to the mortgage means that they now become secured on their property</p>
+<p>Consolidating debts will increase the loan to value which can impact future deals in terms of rates and eligibility</p>
+<p>Confirm in the MRWL you have illustrated the cost and impact of consolidating by providing the customer with two Mortgage Illustrations, or where you have calculated the cost of consolidation, include the figures within the MRWL.  For example:</p>
+<p>If the Mortgage Illustration shows the cost per £1 is £2.23 and the loan is £100,000 including consolidation of £10,000, the calculation would be as follows:</p>
+<p>Cost per £1 is £2.23.</p>
+<p>Total cost of £100,000 over term will be £223,000.</p>
+<p>Cost of £10,000 will be £22,300.</p>
+<p>Total cost of loan, excluding debt consolidation, will be £200,700.</p>
+<p>Where the customer’s existing liabilities are in arrears, you must advise them to speak to their creditors before proceeding as they may be prepared to come to an arrangement that the customer could consider as an alternative to adding these to the mortgage.</p>
+<p>Refer to Section 5.7.2 of these Standard for circumstances when any debts should not be added to the longer term mortgage debt.</p>
+<h4 class="mas-h4"><span class="mas-num">8.4.2</span> Joint review but mortgage application in one name</h4>
+<p>Where you complete a joint review but recommend that only one customer applies for the mortgage, you must document in the MRWL why this is suitable and how it is affordable, with the risk that the customer will be solely responsible for repayments.</p>
+<h4 class="mas-h4"><span class="mas-num">8.4.3</span> Multiple mortgage sales</h4>
+<p>Where the record contains recommendations for more than one property, you may include all recommendations within the same MRWL if you prefer, although you will need to ensure that each mortgage, with its own set of preferences, is addressed appropriately.  The property addresses and respective loan amounts (including any fees added) should be listed on the MRWL.  Alternatively, you can of course simply create a new MRWL for each different property purchase.</p>
+<h4 class="mas-h4"><span class="mas-num">8.4.4</span> Adding fees to the mortgage</h4>
+<p>Where your customer has chosen to add fees to the loan this must be confirmed in the MRWL, with the risk warning that interest will be charged on these throughout the term of the mortgage.</p>
+<p>Where applicable, the MRWL must also confirm the following:</p>
+<p>The reason why existing funds are not being utilised</p>
+<p>If the customer intends to add fees and pay them within a short period after completion</p>
+<p>It should also be pointed out that some fees may not be refundable if the mortgage does not proceed.</p>
+<h4 class="mas-h4"><span class="mas-num">8.4.5</span> Bridging loans</h4>
+<p>You will need to confirm that you have not given advice on any associated bridging loan and that the customer should seek independent legal advice from a solicitor to ensure they understand any contract they enter into with regard to funding the purchase, or capital raising needs, if they have not already done so.</p>
+<h4 class="mas-h4"><span class="mas-num">8.4.6</span> Builders Incentive Schemes / Government Shared Equity Schemes</h4>
+<p>You must remind the customer of the risks associated with the above schemes and confirm these risks in the MRWL.</p>
+<p>The amount you ultimately repay to the builder/Government Scheme organisation will depend on the value of the property at the time of repaying the loan.</p>
+<p>Any improvements you make to the property may increase the value of the builder’s/Government Scheme organisation’s equity share as well as yours.</p>
+<p>If the property has to be valued for any reason, you may be liable for the cost of this valuation.</p>
+<p>I have not given you advice in respect of the second charge.</p>
+<p>I have given you advice on the mortgage contract only.  You will need to seek independent legal advice from your solicitor to ensure that you understand any such contract you enter into in respect of funding the purchase.</p>
+<p>When you sell your home, you must repay any scheme assistance from the sale proceeds.</p>
+<p>You should ensure that you have a separate repayment arrangement in place to repay this facility.</p>
+<p>We have discussed and considered whether you are able to afford to purchase a property using your own resources, rather than by borrowing under a shared equity credit agreement, but you are unable to raise the additional funds required for the type of property you require.</p>
+<h4 class="mas-h4"><span class="mas-num">8.5</span> Buy To Let Mortgages</h4>
+<p>You must inform the customer of the risks associated with BTL properties and confirm these risks in the MRWL.</p>
+<ul class="mas-list">
+<li>That it is your intention to let the above property via an Assured Shorthold Tenancy, or similar tenancy agreement, and that it is not intended for use as a residence by you or your family</li>
+<li>I am unable to advise you on whether property is a good investment.</li>
+<li>The property may command a lower rent than anticipated.</li>
+<li>Tenants may default on payments or leave the property so you could suffer loss or reduced income.</li>
+<li>Property may be untenanted for a period of time and the customer may then have to support two or more mortgages.</li>
+<li>Being liable for the maintenance of the property and responsibility to insure.</li>
+<li>Professional advice should be sought on legal, tax, financial and property management issues.</li>
+<li>The property value may fall as well as rise.</li>
+<li>property falling into negative equity.</li>
+</ul>
+<p>You are responsible, if applicable, for complying with the Houses in Multiple Occupation regulations, which have made it mandatory for landlords to obtain a license for Houses in Multiple Occupation.</p>
+          </div>
+          <div id="mas-records" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">9. Record Keeping</h2>
+<h4 class="mas-h4"><span class="mas-num">9.1</span> General guidance</h4>
+<p>FCA record keeping Rules require a record of all advice given, not just cases that complete.  A POS system record must be completed for all regulated business transactions, and contain all information obtained and advice given to the customer, including Decisions in Principle.</p>
+<p>Throughout these standards we require specific information to be documented in either fact find notes or the Mortgage Reasons Why Letters (MRWL).  You should strive to ensure your notes contain anything relevant to your recommendations, or material to your advice that impacts a particular preference the customer may have.  For example, why the term of the mortgage has been recommended and the discussions around this.</p>
+<p>You must update the record as to the accurate status of the case - e.g. submitted to provider, exchanged, not taken up or rejected by the lender as and when the event occurs.</p>
+<p>If a case does not proceed to completion, the reason why must be recorded e.g. customer found another property, pulled out of sale, unsatisfactory survey, etc.  Where the lender has declined an application, you must fully record their reason for doing so in notes.</p>
+<p>Records must be retained for six years after the business relationship ends.  (Mortgage term plus six years unless it is known that the mortgage has redeemed before the end of the term).</p>
+<p>If paper records are obtained, they must all be scanned and attached to the case.  Where paper records are retained, these must be securely stored and retrievable within two business days.</p>
+<p>The following must be on the POS system record:</p>
+<h4 class="mas-h4"><span class="mas-num">9.2</span> For all MCOB residential and BTL mortgages:</h4>
+<p>Please also note the following:</p>
+<p>Customer identification, evidence of income, bank/credit card statements and evidence of any debts being consolidated must be obtained prior to submission of the mortgage.</p>
+<p>You should obtain sufficient statements to accurately reflect the monthly outgoings for all customers that are party to the mortgage.</p>
+<p>Where the file is pulled for audit (random or targeted record keeping check) and you are advised that remedial work is needed on the case we expect those remedial actions to be completed within 5 working days.</p>
+<h4 class="mas-h4"><span class="mas-num">9.4</span> Data Protection requirements</h4>
+<p>Sensitive data such as credit card numbers and the 3 digit security code on the back of a card must NEVER be stored on the system or held on paper files.   It is a breach of legislation to do so.  Therefore, you must ensure that credit card details are not contained in the lender application forms before attaching these to the record.</p>
+          </div>
+          <div id="mas-annex-a" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">Annex A – Product Disclosure</h2>
+<p>Product Disclosure Guidance – Mortgages</p>
+<p>The purpose of this document is to provide guidance on some key points you must cover with your customer before application.  It’s not exhaustive.</p>
+          </div>
+          <div id="mas-annex-b" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">Annex B – Evidence of ID</h2>
+<p>At least two documents are required in order to verify the customer’s identity and address.</p>
+<p>One level A and one level B2 document should be requested from the customer.</p>
+<p>If a customer cannot provide a document from Level A, two documents from level B must be provided, one of which must be from level B1.</p>
+<p>If a customer cannot meet these requirements you must refer the case to Pete Burgess – pete.burgess@financeplanning.co.uk</p>
+          </div>
+          <div id="mas-annex-c" class="mas-section" style="display:none;">
+<h2 class="mas-section-title">Annex C – Glossary</h2>
+<p>AIP / DIP		Agreement  / Decision in Principle</p>
+<p>APER		Approved Person</p>
+<p>APRC		Annual Percentage Rate Charge</p>
+<p>BBTL		Business Buy To Let</p>
+<p>CBTL		Consumer Buy To Let</p>
+<p>CONC		Consumer Credit Sourcebook</p>
+<p>EEA		European Economic Area</p>
+<p>ESIS		European Standardised Information Sheet</p>
+<p>FCA		Financial Conduct Authority</p>
+<p>FSMA		Financial Services and Markets Act</p>
+<p>HLC		Higher Lending Charge</p>
+<p>ICOB		Insurance Conduct of Business Sourcebook</p>
+<p>KFI		Key Facts Illustration</p>
+<p>KFI+		Key Facts Illustration Plus (i.e. conforms to post MCD requirements)</p>
+<p>MCOB		Mortgage Conduct of Business Sourcebook</p>
+<p>MCD		Mortgage Credit Directive</p>
+<p>MLRO		Money Laundering Reporting Officer</p>
+<p>MRWL		Mortgage Reasons Why Letter</p>
+<p>POS		Point of Sale Software</p>
+<p>RMC		Regulated Mortgage Contract</p>
+<p>SAR		Suspicious Activity Report</p>
+<p>TCF		Treating Customers Fairly</p>
+          </div>
+          <div id="mas-search-results" style="display:none;"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2142,6 +2862,7 @@ function switchTab(tab) {
   if (tab === 'learning')         { showLvSection('weekly-recordings', document.getElementById('lv-nav-weekly')); loadLearningZone(); }
   if (tab === 'compliance')       { if (!_cpdLoaded) loadCpd(); }
   if (tab === 'supervisor-zone')  { svInitDates(); loadSupervisorZone(); }
+  if (tab === 'sales-process')    { showSpSection('sp-overview', document.getElementById('sp-nav-overview')); }
 }
 
 // Hash routing — navigate on load (called directly, no event wrapper needed)
@@ -2215,6 +2936,93 @@ function loadRevalidationVideos() {
   if (_rvLoaded) return;
   _rvLoaded = true;
   buildModuleCards(_rvVideos, 'rv-grid', 'Revalidation module');
+}
+
+// ── Sales Process sub-navigation ────────────────────────────────
+function showSpSection(id, el) {
+  ['sp-overview','mortgage-advice-standards'].forEach(function(s) {
+    var div = document.getElementById(s);
+    if (div) div.style.display = s === id ? '' : 'none';
+  });
+  document.querySelectorAll('#sidebar-sales-process a').forEach(function(a) { a.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  if (id === 'mortgage-advice-standards') {
+    // clear search when navigating in
+    masClearSearch();
+  }
+  return false;
+}
+
+// ── Mortgage Advice Standards in-section nav ─────────────────────
+function showMasSection(id, el) {
+  document.querySelectorAll('.mas-section').forEach(function(d) {
+    d.style.display = d.id === id ? '' : 'none';
+  });
+  document.querySelectorAll('#mas-nav a').forEach(function(a) { a.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  // Hide search results, show normal content
+  var sr = document.getElementById('mas-search-results');
+  var ca = document.getElementById('mas-content-area');
+  if (sr) sr.style.display = 'none';
+  // scroll to top
+  if (ca) ca.scrollTop = 0;
+  return false;
+}
+
+// ── MAS Search ───────────────────────────────────────────────────
+var _masSearchTimer = null;
+function masSearch(q) {
+  clearTimeout(_masSearchTimer);
+  _masSearchTimer = setTimeout(function() { _masDoSearch(q); }, 200);
+}
+function _masDoSearch(q) {
+  var banner = document.getElementById('mas-search-banner');
+  var countEl = document.getElementById('mas-search-count');
+  var resultsEl = document.getElementById('mas-search-results');
+  var sections = document.querySelectorAll('.mas-section');
+  q = (q || '').trim();
+  if (!q) { masClearSearch(); return; }
+  var term = q.toLowerCase();
+  var hits = [];
+  sections.forEach(function(sec) {
+    var paras = sec.querySelectorAll('p, li, h4, h5');
+    paras.forEach(function(el) {
+      var txt = el.textContent;
+      if (txt.toLowerCase().indexOf(term) >= 0) {
+        // find section title
+        var titleEl = sec.querySelector('.mas-section-title');
+        var secTitle = titleEl ? titleEl.textContent : sec.id;
+        var highlighted = txt.replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi'), '<mark style="background:#fff3cd;border-radius:2px;">$1</mark>');
+        hits.push('<div style="padding:10px 0;border-bottom:1px solid #f0f3f5;"><div style="font-size:11px;color:#003768;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">' + secTitle + '</div><div style="font-size:13px;color:#2c3e50;line-height:1.5;">' + highlighted + '</div></div>');
+      }
+    });
+  });
+  // Hide all sections, show results
+  sections.forEach(function(s) { s.style.display = 'none'; });
+  document.querySelectorAll('#mas-nav a').forEach(function(a) { a.classList.remove('active'); });
+  resultsEl.style.display = 'block';
+  if (hits.length > 0) {
+    resultsEl.innerHTML = hits.join('');
+    countEl.textContent = hits.length + ' result' + (hits.length !== 1 ? 's' : '') + ' for "' + q + '"';
+  } else {
+    resultsEl.innerHTML = '<div style="padding:40px;text-align:center;color:#9baabb;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p style="margin-top:12px;">No results for "' + q + '"</p></div>';
+    countEl.textContent = 'No results for "' + q + '"';
+  }
+  banner.style.display = 'block';
+}
+function masClearSearch() {
+  var banner = document.getElementById('mas-search-banner');
+  var resultsEl = document.getElementById('mas-search-results');
+  var srch = document.getElementById('mas-search');
+  if (banner) banner.style.display = 'none';
+  if (resultsEl) resultsEl.style.display = 'none';
+  if (srch) srch.value = '';
+  // restore first section
+  var sections = document.querySelectorAll('.mas-section');
+  sections.forEach(function(s, i) { s.style.display = i === 0 ? '' : 'none'; });
+  var firstNav = document.querySelector('#mas-nav a');
+  document.querySelectorAll('#mas-nav a').forEach(function(a) { a.classList.remove('active'); });
+  if (firstNav) firstNav.classList.add('active');
 }
 
 function showLvSection(id, el) {
