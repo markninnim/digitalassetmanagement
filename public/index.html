@@ -1791,6 +1791,18 @@ function closeCardModal() {
   document.getElementById('card-modal').style.display = 'none';
 }
 function openMcModal() {
+  if (_currentUser) {
+    var u = _currentUser;
+    var sal = document.getElementById('mc-salutation');
+    if (u.salutation) { for (var i = 0; i < sal.options.length; i++) { if (sal.options[i].value === u.salutation) { sal.selectedIndex = i; break; } } }
+    document.getElementById('mc-firstname').value = u.firstName || '';
+    document.getElementById('mc-lastname').value  = u.lastName  || '';
+    document.getElementById('mc-title').value     = u.jobTitle  || '';
+    document.getElementById('mc-email').value     = u.email     || '';
+    document.getElementById('mc-phone').value     = u.mobile    || '';
+    document.getElementById('mc-landline').value  = u.landline  || '';
+    document.getElementById('mc-url').value       = u.website   || '';
+  }
   document.getElementById('mc-modal').style.display = 'flex';
 }
 function closeMcModal() {
@@ -2055,7 +2067,11 @@ function loadTemplatesDates() {
 
 // ── Broker Brand personaliser ─────────────────────────────────
 function openBrokerBrandModal() {
-  document.getElementById('broker-name-input').value = '';
+  var name = '';
+  if (_currentUser) {
+    name = [_currentUser.firstName, _currentUser.lastName].filter(Boolean).join(' ');
+  }
+  document.getElementById('broker-name-input').value = name;
   document.getElementById('broker-brand-modal').style.display = 'flex';
 }
 function closeBrokerBrandModal() {
