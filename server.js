@@ -428,7 +428,7 @@ app.get('/api/supervisor/team', requireAuth, async (req, res) => {
     } while (teamOffset);
     const members = allRecords
       .filter(r => {
-        if (viewAll) return !r.fields[F_IS_SUPERVISOR] && !r.fields[F_ADMIN]; // advisers only
+        if (viewAll) return !r.fields[F_ADMIN]; // everyone except admins
         return (r.fields[F_SUPERVISOR_EMAIL] || '').toLowerCase() === supervisorEmail.toLowerCase();
       })
       .map(r => {

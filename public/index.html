@@ -913,6 +913,14 @@ html { height: 100%; }
         </div>
         <div id="sv-ontrack-list" style="display:grid;gap:12px;"></div>
       </div>
+      <!-- Supervisors section -->
+      <div id="sv-supervisors-wrap" style="display:none;margin-top:28px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#6b7c8f;flex-shrink:0;"></div>
+          <div style="font-size:13px;font-weight:800;color:#4a5a6a;text-transform:uppercase;letter-spacing:.5px;">Supervisors</div>
+        </div>
+        <div id="sv-supervisors-list" style="display:grid;gap:12px;"></div>
+      </div>
       <div id="sv-loading" style="text-align:center;padding:60px 0;color:#6b7c8f;font-size:13px;">Loading team…</div>
     </div>
   </div>
@@ -2764,6 +2772,7 @@ function loadSupervisorZone() {
   document.getElementById('sv-stats').innerHTML = '';
   document.getElementById('sv-behind-wrap').style.display = 'none';
   document.getElementById('sv-ontrack-wrap').style.display = 'none';
+  document.getElementById('sv-supervisors-wrap').style.display = 'none';
 
   // Populate View As selector on first load
   var sel = document.getElementById('sv-viewas-select');
@@ -2825,10 +2834,25 @@ function renderSvDashboard(data) {
   }
 
   // Classify members
-  var behind = [], onTrack = [];
+  var behind = [], onTrack = [], supervisorCards = [];
   members.forEach(function(m) {
     var cpd = cpdByMember[m.email] || {};
-    var noFlags = !m.sellsMortgages && !m.sellsProtection;
+    var isAuthorised = m.sellsMortgages || m.sellsProtection;
+    if (m.isSupervisor) {
+      // Supervisors get their own section; bars only if authorised
+      var visible = isAuthorised ? typeConf.filter(function(t) {
+        return (t.key === 'Mortgage' && m.sellsMortgages) ||
+               (t.key === 'Protection' && m.sellsProtection);
+      }) : [];
+      var worstPct = 100;
+      visible.forEach(function(t) {
+        var pct = targets[t.key] > 0 ? Math.round(((cpd[t.key]||0) / targets[t.key]) * 100) : 0;
+        if (pct < worstPct) worstPct = pct;
+      });
+      supervisorCards.push({ m: m, cpd: cpd, visible: visible, worstPct: worstPct });
+      return;
+    }
+    var noFlags = !isAuthorised;
     var visible = typeConf.filter(function(t) {
       return (t.key === 'Mortgage' && (m.sellsMortgages || noFlags)) ||
              (t.key === 'Protection' && (m.sellsProtection || noFlags));
@@ -2934,11 +2958,13 @@ function renderSvDashboard(data) {
     // Drill-down entries panel
     var drillId = 'sv-drill-' + m.email.replace(/[^a-z0-9]/gi, '_');
 
-    return '<div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.07);overflow:hidden;">' +
+    var cardBg = m.isSupervisor ? '#f0f2f5' : '#fff';
+    var supLabel = m.isSupervisor ? '<span style="background:#6b7c8f;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px;">Supervisor</span>' : '';
+    return '<div style="background:' + cardBg + ';border-radius:10px;box-shadow:0 1px 6px rgba(0,0,0,.07);overflow:hidden;">' +
       '<div style="padding:16px 20px;">' +
-        '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">' +
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:' + (barsHtml ? '12px' : '0') + ';">' +
           '<div>' +
-            '<div style="font-size:14px;font-weight:700;color:#1a2a3a;">' + escHtml(name) + '</div>' +
+            '<div style="font-size:14px;font-weight:700;color:#1a2a3a;">' + escHtml(name) + supLabel + '</div>' +
             '<div style="font-size:12px;color:#6b7c8f;margin-top:2px;">' + escHtml(m.jobTitle || m.email) + '</div>' +
           '</div>' +
           '<div style="display:flex;gap:6px;align-items:center;">' +
@@ -2987,7 +3013,7 @@ function renderSvDashboard(data) {
   var renderer = isCard ? buildCard : buildListRow;
 
   // Set grid layout
-  ['sv-behind-list','sv-ontrack-list'].forEach(function(id) {
+  ['sv-behind-list','sv-ontrack-list','sv-supervisors-list'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.style.gridTemplateColumns = isCard ? 'repeat(3,1fr)' : '1fr';
   });
@@ -3001,6 +3027,11 @@ function renderSvDashboard(data) {
   if (onTrack.length) {
     document.getElementById('sv-ontrack-wrap').style.display = 'block';
     document.getElementById('sv-ontrack-list').innerHTML = onTrack.map(renderer).join('');
+  }
+  // Populate Supervisors
+  if (supervisorCards.length) {
+    document.getElementById('sv-supervisors-wrap').style.display = 'block';
+    document.getElementById('sv-supervisors-list').innerHTML = supervisorCards.map(renderer).join('');
   }
 }
 
