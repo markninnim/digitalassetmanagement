@@ -5020,7 +5020,7 @@ function loadSupervisorZone() {
         if (sbWrap && supervisors.length > 0) {
           var sbHtml = '<div style="margin:16px 0 4px;padding:0 18px;"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#fcb034;">SUPERVISORS</span></div>';
           supervisors.forEach(function(s) {
-            sbHtml += '<a href="#" onclick="return svSidebarSelect(' + JSON.stringify(s.email) + ',this)" style="padding-left:24px;">' + escHtml(s.name) + '</a>';
+            sbHtml += '<a href="#" onclick="return svSidebarSelect(\'' + s.email + '\',this)" style="padding-left:24px;">' + escHtml(s.name) + '</a>';
           });
           sbWrap.innerHTML = sbHtml;
           sbWrap.style.display = 'block';
