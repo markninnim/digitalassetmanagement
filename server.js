@@ -98,6 +98,25 @@ app.use('/static', express.static(path.join(__dirname, 'public/static')));
 // ── Newsletters (auth-gated PDF + cover serving) ────────────
 app.use('/newsletters', requireAuth, express.static(path.join(__dirname, 'public/newsletters')));
 
+// ── Newsletter upload (supervisor/admin only) ─────────────────
+app.post('/api/newsletters/upload', requireAuth, async (req, res) => {
+  const user = req.session.user;
+  if (!user.isSupervisor && !user.isAdmin) return res.status(403).json({ error: 'Forbidden' });
+  const { month, year, data } = req.body; // data = base64 PDF string
+  if (!month || !year || !data) return res.status(400).json({ error: 'Missing fields' });
+  const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const mon = MONTHS[parseInt(month) - 1];
+  if (!mon) return res.status(400).json({ error: 'Invalid month' });
+  const filename = mon + '-' + year + '.pdf';
+  const dest = path.join(__dirname, 'public/newsletters', filename);
+  try {
+    const buf = Buffer.from(data, 'base64');
+    if (buf.length > 20_000_000) return res.status(400).json({ error: 'File too large (max 20MB)' });
+    require('fs').writeFileSync(dest, buf);
+    res.json({ ok: true, filename });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── Newsletter list API ───────────────────────────────────────
 app.get('/api/newsletters', requireAuth, (req, res) => {
   const dir = path.join(__dirname, 'public/newsletters');

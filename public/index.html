@@ -901,8 +901,45 @@ html { height: 100%; }
     <!-- Monthly Newsletters -->
     <div id="monthly-newsletters" style="display:none;">
       <div style="padding:32px 32px 0;">
-        <h2 style="color:#003768;font-size:20px;margin:0 0 6px;">Monthly Newsletters</h2>
-        <p style="color:#6b7c8f;font-size:13.5px;margin:0 0 20px;line-height:1.6;">Read the latest CPD Round-up newsletters. Opening a newsletter logs <strong>20 minutes CPD</strong> — 10 minutes Mortgage and 10 minutes Protection.</p>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:0;">
+          <div>
+            <h2 style="color:#003768;font-size:20px;margin:0 0 6px;">Monthly Newsletters</h2>
+            <p style="color:#6b7c8f;font-size:13.5px;margin:0 0 20px;line-height:1.6;">Read the latest CPD Round-up newsletters. Opening a newsletter logs <strong>20 minutes CPD</strong> — 10 minutes Mortgage and 10 minutes Protection.</p>
+          </div>
+          <!-- Upload button: supervisors/admins only -->
+          <div id="nl-upload-wrap" style="display:none;flex-shrink:0;">
+            <button onclick="nlToggleUpload()" style="display:flex;align-items:center;gap:7px;background:#003768;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload Newsletter
+            </button>
+            <!-- Upload panel -->
+            <div id="nl-upload-panel" style="display:none;position:absolute;right:32px;top:auto;background:#fff;border:1.5px solid #e8ecf0;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.12);padding:20px;width:300px;z-index:100;margin-top:8px;">
+              <h3 style="color:#003768;font-size:14px;font-weight:700;margin:0 0 14px;">Upload Newsletter</h3>
+              <div style="margin-bottom:10px;">
+                <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">MONTH</label>
+                <select id="nl-up-month" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;">
+                  <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                  <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                  <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+                  <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                </select>
+              </div>
+              <div style="margin-bottom:10px;">
+                <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">YEAR</label>
+                <input id="nl-up-year" type="number" value="2026" min="2020" max="2099" style="width:100%;padding:8px 10px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+              </div>
+              <div style="margin-bottom:14px;">
+                <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">PDF FILE</label>
+                <input id="nl-up-file" type="file" accept=".pdf" style="width:100%;font-size:12px;font-family:inherit;">
+              </div>
+              <div id="nl-up-status" style="font-size:12px;color:#6b7c8f;margin-bottom:10px;min-height:16px;"></div>
+              <div style="display:flex;gap:8px;">
+                <button onclick="nlUpload()" style="flex:1;background:#003768;color:#fff;border:none;padding:9px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Upload</button>
+                <button onclick="nlToggleUpload()" style="background:#f5f7fa;color:#6b7c8f;border:1.5px solid #e8ecf0;padding:9px 14px;border-radius:7px;font-size:13px;cursor:pointer;font-family:inherit;">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div style="padding:0 32px 8px;">
         <div id="nl-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px;"></div>
@@ -4408,6 +4445,43 @@ function renderNlCards(containerId, items) {
   }).join('');
 }
 
+function nlToggleUpload() {
+  var panel = document.getElementById('nl-upload-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('nl-up-status').textContent = '';
+}
+
+function nlUpload() {
+  var month  = document.getElementById('nl-up-month').value;
+  var year   = document.getElementById('nl-up-year').value;
+  var file   = document.getElementById('nl-up-file').files[0];
+  var status = document.getElementById('nl-up-status');
+  if (!file) { status.textContent = 'Please select a PDF file.'; status.style.color = '#c00'; return; }
+  if (!file.name.toLowerCase().endsWith('.pdf')) { status.textContent = 'File must be a PDF.'; status.style.color = '#c00'; return; }
+  status.textContent = 'Uploading…'; status.style.color = '#6b7c8f';
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var base64 = e.target.result.split(',')[1];
+    fetch('/api/newsletters/upload', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ month: month, year: year, data: base64 })
+    }).then(function(r){ return r.json(); }).then(function(d) {
+      if (d.ok) {
+        status.textContent = '✓ Uploaded: ' + d.filename; status.style.color = '#22c55e';
+        _nlLoaded = false; // force refresh
+        setTimeout(function() {
+          nlToggleUpload();
+          loadNewsletters();
+        }, 1200);
+      } else {
+        status.textContent = d.error || 'Upload failed.'; status.style.color = '#c00';
+      }
+    }).catch(function() { status.textContent = 'Upload failed.'; status.style.color = '#c00'; });
+  };
+  reader.readAsDataURL(file);
+}
+
 function toggleNlArchive() {
   var grid    = document.getElementById('nl-archive-grid');
   var chevron = document.getElementById('nl-archive-chevron');
@@ -4718,6 +4792,8 @@ var _currentUser = null;
       if (sbtn) sbtn.style.display = '';
       var pbtn = document.getElementById('tab-btn-performance-zone');
       if (pbtn) pbtn.style.display = '';
+      var nlup = document.getElementById('nl-upload-wrap');
+      if (nlup) nlup.style.display = 'block';
     }
     updateNavUser(user);
     initShareButtons();
