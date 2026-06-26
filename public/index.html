@@ -6330,10 +6330,10 @@ function pzInit() {
   if (!list || list.children.length > 0) return;
   Object.keys(PZ_DATA).sort().forEach(function(name) {
     var a = document.createElement('a');
-    a.href = '#';
+    a.href = 'javascript:void(0)';
     a.textContent = name;
     a.setAttribute('data-broker', name);
-    a.onclick = function(){ pzShowBroker(name, this); return false; };
+    a.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); pzShowBroker(name, this); });
     list.appendChild(a);
   });
 }
@@ -6349,44 +6349,31 @@ function pzShowBroker(name, el) {
   if (el) el.classList.add('active');
   var d = PZ_DATA[name];
   var main = document.getElementById('pz-main');
-  if (!main) return;
-
-  if (!d) {
-    main.innerHTML = '<div style="padding:80px 0;text-align:center;color:#6b7c8f;">No data found for ' + name + '</div>';
-    return;
-  }
+  if (!main || !d) return;
 
   var maxMo = Math.max.apply(null, d.mo.filter(function(v){return v>0;})) || 1;
-
   var bars = PZ_MONTHS.map(function(m, i) {
-    var v = d.mo[i];
-    if (!v) return '';
-    var h = Math.round((v / maxMo) * 60);
+    var v = d.mo[i]; if (!v) return '';
+    var h = Math.round((v/maxMo)*60);
     return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;">' +
       '<span style="font-size:11px;font-weight:700;color:#003768;">' + v + '</span>' +
       '<div style="width:100%;max-width:32px;height:' + h + 'px;background:#003768;border-radius:3px 3px 0 0;"></div>' +
       '<span style="font-size:10px;color:#6b7c8f;">' + m + '</span></div>';
   }).join('');
 
-  var content = '<div style="margin-bottom:28px;">' +
-      '<h2 style="color:#003768;font-size:22px;font-weight:800;margin:0 0 4px;">' + name + '</h2>' +
-      '<p style="color:#6b7c8f;font-size:13px;margin:0;">2026 YTD · Data from MI Report</p>' +
-    '</div>' +
+  var html = '<div style="margin-bottom:28px;">' +
+    '<h2 style="color:#003768;font-size:22px;font-weight:800;margin:0 0 4px;">' + escHtml(name) + '</h2>' +
+    '<p style="color:#6b7c8f;font-size:13px;margin:0;">2026 YTD &middot; Data from MI Report</p></div>' +
     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;">' +
-      pzCard('Mortgage Subs', d.ms, '#003768') +
-      pzCard('Protection Subs', d.ps, '#fcb034') +
-      pzCard('GI Subs', d.gs, '#2e99d5') +
-      pzCard('Mortgage Volume', '£' + pzFmt(d.mv), '#003768') +
-      pzCard('Net Proc Fee', '£' + pzFmt(d.mp), '#16a34a') +
-      pzCard('Prot. Completions', d.pc, '#fcb034') +
-    '</div>' +
-    (d.ms > 0 ?
+      pzCard('Mortgage Subs', d.ms, '#003768') + pzCard('Protection Subs', d.ps, '#fcb034') +
+      pzCard('GI Subs', d.gs, '#2e99d5') + pzCard('Mortgage Volume', '&pound;' + pzFmt(d.mv), '#003768') +
+      pzCard('Net Proc Fee', '&pound;' + pzFmt(d.mp), '#16a34a') + pzCard('Prot. Completions', d.pc, '#fcb034') +
+    '</div>' + (d.ms > 0 ?
     '<div style="background:#fff;border:1.5px solid #e8ecf0;border-radius:10px;padding:20px 24px;">' +
       '<div style="font-size:12px;font-weight:700;color:#003768;margin-bottom:16px;text-transform:uppercase;letter-spacing:.06em;">Mortgage Submissions by Month</div>' +
-      '<div style="display:flex;align-items:flex-end;gap:6px;height:84px;">' + bars + '</div>' +
-    '</div>' : '');
+      '<div style="display:flex;align-items:flex-end;gap:6px;height:84px;">' + bars + '</div></div>' : '');
 
-  main.innerHTML = content;
+  main.innerHTML = html;
   slideIn(main);
 }
 
