@@ -4621,9 +4621,9 @@ function loadSurveying() {
     // Monthly competition tickets
     var myTickets    = mtdLeads.length + (mtdSales.length * 2);
     var totalTickets = leads.length + (paidDirect.length * 2);
-    document.getElementById('sv-comp-tickets').textContent     = myTickets;
-    document.getElementById('sv-comp-tickets-big').textContent = myTickets;
-    document.getElementById('sv-comp-total').textContent       = totalTickets;
+    var _t1 = document.getElementById('sv-comp-tickets');     if (_t1) _t1.textContent = myTickets;
+    var _t2 = document.getElementById('sv-comp-tickets-big'); if (_t2) _t2.textContent = myTickets;
+    var _t3 = document.getElementById('sv-comp-total');       if (_t3) _t3.textContent = totalTickets;
 
     // Render sales
     var sTbody = document.getElementById('sv-sales-body');
