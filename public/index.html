@@ -4781,16 +4781,23 @@ function msStopAndLog() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ minutes: mins, date: today, category: 'Financial News', source: 'Learning Zone', activity: _msSourceName + ' reading (' + mins + ' min)' })
-  }).then(function() {
+  }).then(function(r) {
+    return r.json().then(function(data) {
+      document.getElementById('ms-state-reading').style.display = 'none';
+      document.getElementById('ms-state-done').style.display    = '';
+      if (r.ok) {
+        document.getElementById('ms-done-summary').textContent =
+          mins + ' minute' + (mins === 1 ? '' : 's') + ' logged as CPD';
+      } else {
+        document.getElementById('ms-done-summary').textContent =
+          'Log failed: ' + (data.error || r.status);
+      }
+    });
+  }).catch(function(err) {
     document.getElementById('ms-state-reading').style.display = 'none';
     document.getElementById('ms-state-done').style.display    = '';
     document.getElementById('ms-done-summary').textContent    =
-      mins + ' minute' + (mins === 1 ? '' : 's') + ' logged as CPD';
-  }).catch(function() {
-    document.getElementById('ms-state-reading').style.display = 'none';
-    document.getElementById('ms-state-done').style.display    = '';
-    document.getElementById('ms-done-summary').textContent    =
-      mins + ' min read — CPD log failed, please add manually.';
+      'Log failed: ' + (err.message || 'network error');
   });
 }
 
@@ -4812,7 +4819,7 @@ function msReset() {
 function loadNewsletters() {
   if (_nlLoaded) return;
   _nlLoaded = true;
-  fetch('/api/newsletters').then(function(r){ return r.json(); }).then(function(items) {
+  fetch('/api/newsletters').then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); }).then(function(items) {
     if (!items.length) {
       document.getElementById('nl-grid').innerHTML = '<div style="grid-column:1/-1;color:#6b7c8f;font-size:13px;padding:40px 0;text-align:center;">No newsletters available yet.</div>';
       return;
@@ -4826,7 +4833,7 @@ function loadNewsletters() {
       document.getElementById('nl-archive-wrap').style.display = 'block';
     }
   }).catch(function() {
-    document.getElementById('nl-grid').innerHTML = '<div style="grid-column:1/-1;color:#c00;font-size:13px;padding:40px 0;text-align:center;">Could not load newsletters.</div>';
+    document.getElementById('nl-grid').innerHTML = '<div style="grid-column:1/-1;color:#c00;font-size:13px;padding:40px 0;text-align:center;">Could not load newsletters: ' + (e && e.message ? e.message : 'unknown error') + '</div>';
   });
 }
 
