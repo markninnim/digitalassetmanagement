@@ -4542,6 +4542,9 @@ function loadSurveying() {
 
     document.getElementById('sv-stat-sales-val').textContent = paidDirect.length;
     document.getElementById('sv-stat-earned-val').textContent = '£' + totalFee.toLocaleString();
+    // Update nav tab button
+    var svBtn = document.getElementById('tab-btn-surveying');
+    if (svBtn && totalFee > 0) svBtn.textContent = 'Surveying £' + totalFee.toLocaleString();
 
     var tbody = document.getElementById('sv-sales-body');
     if (!paidDirect.length) {

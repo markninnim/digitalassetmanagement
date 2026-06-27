@@ -136,7 +136,7 @@ app.get('/api/surveying/leads', requireAuth, async (req, res) => {
   try {
     const user = req.session.user;
     const name = [user.firstName, user.lastName].filter(Boolean).join(' ');
-    const formula = encodeURIComponent(`FIND("${name}", ARRAYJOIN({Seller}, ","))`);
+    const formula = encodeURIComponent(`FIND("${user.firstName}", ARRAYJOIN({Seller}, ","))`);
     const fieldQs = ['Customer Name','Postcode','Date','Seller','Time to call','Status','Quotation']
       .map(f => `fields[]=${encodeURIComponent(f)}`).join('&');
     const allRecords = [];
