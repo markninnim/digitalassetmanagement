@@ -215,6 +215,8 @@ html { height: 100%; }
     <a href="https://acresurveying.co.uk" target="_blank" rel="noopener">Visit Website</a>
     <a href="https://uk.trustpilot.com/review/fpsurveying.co.uk" target="_blank" rel="noopener">Trustpilot</a>
     <a href="https://www.facebook.com/fpsurveying" target="_blank" rel="noopener">Facebook</a>
+    <a href="https://www.instagram.com/fpsurveying/" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.linkedin.com/company/fp-surveying" target="_blank" rel="noopener">LinkedIn</a>
   </div>
   <!-- Selling Zone sidebar -->
   <div id="sidebar-selling-zone" style="display:none">
@@ -1066,20 +1068,42 @@ html { height: 100%; }
         <div class="sv-stat-card"><div class="sv-stat-val" id="sv-ytd-val">—</div><div class="sv-stat-lbl">Value per Click</div></div>
       </div>
 
-      <!-- Monthly Competition -->
-      <div style="background:linear-gradient(135deg,#003768 0%,#005fa3 100%);border-radius:12px;padding:24px 28px;margin-bottom:24px;color:#fff;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:260px;">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:6px;">Monthly Competition</div>
-            <div style="font-size:22px;font-weight:700;margin-bottom:8px;">You have <span id="sv-comp-tickets" style="color:#F5A623;">—</span> tickets in this month's draw</div>
-            <p style="font-size:13px;line-height:1.7;opacity:.9;margin:0 0 8px;">So far <strong id="sv-comp-total">—</strong> tickets have been put in the hat across all referrals. Keep referring whenever you can to boost your chances of winning — every referral earns you a ticket.</p>
-            <p style="font-size:12px;opacity:.75;margin:0;font-style:italic;">Bonus this month: every completed sale counts as <strong style="color:#F5A623;">2 tickets</strong>.</p>
-          </div>
-          <div style="text-align:center;flex-shrink:0;">
-            <div style="font-size:48px;font-weight:800;color:#F5A623;line-height:1;" id="sv-comp-tickets-big">—</div>
-            <div style="font-size:12px;opacity:.7;margin-top:4px;">your tickets</div>
+      <!-- Monthly Competition — two cards side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+
+        <!-- Card 1: Referral draw -->
+        <div style="background:linear-gradient(135deg,#003768 0%,#005fa3 100%);border-radius:12px;padding:22px 24px;color:#fff;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:6px;">Monthly Competition</div>
+          <div style="font-size:19px;font-weight:700;margin-bottom:8px;">You have <span id="sv-comp-tickets" style="color:#F5A623;">—</span> referral tickets</div>
+          <p style="font-size:12px;line-height:1.7;opacity:.9;margin:0 0 8px;">So far <strong id="sv-comp-total">—</strong> tickets have been put in the hat. Keep referring to boost your chances — every referral earns a ticket.</p>
+          <p style="font-size:11px;opacity:.75;margin:0;font-style:italic;">Bonus: every completed sale counts as <strong style="color:#F5A623;">2 tickets</strong>.</p>
+          <div style="margin-top:16px;text-align:center;">
+            <div style="font-size:44px;font-weight:800;color:#F5A623;line-height:1;" id="sv-comp-tickets-big">—</div>
+            <div style="font-size:11px;opacity:.7;margin-top:4px;">your tickets this month</div>
           </div>
         </div>
+
+        <!-- Card 2: Social media draw -->
+        <div style="background:linear-gradient(135deg,#00695c 0%,#00897b 100%);border-radius:12px;padding:22px 24px;color:#fff;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:6px;">Monthly Competition</div>
+          <div style="font-size:19px;font-weight:700;margin-bottom:8px;">Earn <span style="color:#F5A623;">5 tickets</span> per platform you follow</div>
+          <p style="font-size:12px;line-height:1.7;opacity:.9;margin:0 0 12px;">Follow our social media pages to earn bonus tickets for this month's draw. Following us also helps us stay in touch with you with the latest news and updates.</p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <a href="https://www.instagram.com/fpsurveying/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.15);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" stroke-width="2"/><path fill="none" stroke="currentColor" stroke-width="2" d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Instagram — 5 tickets
+            </a>
+            <a href="https://www.facebook.com/fpsurveying" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.15);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              Facebook — 5 tickets
+            </a>
+            <a href="https://www.linkedin.com/company/fp-surveying" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.15);color:#fff;text-decoration:none;padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              LinkedIn — 5 tickets
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
 
