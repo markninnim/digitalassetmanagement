@@ -5022,6 +5022,8 @@ var _currentUser = null;
     }
     updateNavUser(user);
     initShareButtons();
+    // Pre-load surveying so the tab button shows fees on arrival
+    loadSurveying();
   }).catch(function(){});
 })();
 
