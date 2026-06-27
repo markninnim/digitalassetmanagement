@@ -307,6 +307,21 @@ html { height: 100%; }
 
       <div class="card"><div class="thumb"><img src="/download/templates/fpg-pptx-thumb.png" style="max-height:80px;max-width:100%;object-fit:contain;border-radius:4px;"></div><h3>PowerPoint Template</h3><p>Master deck with all slide layouts.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="fpg-presentation-template.pptx" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download/templates/fpg-presentation-template.pptx" class="btn">Download</a><a href="/download/templates/fpg-presentation-template.pptx" class="btn-view" onclick="openPreview(event,this)">View</a></div>
       <div class="card"><div class="thumb"><img src="/download-asset/templates/FPG-Background-2026.jpg" style="max-height:104px;max-width:100%;object-fit:contain;border-radius:4px;"></div><h3>Background Graphic 2026</h3><p>Branded background for use in PowerPoint, Word, and other documents.</p><br><span class="badge ready">Approved</span> <span class="file-date" data-file="FPG-Background-2026.jpg" style="font-size:11px;color:#6b7c8f;"></span><br><a href="/download-asset/templates/FPG-Background-2026.jpg" class="btn">Download</a><a href="/view-asset/templates/FPG-Background-2026.jpg" class="btn-view" onclick="openPreview(event,this)">View</a></div>
+
+      <!-- DIP Certificate card -->
+      <div class="card">
+        <div class="thumb" style="display:flex;align-items:center;justify-content:center;height:80px;background:linear-gradient(135deg,#003768 0%,#004a8a 100%);border-radius:6px;position:relative;overflow:hidden;">
+          <div style="position:absolute;bottom:0;right:0;width:50px;height:50px;background:#fcb034;clip-path:polygon(100% 0,100% 100%,0 100%);"></div>
+          <div style="text-align:center;color:#fff;z-index:1;">
+            <div style="font-size:18px;font-weight:900;letter-spacing:-0.5px;">DIP</div>
+            <div style="font-size:9px;letter-spacing:1px;opacity:0.8;margin-top:2px;">CERTIFICATE</div>
+          </div>
+        </div>
+        <h3>Decision in Principle</h3>
+        <p>Generate a branded FPG DIP certificate. Enter applicant names and loan amount — date is auto-filled.</p><br>
+        <span class="badge ready">Approved</span><br>
+        <button onclick="openDipModal()" style="display:block;width:100%;margin-top:8px;background:#003768;color:#fff;padding:7px 14px;border-radius:6px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;box-sizing:border-box;">Generate Certificate</button>
+      </div>
     </div>
 
     <h3 style="color:#003768;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin:28px 0 12px;padding-bottom:6px;border-bottom:2px solid #fcb034;">Zoom Backgrounds</h3>
@@ -3326,6 +3341,37 @@ html { height: 100%; }
   </div>
 </div>
 
+<!-- ── DIP Certificate Modal ───────────────────────────────── -->
+<div id="dip-modal" onclick="if(event.target===this)closeDipModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;width:440px;max-width:95vw;box-shadow:0 16px 48px rgba(0,0,0,.22);overflow:hidden;">
+    <div style="background:#003768;padding:18px 22px 14px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#fff;">Decision in Principle</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px;">Generate FPG branded certificate</div>
+      </div>
+      <button onclick="closeDipModal()" style="background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;line-height:1;padding:0 0 0 12px;">&times;</button>
+    </div>
+    <div style="padding:22px 22px 20px;">
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:700;color:#1a2a3a;margin-bottom:6px;">Maximum Loan Amount</label>
+        <input id="dip-amount" type="text" placeholder="e.g. 350000 or £350,000" style="width:100%;padding:10px 12px;border:1.5px solid #dde3ea;border-radius:7px;font-size:14px;font-family:inherit;color:#1a2a3a;outline:none;box-sizing:border-box;" oninput="clearDipError()">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:700;color:#1a2a3a;margin-bottom:6px;">Applicant Name(s)</label>
+        <textarea id="dip-names" rows="3" placeholder="e.g. Mr John Smith&#10;Mrs Jane Smith" style="width:100%;padding:10px 12px;border:1.5px solid #dde3ea;border-radius:7px;font-size:14px;font-family:inherit;color:#1a2a3a;outline:none;resize:vertical;box-sizing:border-box;" oninput="clearDipError()"></textarea>
+      </div>
+      <div style="background:#f0f4f8;border-radius:6px;padding:10px 12px;margin-bottom:18px;font-size:12px;color:#4a5a6a;line-height:1.5;">
+        <strong style="color:#003768;">Auto-filled:</strong> Decision date (today) and valid-until date (90 days) will be added automatically. Your business card details will appear at the bottom.
+      </div>
+      <div id="dip-error" style="display:none;background:#fff0f0;border:1px solid #ffcccc;color:#c00;border-radius:6px;padding:8px 12px;font-size:12px;margin-bottom:14px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeDipModal()" style="flex:1;padding:10px;background:#f0f4f8;color:#4a5a6a;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+        <button id="dip-btn" onclick="generateDip()" style="flex:2;padding:10px;background:#003768;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Generate &amp; Download PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="preview-modal" onclick="if(event.target===this)closePreview()">
   <div id="preview-box">
     <div id="preview-header">
@@ -4079,6 +4125,62 @@ function loadTemplatesDates() {
 }
 
 // ── Broker Brand personaliser ─────────────────────────────────
+// ── DIP Certificate ───────────────────────────────────────────
+function openDipModal() {
+  document.getElementById('dip-amount').value = '';
+  document.getElementById('dip-names').value = '';
+  document.getElementById('dip-error').style.display = 'none';
+  document.getElementById('dip-btn').disabled = false;
+  document.getElementById('dip-btn').textContent = 'Generate & Download PDF';
+  document.getElementById('dip-modal').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('dip-amount').focus(); }, 100);
+}
+function closeDipModal() {
+  document.getElementById('dip-modal').style.display = 'none';
+}
+function clearDipError() {
+  document.getElementById('dip-error').style.display = 'none';
+}
+function generateDip() {
+  var amount = document.getElementById('dip-amount').value.trim();
+  var names  = document.getElementById('dip-names').value.trim();
+  var errEl  = document.getElementById('dip-error');
+  if (!amount) {
+    errEl.textContent = 'Please enter a loan amount.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!names) {
+    errEl.textContent = 'Please enter at least one applicant name.';
+    errEl.style.display = 'block';
+    return;
+  }
+  var btn = document.getElementById('dip-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+  errEl.style.display = 'none';
+  var url = '/api/dip-certificate?amount=' + encodeURIComponent(amount) + '&names=' + encodeURIComponent(names);
+  fetch(url)
+    .then(function(r) {
+      if (!r.ok) return r.json().then(function(d){ throw new Error(d.error || r.status); });
+      return r.blob();
+    })
+    .then(function(blob) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'FPG-DIP-Certificate.pdf';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      closeDipModal();
+    })
+    .catch(function(err) {
+      errEl.textContent = 'Error: ' + (err.message || 'Could not generate PDF');
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Generate & Download PDF';
+    });
+}
+
 function openBrokerBrandModal() {
   var name = '';
   if (_currentUser) {

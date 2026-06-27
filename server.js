@@ -1761,6 +1761,254 @@ app.post('/api/share/standards', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/dip-certificate — generate FPG branded DIP certificate PDF
+app.get('/api/dip-certificate', requireAuth, async (req, res) => {
+  try {
+    const { amount, names } = req.query;
+    if (!amount || !names) return res.status(400).json({ error: 'amount and names are required' });
+
+    const user = req.session.user;
+    const brokerName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email;
+
+    // Load assets
+    const fontBoldBytes = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-ExtraBold.ttf'));
+    const fontMedBytes  = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-Medium.ttf'));
+    const logoBytes     = fs.readFileSync(path.join(__dirname, 'public/assets/logos/web/FPG-Logo-Transparent.png'));
+
+    const pdfDoc = await PDFDocument.create();
+    pdfDoc.registerFontkit(fontkit);
+    const fontBold = await pdfDoc.embedFont(fontBoldBytes);
+    const fontMed  = await pdfDoc.embedFont(fontMedBytes);
+    const logoImg  = await pdfDoc.embedPng(logoBytes);
+
+    const W = 595.28, H = 841.89; // A4
+    const page = pdfDoc.addPage([W, H]);
+
+    const navy      = rgb(0/255,   55/255,  104/255);
+    const gold      = rgb(252/255, 176/255,  52/255);
+    const borderBlue = rgb(46/255, 153/255, 213/255);
+    const greyCol   = rgb(107/255, 124/255, 143/255);
+    const lightGrey = rgb(220/255, 228/255, 236/255);
+    const white     = rgb(1, 1, 1);
+    const dark      = rgb(26/255,  42/255,  58/255);
+
+    const ML = 50, MR = 50;
+    const CW = W - ML - MR; // 495.28
+
+    // Dates
+    const today = new Date();
+    const validUntil = new Date(today);
+    validUntil.setDate(validUntil.getDate() + 90);
+    const fmtDate = d => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    const todayStr   = fmtDate(today);
+    const validStr   = fmtDate(validUntil);
+
+    // Format loan amount
+    const amtClean = amount.toString().replace(/[^0-9.]/g, '');
+    const amtNum   = parseFloat(amtClean);
+    const amtFormatted = isNaN(amtNum) ? amount : '£' + amtNum.toLocaleString('en-GB', { minimumFractionDigits: 0 });
+
+    // ── Helpers ───────────────────────────────────────────────────
+    function wrapText(text, font, size, maxWidth) {
+      const words = text.split(' ');
+      const lines = [];
+      let current = '';
+      for (const word of words) {
+        const test = current ? current + ' ' + word : word;
+        if (font.widthOfTextAtSize(test, size) <= maxWidth) {
+          current = test;
+        } else {
+          if (current) lines.push(current);
+          current = word;
+        }
+      }
+      if (current) lines.push(current);
+      return lines;
+    }
+
+    // Draws wrapped text, returns y after last line
+    function drawWrapped(text, font, size, color, x, y, maxWidth, leading) {
+      const lines = wrapText(text, font, size, maxWidth);
+      for (const line of lines) {
+        page.drawText(line, { x, y, size, font, color });
+        y -= leading;
+      }
+      return y;
+    }
+
+    // ── White background ──────────────────────────────────────────
+    page.drawRectangle({ x: 0, y: 0, width: W, height: H, color: white });
+
+    // ── Logo (centred, large) ─────────────────────────────────────
+    const logoDims = logoImg.scale(0.22);
+    const logoX = (W - logoDims.width) / 2;
+    page.drawImage(logoImg, { x: logoX, y: H - 75, width: logoDims.width, height: logoDims.height });
+
+    // ── Gold rule ─────────────────────────────────────────────────
+    page.drawRectangle({ x: ML, y: H - 88, width: CW, height: 2.5, color: gold });
+
+    // ── Title ─────────────────────────────────────────────────────
+    const titleTxt = 'Decision in Principle';
+    const titleSz  = 21;
+    const titleW   = fontBold.widthOfTextAtSize(titleTxt, titleSz);
+    page.drawText(titleTxt, { x: (W - titleW) / 2, y: H - 114, size: titleSz, font: fontBold, color: navy });
+
+    // ── Navy rule under title ─────────────────────────────────────
+    page.drawRectangle({ x: ML, y: H - 120, width: CW, height: 0.75, color: lightGrey });
+
+    // ── Intro paragraph ───────────────────────────────────────────
+    let y = H - 140;
+    const intro = 'We are pleased to confirm that your application has been approved in principle. This is subject to:';
+    y = drawWrapped(intro, fontMed, 9.5, dark, ML, y, CW, 14) - 4;
+
+    // ── 4 subject-to bullets ──────────────────────────────────────
+    const subjectBullets = [
+      'A satisfactory valuation of the property to be mortgaged.',
+      'The information you have supplied to us being true and accurate.',
+      'Our Mortgage Conditions and the terms of any mortgage offer.',
+      'A full appraisal of the information contained in a completed application form including an assessment that you are able to repay the mortgage.',
+    ];
+    for (const b of subjectBullets) {
+      page.drawText('•', { x: ML + 6, y, size: 9.5, font: fontBold, color: navy });
+      y = drawWrapped(b, fontMed, 9.5, dark, ML + 18, y, CW - 18, 13) - 3;
+    }
+    y -= 12;
+
+    // ── Info box ───────────────────────────────────────────────────
+    const labelColW = CW * 0.58;
+    const valueColW = CW - labelColW;
+    const rowH = 34;
+    const infoRows = [
+      { label: 'This is based on a maximum loan amount of', value: amtFormatted,  bold: true,  valueSize: 13 },
+      { label: 'Decision date',                            value: todayStr,       bold: false, valueSize: 9.5 },
+      { label: 'Applicant name(s)',                        value: names,          bold: false, valueSize: 9.5 },
+      { label: 'This decision, which is not an offer of mortgage, is valid until', value: validStr, bold: false, valueSize: 9.5 },
+    ];
+
+    const boxH  = infoRows.length * rowH;
+    const boxTop = y;
+    const boxBot = boxTop - boxH;
+
+    // Box outline
+    page.drawRectangle({ x: ML, y: boxBot, width: CW, height: boxH, borderColor: borderBlue, borderWidth: 1.5, color: white });
+
+    // Vertical divider between label/value columns
+    page.drawLine({ start: { x: ML + labelColW, y: boxBot }, end: { x: ML + labelColW, y: boxTop }, thickness: 0.75, color: lightGrey });
+
+    // Rows
+    let rowTop = boxTop;
+    for (let i = 0; i < infoRows.length; i++) {
+      const r = infoRows[i];
+      const rowBot = rowTop - rowH;
+
+      // Horizontal divider (not before first row)
+      if (i > 0) {
+        page.drawLine({ start: { x: ML, y: rowTop }, end: { x: ML + CW, y: rowTop }, thickness: 0.5, color: lightGrey });
+      }
+
+      // Label — vertically centred in row
+      const lblLines = wrapText(r.label, fontMed, 8.5, labelColW - 14);
+      const lblBlockH = lblLines.length * 12;
+      let lblY = rowBot + (rowH + lblBlockH) / 2 - 11;
+      for (const line of lblLines) {
+        page.drawText(line, { x: ML + 8, y: lblY, size: 8.5, font: fontMed, color: dark });
+        lblY -= 12;
+      }
+
+      // Value — vertically centred
+      const vFont  = r.bold ? fontBold : fontMed;
+      const vColor = r.bold ? navy : dark;
+      const vSize  = r.valueSize;
+      const valLines = wrapText(r.value, vFont, vSize, valueColW - 14);
+      const valBlockH = valLines.length * (vSize + 2);
+      let valY = rowBot + (rowH + valBlockH) / 2 - vSize;
+      for (const line of valLines) {
+        page.drawText(line, { x: ML + labelColW + 8, y: valY, size: vSize, font: vFont, color: vColor });
+        valY -= (vSize + 2);
+      }
+
+      rowTop = rowBot;
+    }
+    y = boxBot - 16;
+
+    // ── Please note ────────────────────────────────────────────────
+    page.drawText('Please note:', { x: ML, y, size: 9.5, font: fontBold, color: navy });
+    y -= 15;
+
+    const pleaseNotes = [
+      'You should not enter into a binding legal commitment to buy a property until you have received, and are happy with, the full mortgage offer.',
+      'You must tell us if any of the information you have given us changes. You must also tell us if something happens, or is likely to happen which might affect our decision to make you a mortgage offer. Your mortgage advisor can provide you with further information.',
+      'We will set out full details of the terms on which we will make the loan in the mortgage offer.',
+      'This document does not contain all of the details you need to choose a mortgage. Please make sure you obtain a personalised illustration before you make a decision.',
+      'We will request references when applicable.',
+    ];
+    for (const note of pleaseNotes) {
+      page.drawText('•', { x: ML + 6, y, size: 9, font: fontBold, color: navy });
+      y = drawWrapped(note, fontMed, 9, dark, ML + 18, y, CW - 18, 13) - 4;
+    }
+
+    // ── Disclaimer (very bottom, full width) ──────────────────────
+    const disclaimer = 'Finance Planning Mortgage & Protection Solutions is a trading name of The Finance Planning Group Limited, which is authorised and regulated by the Financial Conduct Authority. The Finance Planning Group Limited, registered in England and Wales, 3894404. Registered office: Hurstwood Grange, Hurstwood Lane, Haywards Heath, West Sussex RH17 7QX';
+    const discLines = wrapText(disclaimer, fontMed, 6.5, CW);
+    let discY = 14 + (discLines.length - 1) * 8.5;
+    for (const line of discLines) {
+      page.drawText(line, { x: ML, y: discY, size: 6.5, font: fontMed, color: greyCol });
+      discY -= 8.5;
+    }
+
+    // ── Divider above disclaimer ──────────────────────────────────
+    const discBlockTop = 14 + discLines.length * 8.5;
+    page.drawRectangle({ x: ML, y: discBlockTop + 4, width: CW, height: 0.5, color: lightGrey });
+
+    // ── Broker business card (bottom left, above disclaimer) ──────
+    const cardW = 200, cardH = 88;
+    const cardX = ML;
+    const cardY = discBlockTop + 12;
+
+    page.drawRectangle({ x: cardX, y: cardY, width: cardW, height: cardH, color: navy });
+    // Gold top strip
+    page.drawRectangle({ x: cardX, y: cardY + cardH - 5, width: cardW, height: 5, color: gold });
+
+    // Broker name
+    const cardNameLines = wrapText(brokerName, fontBold, 9.5, cardW - 16);
+    let cardY2 = cardY + cardH - 20;
+    for (const l of cardNameLines) {
+      page.drawText(l, { x: cardX + 8, y: cardY2, size: 9.5, font: fontBold, color: white });
+      cardY2 -= 12;
+    }
+    // Job title (gold)
+    if (user.jobTitle) {
+      page.drawText(user.jobTitle, { x: cardX + 8, y: cardY2, size: 7.5, font: fontMed, color: gold });
+      cardY2 -= 12;
+    }
+    // Mobile
+    if (user.mobile) {
+      page.drawText('M: ' + user.mobile, { x: cardX + 8, y: cardY2, size: 7.5, font: fontMed, color: white });
+      cardY2 -= 11;
+    }
+    // Email
+    if (user.email) {
+      const emailLines = wrapText(user.email, fontMed, 7.5, cardW - 16);
+      for (const l of emailLines) {
+        page.drawText(l, { x: cardX + 8, y: cardY2, size: 7.5, font: fontMed, color: white });
+        cardY2 -= 10;
+      }
+    }
+    // FPG footer text
+    page.drawText('Finance Planning Group', { x: cardX + 8, y: cardY + 6, size: 6.5, font: fontMed, color: rgb(0.55, 0.70, 0.85) });
+
+    // Send PDF
+    const pdfBytes = await pdfDoc.save();
+    const safeNames = (names || 'Applicant').replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-').substring(0, 40);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="FPG-DIP-${safeNames}.pdf"`);
+    res.send(Buffer.from(pdfBytes));
+  } catch (err) {
+    console.error('DIP cert error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Start ─────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`FPG Digital Asset Management Tool running on port ${PORT}`);
