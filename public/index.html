@@ -4980,6 +4980,16 @@ var _currentUser = null;
 (function initUser() {
   fetch('/api/me').then(r => r.json()).then(function(user) {
     _currentUser = user;
+    if (user && user._impersonating) {
+      var banner = document.createElement('div');
+      banner.id = 'impersonate-banner';
+      banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#003768;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:16px;';
+      var name = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email;
+      banner.innerHTML = '👤 Viewing as <strong>' + name + '</strong> — this is not your account &nbsp;'
+        + '<button onclick="stopImpersonation()" style="background:#fff;color:#003768;border:none;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">↩ Back to my account</button>';
+      document.body.appendChild(banner);
+      document.body.style.paddingBottom = '48px';
+    }
     if (user && user.isAdmin) {
       var btn = document.getElementById('admin-btn');
       if (btn) btn.style.display = 'inline-flex';
@@ -5192,12 +5202,28 @@ function renderUserList(users) {
         '<div style="font-size:12px;color:#6b7c8f;margin-top:1px;">' + escHtml(u.email) + (u.jobTitle ? ' · ' + escHtml(u.jobTitle) : '') + supInfo + '</div>' +
       '</div>' +
       '<div style="display:flex;gap:8px;">' +
+        '<button onclick="impersonateUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#e8f4f8;color:#005f8a;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Login as</button>' +
         '<button onclick="openUserForm(\'' + u.id + '\')" style="background:#f5f7fa;color:#003768;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Edit</button>' +
         '<button onclick="deleteUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#fff0f0;color:#c00;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Delete</button>' +
       '</div>' +
     '</div>';
   }).join('');
   el.innerHTML = rows;
+}
+
+function impersonateUser(id, name) {
+  if (!confirm('Log in as ' + name + '?\n\nYou will see the platform exactly as they do. A banner will appear so you can switch back.')) return;
+  fetch('/api/admin/impersonate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id }) })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.ok) { window.location.reload(); }
+      else alert('Error: ' + (d.error || 'Unknown error'));
+    });
+}
+
+function stopImpersonation() {
+  fetch('/api/admin/impersonate/stop', { method:'POST' })
+    .then(function(){ window.location.reload(); });
 }
 
 function escHtml(s) {

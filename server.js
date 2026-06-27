@@ -245,7 +245,7 @@ app.get('/logout', (req, res) => {
 
 // ── Current user ─────────────────────────────────────────────
 app.get('/api/me', requireAuth, (req, res) => {
-  res.json(req.session.user || {});
+  res.json({ ...(req.session.user || {}), _impersonating: req.session.impersonating || false });
 });
 
 // ── Profile: current user self-edit ──────────────────────────
@@ -451,6 +451,32 @@ app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// ── Admin: impersonate a user ─────────────────────────────────
+app.post('/api/admin/impersonate', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'Missing user id' });
+    // Fetch the target user's record
+    const record = await atFetch(`/${id}?returnFieldsByFieldId=true`);
+    const target = recordToUser(record);
+    // Store original admin session so they can return
+    if (!req.session.impersonating) {
+      req.session.originalUser = req.session.user;
+    }
+    req.session.user = target;
+    req.session.impersonating = true;
+    req.session.save(() => res.json({ ok: true }));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/admin/impersonate/stop', requireAuth, (req, res) => {
+  if (!req.session.impersonating) return res.json({ ok: true });
+  req.session.user = req.session.originalUser;
+  delete req.session.impersonating;
+  delete req.session.originalUser;
+  req.session.save(() => res.json({ ok: true }));
 });
 
 // ── PZ: broker → supervisor name map ──────────────────────────
