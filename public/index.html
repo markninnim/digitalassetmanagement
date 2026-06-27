@@ -1072,26 +1072,27 @@ html { height: 100%; }
       <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:24px;align-items:stretch;">
 
         <!-- Card 1: Referral draw -->
-        <div style="background:linear-gradient(135deg,#003768 0%,#005fa3 100%);border-radius:12px;color:#fff;overflow:hidden;display:flex;height:280px;">
+        <div style="background:linear-gradient(135deg,#003768 0%,#005fa3 100%);border-radius:12px;color:#fff;overflow:hidden;display:flex;">
 
-          <!-- Left: text + ticket count -->
-          <div style="flex:1;padding:28px 28px 24px;display:flex;flex-direction:column;">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:10px;">Monthly Competition</div>
-            <div style="font-size:22px;font-weight:800;line-height:1.25;margin-bottom:14px;">Win a <span style="color:#F5A623;">Virgin Experience Days</span> voucher</div>
-            <p style="font-size:13px;line-height:1.8;opacity:.9;margin:0 0 10px;">The broker with the <strong>most tickets</strong> at the end of the month wins a Virgin Experience Days voucher to spend on something truly memorable. Every referral earns <strong style="color:#F5A623;">1 ticket</strong>, and every completed sale earns <strong style="color:#F5A623;">2 tickets</strong>.</p>
-            <p style="font-size:12px;line-height:1.7;opacity:.8;margin:0;">So far <strong id="sv-comp-total">—</strong> tickets have been entered across the team this month. Keep those referrals coming.</p>
-            <div style="margin-top:auto;padding-top:20px;">
-              <div style="font-size:13px;opacity:.7;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Your tickets this month</div>
-              <div style="font-size:64px;font-weight:900;color:#F5A623;line-height:1;" id="sv-comp-tickets-big">—</div>
-              <div style="display:inline-block;margin-top:8px;background:rgba(255,255,255,.15);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;">
-                <span id="sv-comp-tickets">—</span> tickets in the hat
+          <!-- Left: compact text + ticket count -->
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;justify-content:space-between;">
+            <div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.6;margin-bottom:6px;">Monthly Competition</div>
+              <div style="font-size:17px;font-weight:800;line-height:1.2;margin-bottom:10px;">Win a <span style="color:#F5A623;">Virgin Experience Days</span> voucher</div>
+              <p style="font-size:11px;line-height:1.65;opacity:.85;margin:0;">The broker with the <strong>most tickets</strong> wins. Every referral earns <strong style="color:#F5A623;">1 ticket</strong>, every completed sale earns <strong style="color:#F5A623;">2 tickets</strong>.</p>
+            </div>
+            <div>
+              <div style="font-size:9px;opacity:.6;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Your tickets this month</div>
+              <div style="display:flex;align-items:baseline;gap:10px;">
+                <div style="font-size:48px;font-weight:900;color:#F5A623;line-height:1;" id="sv-comp-tickets-big">—</div>
+                <div style="font-size:11px;opacity:.7;"><span id="sv-comp-total">—</span> total<br>in the hat</div>
               </div>
             </div>
           </div>
 
-          <!-- Right: full image contained within card height -->
-          <div style="flex:0 0 260px;background:#c8102e;overflow:hidden;">
-            <img src="/static/virgin.png" alt="Virgin Experience Days" style="width:100%;height:100%;object-fit:contain;display:block;">
+          <!-- Right: image natural size, no letterbox -->
+          <div style="flex:0 0 260px;overflow:hidden;line-height:0;">
+            <img src="/static/virgin.png" alt="Virgin Experience Days" style="width:260px;height:auto;display:block;">
           </div>
 
         </div>
