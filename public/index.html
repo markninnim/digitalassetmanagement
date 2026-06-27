@@ -4538,7 +4538,7 @@ function loadSurveying() {
   // Load sales
   fetch('/api/surveying/sales').then(function(r){ return r.json(); }).then(function(sales) {
     var paidDirect = sales.filter(function(s){ return s.status === 'Paid Direct'; });
-    var totalFee = paidDirect.length * 100;
+    var totalFee = paidDirect.reduce(function(sum, s){ return sum + (s.fee || 0); }, 0);
 
     document.getElementById('sv-stat-sales-val').textContent = paidDirect.length;
     document.getElementById('sv-stat-earned-val').textContent = '£' + totalFee.toLocaleString();
