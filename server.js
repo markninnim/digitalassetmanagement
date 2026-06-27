@@ -72,13 +72,10 @@ function recordToUser(record) {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '10mb' }));
 app.set('trust proxy', 1);
-app.set('trust proxy', 1);
 app.use(session({
   name: 'fpg_session',
   keys: [SECRET],
-  maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-  sameSite: 'lax',
-  secure: process.env.NODE_ENV === 'production'
+  maxAge: 1000 * 60 * 60 * 24 * 365 * 10 // 10 years
 }));
 
 // ── Auth guards ──────────────────────────────────────────────
