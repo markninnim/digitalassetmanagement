@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express  = require('express');
-const session  = require('express-session');
+const session  = require('cookie-session');
 const path     = require('path');
 const fs       = require('fs');
 const bcrypt   = require('bcryptjs');
@@ -72,11 +72,13 @@ function recordToUser(record) {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '10mb' }));
 app.set('trust proxy', 1);
+app.set('trust proxy', 1);
 app.use(session({
-  secret: SECRET,
-  resave: true,
-  saveUninitialized: true,
-  cookie: { maxAge: 1000 * 60 * 60 * 24 * 365 * 10, secure: process.env.NODE_ENV === 'production' } // 10 years
+  name: 'fpg_session',
+  keys: [SECRET],
+  maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production'
 }));
 
 // ── Auth guards ──────────────────────────────────────────────
@@ -241,7 +243,7 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/logout', (req, res) => {
-  req.session.destroy();
+  req.session = null;
   res.redirect('/login');
 });
 
