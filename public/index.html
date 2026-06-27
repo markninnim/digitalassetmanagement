@@ -1036,18 +1036,26 @@ html { height: 100%; }
       <h2 style="color:#003768;margin:0 0 4px;">Surveying</h2>
 
       <!-- Stats row -->
-      <div id="sv-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
-        <div class="sv-stat-card" id="sv-stat-sales">
+      <div id="sv-stats" style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px;">
+        <div class="sv-stat-card">
           <div class="sv-stat-val" id="sv-stat-sales-val">—</div>
           <div class="sv-stat-lbl">Sales</div>
         </div>
-        <div class="sv-stat-card" id="sv-stat-earned">
+        <div class="sv-stat-card">
           <div class="sv-stat-val" id="sv-stat-earned-val">—</div>
-          <div class="sv-stat-lbl">Broker Fees Earned</div>
+          <div class="sv-stat-lbl">Fees Earned</div>
         </div>
-        <div class="sv-stat-card" id="sv-stat-leads">
+        <div class="sv-stat-card">
           <div class="sv-stat-val" id="sv-stat-leads-val">—</div>
-          <div class="sv-stat-lbl">Leads</div>
+          <div class="sv-stat-lbl">Referrals</div>
+        </div>
+        <div class="sv-stat-card">
+          <div class="sv-stat-val" id="sv-stat-ratio-val">—</div>
+          <div class="sv-stat-lbl">Lead to Sale Ratio</div>
+        </div>
+        <div class="sv-stat-card">
+          <div class="sv-stat-val" id="sv-stat-refval-val">—</div>
+          <div class="sv-stat-lbl">Value per Referral</div>
         </div>
       </div>
     </div>
@@ -1119,7 +1127,7 @@ html { height: 100%; }
       </div>
 
       <!-- Leads section -->
-      <h3 style="color:#003768;font-size:15px;font-weight:700;margin:32px 0 12px;padding-bottom:8px;border-bottom:2px solid #003768;">Leads</h3>
+      <h3 style="color:#003768;font-size:15px;font-weight:700;margin:32px 0 12px;padding-bottom:8px;border-bottom:2px solid #003768;">Referrals</h3>
       <div style="overflow-x:auto;">
         <table id="sv-leads-table" style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead>
@@ -4535,57 +4543,66 @@ function loadSurveying() {
     return '<span class="sv-badge ' + cls + '">' + s + '</span>';
   };
 
-  // Load sales
-  fetch('/api/surveying/sales').then(function(r){ return r.json(); }).then(function(sales) {
+  Promise.all([
+    fetch('/api/surveying/sales').then(function(r){ return r.json(); }),
+    fetch('/api/surveying/leads').then(function(r){ return r.json(); })
+  ]).then(function(results) {
+    var sales  = results[0];
+    var leads  = results[1];
     var paidDirect = sales.filter(function(s){ return s.status === 'Paid Direct'; });
-    var totalFee = paidDirect.reduce(function(sum, s){ return sum + (s.fee || 0); }, 0);
+    var totalFee   = paidDirect.reduce(function(sum, s){ return sum + (s.fee || 0); }, 0);
+    var ratio      = leads.length ? ((paidDirect.length / leads.length) * 100).toFixed(1) + '%' : '—';
+    var refValue   = leads.length ? '£' + (totalFee / leads.length).toFixed(0) : '—';
 
-    document.getElementById('sv-stat-sales-val').textContent = paidDirect.length;
+    document.getElementById('sv-stat-sales-val').textContent  = paidDirect.length;
     document.getElementById('sv-stat-earned-val').textContent = '£' + totalFee.toLocaleString();
-    // Update nav tab button
+    document.getElementById('sv-stat-leads-val').textContent  = leads.length;
+    document.getElementById('sv-stat-ratio-val').textContent  = ratio;
+    document.getElementById('sv-stat-refval-val').textContent = refValue;
+
     var svBtn = document.getElementById('tab-btn-surveying');
     if (svBtn && totalFee > 0) svBtn.textContent = 'Surveying £' + totalFee.toLocaleString();
 
-    var tbody = document.getElementById('sv-sales-body');
+    // Render sales
+    var sTbody = document.getElementById('sv-sales-body');
     if (!paidDirect.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:#6b7c8f;">No paid direct sales found</td></tr>';
-      return;
+      sTbody.innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:#6b7c8f;">No paid direct sales found</td></tr>';
+    } else {
+      sTbody.innerHTML = paidDirect.map(function(s) {
+        var isSelf = s.firm && s.firm.toLowerCase().indexOf('self') !== -1;
+        var sourceCell = isSelf
+          ? '<span class="sv-badge" style="background:#e8f4f8;color:#005f8a;">Self-referral</span>'
+          : (s.firm || '—');
+        return '<tr class="sv-sales-row">'
+          + '<td>' + (s.address || '—') + '</td>'
+          + '<td>' + fmtDate(s.date) + '</td>'
+          + '<td>' + fmtDate(s.paid) + '</td>'
+          + '<td>' + sourceCell + '</td>'
+          + '<td>' + statusBadge(s.status) + '</td>'
+          + '<td style="text-align:right;font-weight:600;color:#003768;">£' + (s.fee || 100).toLocaleString() + '</td>'
+          + '</tr>';
+      }).join('');
     }
-    tbody.innerHTML = paidDirect.map(function(s) {
-      var isSelf = s.firm && s.firm.toLowerCase().indexOf('self') !== -1;
-      var sourceCell = isSelf
-        ? '<span class="sv-badge" style="background:#e8f4f8;color:#005f8a;">Self-referral</span>'
-        : (s.firm || '—');
-      return '<tr class="sv-sales-row">'
-        + '<td>' + (s.address || '—') + '</td>'
-        + '<td>' + fmtDate(s.date) + '</td>'
-        + '<td>' + fmtDate(s.paid) + '</td>'
-        + '<td>' + sourceCell + '</td>'
-        + '<td>' + statusBadge(s.status) + '</td>'
-        + '<td style="text-align:right;font-weight:600;color:#003768;">£100</td>'
-        + '</tr>';
-    }).join('');
-  }).catch(function(){ document.getElementById('sv-sales-body').innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:#c00;">Error loading sales</td></tr>'; });
 
-  // Load leads
-  fetch('/api/surveying/leads').then(function(r){ return r.json(); }).then(function(leads) {
-    document.getElementById('sv-stat-leads-val').textContent = leads.length;
-
-    var tbody = document.getElementById('sv-leads-body');
+    // Render referrals
+    var lTbody = document.getElementById('sv-leads-body');
     if (!leads.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#6b7c8f;">No leads found</td></tr>';
-      return;
+      lTbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#6b7c8f;">No referrals found</td></tr>';
+    } else {
+      lTbody.innerHTML = leads.map(function(l) {
+        return '<tr class="sv-leads-row">'
+          + '<td><strong>' + (l.name || '—') + '</strong>' + (l.postcode ? '<br><span style="color:#6b7c8f;font-size:12px;">' + l.postcode + '</span>' : '') + '</td>'
+          + '<td>' + fmtDate(l.date) + '</td>'
+          + '<td>' + (l.seller || '—') + '</td>'
+          + '<td>' + (l.timeToCall || '—') + '</td>'
+          + '<td>' + statusBadge(l.status) + '</td>'
+          + '</tr>';
+      }).join('');
     }
-    tbody.innerHTML = leads.map(function(l) {
-      return '<tr class="sv-leads-row">'
-        + '<td><strong>' + (l.name || '—') + '</strong>' + (l.postcode ? '<br><span style="color:#6b7c8f;font-size:12px;">' + l.postcode + '</span>' : '') + '</td>'
-        + '<td>' + fmtDate(l.date) + '</td>'
-        + '<td>' + (l.seller || '—') + '</td>'
-        + '<td>' + (l.timeToCall || '—') + '</td>'
-        + '<td>' + statusBadge(l.status) + '</td>'
-        + '</tr>';
-    }).join('');
-  }).catch(function(){ document.getElementById('sv-leads-body').innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#c00;">Error loading leads</td></tr>'; });
+  }).catch(function(e) {
+    document.getElementById('sv-sales-body').innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:#c00;">Error loading data</td></tr>';
+    document.getElementById('sv-leads-body').innerHTML = '';
+  });
 }
 
 // ── Newsletters ───────────────────────────────────────────────
