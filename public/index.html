@@ -1149,8 +1149,9 @@ html { height: 100%; }
             <tr style="background:#f5f7fa;">
               <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Customer</th>
               <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Date</th>
-              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Salesperson</th>
-              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Time to Call</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Acre Ref</th>
+              <th style="padding:10px 12px;text-align:right;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Valuation</th>
+              <th style="padding:10px 12px;text-align:right;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Quotation</th>
               <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Status</th>
             </tr>
           </thead>
@@ -4635,14 +4636,15 @@ function loadSurveying() {
     // Render referrals
     var lTbody = document.getElementById('sv-leads-body');
     if (!leads.length) {
-      lTbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#6b7c8f;">No referrals found</td></tr>';
+      lTbody.innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:#6b7c8f;">No referrals found</td></tr>';
     } else {
       lTbody.innerHTML = leads.map(function(l) {
         return '<tr class="sv-leads-row">'
           + '<td><strong>' + (l.name || '—') + '</strong>' + (l.postcode ? '<br><span style="color:#6b7c8f;font-size:12px;">' + l.postcode + '</span>' : '') + '</td>'
           + '<td>' + fmtDate(l.date) + '</td>'
-          + '<td>' + (l.seller || '—') + '</td>'
-          + '<td>' + (l.timeToCall || '—') + '</td>'
+          + '<td style="color:#6b7c8f;font-size:12px;">' + (l.acreRef || '—') + '</td>'
+          + '<td style="text-align:right;">' + (l.valuation ? '£' + Number(l.valuation).toLocaleString() : '—') + '</td>'
+          + '<td style="text-align:right;">' + (l.quotation ? '£' + Number(l.quotation).toLocaleString() : '—') + '</td>'
           + '<td>' + statusBadge(l.status) + '</td>'
           + '</tr>';
       }).join('');

@@ -137,7 +137,7 @@ app.get('/api/surveying/leads', requireAuth, async (req, res) => {
     const user = req.session.user;
     const name = [user.firstName, user.lastName].filter(Boolean).join(' ');
     const formula = encodeURIComponent(`FIND("${name}", {Introducer})`);
-    const fieldQs = ['Customer Name','Postcode','Date','Introducer','Time to call','Status','Quotation','Seller']
+    const fieldQs = ['Customer Name','Postcode','Date','Introducer','Status','Quotation','Acre reference','Valuation']
       .map(f => `fields[]=${encodeURIComponent(f)}`).join('&');
     const allRecords = [];
     let offset = '';
@@ -152,11 +152,11 @@ app.get('/api/surveying/leads', requireAuth, async (req, res) => {
       name:       r.fields['Customer Name'] || '',
       postcode:   r.fields['Postcode'] || '',
       date:       r.fields['Date'] || '',
-      seller:     Array.isArray(r.fields['Seller']) ? r.fields['Seller'].map(s => s.name || s).join(', ') : (r.fields['Seller'] || ''),
       introducer: r.fields['Introducer'] || '',
-      timeToCall: r.fields['Time to call'] || '',
       status:     r.fields['Status'] ? (r.fields['Status'].name || r.fields['Status']) : '',
-      quotation:  r.fields['Quotation'] || 0
+      quotation:  r.fields['Quotation'] || 0,
+      acreRef:    r.fields['Acre reference'] || '',
+      valuation:  r.fields['Valuation'] || 0
     })));
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
