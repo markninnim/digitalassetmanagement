@@ -1034,10 +1034,9 @@ html { height: 100%; }
   <div id="tab-surveying" class="tab-pane">
     <div style="padding:32px 32px 0;">
       <h2 style="color:#003768;margin:0 0 4px;">Surveying</h2>
-      <p style="color:#6b7c8f;margin:0 0 24px;font-size:13px;">Your leads and referrals from Acre</p>
 
       <!-- Stats row -->
-      <div id="sv-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+      <div id="sv-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
         <div class="sv-stat-card" id="sv-stat-sales">
           <div class="sv-stat-val" id="sv-stat-sales-val">—</div>
           <div class="sv-stat-lbl">Sales</div>
@@ -1053,6 +1052,51 @@ html { height: 100%; }
       </div>
     </div>
 
+    <!-- Intro & Benefits -->
+    <div style="padding:0 32px 24px;">
+      <div style="background:#f0f7ff;border-left:4px solid #003768;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:20px;">
+        <p style="margin:0;color:#2D3748;font-size:13px;line-height:1.7;">Thank you for referring to Acre Surveying. Below you can see the sales you have generated and the referrals made on your behalf — including referrals generated directly by your clients through the Acre customer portal.</p>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:20px 24px;">
+        <h3 style="color:#003768;font-size:14px;font-weight:700;margin:0 0 12px;">Why recommend a Level 2 Home Survey?</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;">
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#2D3748;padding:4px 0;">
+            <span style="color:#00A99D;font-weight:700;flex-shrink:0;">✓</span>
+            <span>Identifies structural issues, damp and defects before your client commits to the purchase</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#2D3748;padding:4px 0;">
+            <span style="color:#00A99D;font-weight:700;flex-shrink:0;">✓</span>
+            <span>Provides powerful evidence to renegotiate the purchase price if defects are found</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#2D3748;padding:4px 0;">
+            <span style="color:#00A99D;font-weight:700;flex-shrink:0;">✓</span>
+            <span>Protects clients from costly, unexpected repair bills after moving in</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#2D3748;padding:4px 0;">
+            <span style="color:#00A99D;font-weight:700;flex-shrink:0;">✓</span>
+            <span>Includes a professional market valuation of the property</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#2D3748;padding:4px 0;">
+            <span style="color:#00A99D;font-weight:700;flex-shrink:0;">✓</span>
+            <span>Gives a clear condition rating for every element of the property</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#2D3748;padding:4px 0;">
+            <span style="color:#00A99D;font-weight:700;flex-shrink:0;">✓</span>
+            <span>Highlights urgent repairs and legal issues that need attention before exchange</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#2D3748;padding:4px 0;">
+            <span style="color:#00A99D;font-weight:700;flex-shrink:0;">✓</span>
+            <span>Adds real value to your service — helping clients feel confident and well-advised</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#2D3748;padding:4px 0;">
+            <span style="color:#00A99D;font-weight:700;flex-shrink:0;">✓</span>
+            <span>RICS-qualified surveyors with local expertise and fast turnaround</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Sales section -->
     <div style="padding:0 32px;">
       <h3 style="color:#003768;font-size:15px;font-weight:700;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #003768;">Sales</h3>
@@ -1063,6 +1107,7 @@ html { height: 100%; }
               <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Address</th>
               <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Date</th>
               <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Paid Date</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Source</th>
               <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Status</th>
               <th style="padding:10px 12px;text-align:right;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Fee</th>
             </tr>
@@ -4500,19 +4545,24 @@ function loadSurveying() {
 
     var tbody = document.getElementById('sv-sales-body');
     if (!paidDirect.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#6b7c8f;">No paid direct sales found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:#6b7c8f;">No paid direct sales found</td></tr>';
       return;
     }
     tbody.innerHTML = paidDirect.map(function(s) {
+      var isSelf = s.firm && s.firm.toLowerCase().indexOf('self') !== -1;
+      var sourceCell = isSelf
+        ? '<span class="sv-badge" style="background:#e8f4f8;color:#005f8a;">Self-referral</span>'
+        : (s.firm || '—');
       return '<tr class="sv-sales-row">'
         + '<td>' + (s.address || '—') + '</td>'
         + '<td>' + fmtDate(s.date) + '</td>'
         + '<td>' + fmtDate(s.paid) + '</td>'
+        + '<td>' + sourceCell + '</td>'
         + '<td>' + statusBadge(s.status) + '</td>'
         + '<td style="text-align:right;font-weight:600;color:#003768;">£100</td>'
         + '</tr>';
     }).join('');
-  }).catch(function(){ document.getElementById('sv-sales-body').innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#c00;">Error loading sales</td></tr>'; });
+  }).catch(function(){ document.getElementById('sv-sales-body').innerHTML = '<tr><td colspan="6" style="padding:24px;text-align:center;color:#c00;">Error loading sales</td></tr>'; });
 
   // Load leads
   fetch('/api/surveying/leads').then(function(r){ return r.json(); }).then(function(leads) {
