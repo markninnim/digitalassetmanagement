@@ -6069,7 +6069,9 @@ function _periodTarget(annualTarget, period) {
 function loadCpd() {
   _cpdLoaded = true;
   fetch('/api/cpd').then(r => r.json()).then(function(data) {
-    _cpdAllEntries = data.entries || [];
+    _cpdAllEntries = (data.entries || []).sort(function(a, b) {
+      return (b.date || '').localeCompare(a.date || '');
+    });
     _cpdTargets    = data.targets || { Mortgage: 900, Protection: 900 };
     renderCpdProgress();
     renderCpdPie();
@@ -6244,8 +6246,8 @@ function renderCpdEntries(entries) {
     el.innerHTML = '<div style="padding:40px;text-align:center;color:#6b7c8f;font-size:13px;">No entries yet. Watch a Learning Zone video or add one manually.</div>';
     return;
   }
-  var catColors = { 'Lender Update':'#dbeafe', 'Insurer Update':'#fef9c3', 'Compliance':'#dcfce7', 'Technical Knowledge':'#ede9fe', 'Other':'#f1f5f9' };
-  var catText   = { 'Lender Update':'#1d4ed8', 'Insurer Update':'#854d0e', 'Compliance':'#166534', 'Technical Knowledge':'#6b21a8', 'Other':'#475569' };
+  var catColors = { 'Lender Update':'#dbeafe', 'Insurer Update':'#fef9c3', 'Compliance':'#dcfce7', 'Technical Knowledge':'#ede9fe', 'Financial News':'#fce7f3', 'Other':'#f1f5f9' };
+  var catText   = { 'Lender Update':'#1d4ed8', 'Insurer Update':'#854d0e', 'Compliance':'#166534', 'Technical Knowledge':'#6b21a8', 'Financial News':'#9d174d', 'Other':'#475569' };
   var typeColors = { 'Investment':'#ede9fe', 'Mortgage':'#dbeafe', 'Protection':'#fef9c3' };
   var typeText   = { 'Investment':'#6b21a8', 'Mortgage':'#1d4ed8', 'Protection':'#854d0e' };
   var rows = entries.map(function(e, i) {
