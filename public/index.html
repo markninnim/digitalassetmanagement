@@ -102,6 +102,17 @@ html { height: 100%; }
 .tab-btn { background:none; border:none; padding:6px 16px; border-radius:20px; font-size:13px; font-weight:600; color:#6b7c8f; cursor:pointer; font-family:inherit; transition:all .15s; white-space:nowrap; }
 .tab-btn:hover { background:#f5f7fa; color:#003768; }
 .tab-btn.active { background:#003768; color:#fff; }
+.sv-stat-card { background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:20px 24px; }
+.sv-stat-val  { font-size:28px;font-weight:700;color:#003768;line-height:1; }
+.sv-stat-lbl  { font-size:12px;color:#6b7c8f;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.04em; }
+.sv-sales-row td, .sv-leads-row td { padding:10px 12px;border-bottom:1px solid #f0f3f6;color:#2D3748; }
+.sv-sales-row:hover td, .sv-leads-row:hover td { background:#f9fafb; }
+.sv-badge { display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em; }
+.sv-badge-paid { background:#d4edda;color:#1a7f3c; }
+.sv-badge-paidirect { background:#cce5ff;color:#004085; }
+.sv-badge-invoiced { background:#fff3cd;color:#856404; }
+.sv-badge-cancelled { background:#f8d7da;color:#721c24; }
+.sv-badge-other { background:#e9ecef;color:#495057; }
 .tab-pane { display:none; }
 .tab-pane.active { display:block; }
 .coming-soon { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60vh; text-align:center; }
@@ -130,6 +141,7 @@ html { height: 100%; }
     <button class="tab-btn"        id="tab-btn-compliance"    onclick="switchTab('compliance')">Compliance</button>
     <button class="tab-btn"        id="tab-btn-sales-process" onclick="switchTab('sales-process')">Advice Standards</button>
     <button class="tab-btn"        id="tab-btn-learning"      onclick="switchTab('learning')">Learning</button>
+    <button class="tab-btn"        id="tab-btn-surveying"     onclick="switchTab('surveying')">Surveying</button>
     <button class="tab-btn"        id="tab-btn-performance-zone" onclick="switchTab('performance-zone')" style="display:none;">Performance Zone</button>
     <button class="tab-btn"        id="tab-btn-selling-zone"  onclick="switchTab('selling-zone')" style="display:none;">Selling Zone</button>
     <button class="tab-btn"        id="tab-btn-supervisor-zone" onclick="switchTab('supervisor-zone')" style="display:none;">Supervisor Zone</button>
@@ -1016,6 +1028,71 @@ html { height: 100%; }
       </div>
     </div>
 
+  </div>
+
+  <!-- ── Surveying tab ─────────────────────────────────────── -->
+  <div id="tab-surveying" class="tab-pane">
+    <div style="padding:32px 32px 0;">
+      <h2 style="color:#003768;margin:0 0 4px;">Surveying</h2>
+      <p style="color:#6b7c8f;margin:0 0 24px;font-size:13px;">Your leads and referrals from Acre</p>
+
+      <!-- Stats row -->
+      <div id="sv-stats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px;">
+        <div class="sv-stat-card" id="sv-stat-sales">
+          <div class="sv-stat-val" id="sv-stat-sales-val">—</div>
+          <div class="sv-stat-lbl">Sales</div>
+        </div>
+        <div class="sv-stat-card" id="sv-stat-earned">
+          <div class="sv-stat-val" id="sv-stat-earned-val">—</div>
+          <div class="sv-stat-lbl">Broker Fees Earned</div>
+        </div>
+        <div class="sv-stat-card" id="sv-stat-leads">
+          <div class="sv-stat-val" id="sv-stat-leads-val">—</div>
+          <div class="sv-stat-lbl">Leads</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales section -->
+    <div style="padding:0 32px;">
+      <h3 style="color:#003768;font-size:15px;font-weight:700;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid #003768;">Sales</h3>
+      <div style="overflow-x:auto;">
+        <table id="sv-sales-table" style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:#f5f7fa;">
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Address</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Date</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Paid Date</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Status</th>
+              <th style="padding:10px 12px;text-align:right;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Fee</th>
+            </tr>
+          </thead>
+          <tbody id="sv-sales-body">
+            <tr><td colspan="5" style="padding:24px;text-align:center;color:#6b7c8f;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Leads section -->
+      <h3 style="color:#003768;font-size:15px;font-weight:700;margin:32px 0 12px;padding-bottom:8px;border-bottom:2px solid #003768;">Leads</h3>
+      <div style="overflow-x:auto;">
+        <table id="sv-leads-table" style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:#f5f7fa;">
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Customer</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Date</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Salesperson</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Time to Call</th>
+              <th style="padding:10px 12px;text-align:left;color:#6b7c8f;font-weight:600;border-bottom:1px solid #e8ecf0;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="sv-leads-body">
+            <tr><td colspan="5" style="padding:24px;text-align:center;color:#6b7c8f;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="height:40px;"></div>
+    </div>
   </div>
 
   <!-- ── Sales Process tab ─────────────────────────────────── -->
@@ -3873,7 +3950,7 @@ function generateBrokerBrand() {
 }
 
 // ── Tab switching ─────────────────────────────────────────────
-var TAB_IDS = ['marketing','compliance','learning','sales-process','selling-zone','supervisor-zone','performance-zone'];
+var TAB_IDS = ['marketing','compliance','learning','surveying','sales-process','selling-zone','supervisor-zone','performance-zone'];
 function switchTab(tab) {
   TAB_IDS.forEach(function(t) {
     var pane    = document.getElementById('tab-' + t);
@@ -3884,6 +3961,7 @@ function switchTab(tab) {
     if (btn)     btn.classList.toggle('active', t === tab);
   });
   window.location.hash = tab;
+  if (tab === 'surveying')        { loadSurveying(); }
   if (tab === 'learning')         { showLvSection('weekly-recordings', document.getElementById('lv-nav-weekly')); loadLearningZone(); }
   if (tab === 'compliance')       { if (!_cpdLoaded) loadCpd(); }
   if (tab === 'supervisor-zone')  { svInitDates(); loadSupervisorZone(); }
@@ -4387,6 +4465,75 @@ function initShareButtons() {
 }
 
 // ── Add pas-nav styling (same as mas-nav) ────────────────────────
+
+// ── Surveying ─────────────────────────────────────────────────
+var _svLoaded = false;
+
+function loadSurveying() {
+  if (_svLoaded) return;
+  _svLoaded = true;
+
+  var fmtDate = function(d) {
+    if (!d) return '—';
+    var dt = new Date(d);
+    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  };
+
+  var statusBadge = function(s) {
+    var cls = 'sv-badge-other';
+    if (!s) return '<span class="sv-badge sv-badge-other">—</span>';
+    var sl = s.toLowerCase();
+    if (sl === 'paid') cls = 'sv-badge-paid';
+    else if (sl === 'paid direct') cls = 'sv-badge-paidirect';
+    else if (sl.indexOf('invoice') !== -1) cls = 'sv-badge-invoiced';
+    else if (sl === 'cancelled') cls = 'sv-badge-cancelled';
+    return '<span class="sv-badge ' + cls + '">' + s + '</span>';
+  };
+
+  // Load sales
+  fetch('/api/surveying/sales').then(function(r){ return r.json(); }).then(function(sales) {
+    var paidDirect = sales.filter(function(s){ return s.status === 'Paid Direct'; });
+    var totalFee = paidDirect.length * 100;
+
+    document.getElementById('sv-stat-sales-val').textContent = paidDirect.length;
+    document.getElementById('sv-stat-earned-val').textContent = '£' + totalFee.toLocaleString();
+
+    var tbody = document.getElementById('sv-sales-body');
+    if (!paidDirect.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#6b7c8f;">No paid direct sales found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = paidDirect.map(function(s) {
+      return '<tr class="sv-sales-row">'
+        + '<td>' + (s.address || '—') + '</td>'
+        + '<td>' + fmtDate(s.date) + '</td>'
+        + '<td>' + fmtDate(s.paid) + '</td>'
+        + '<td>' + statusBadge(s.status) + '</td>'
+        + '<td style="text-align:right;font-weight:600;color:#003768;">£100</td>'
+        + '</tr>';
+    }).join('');
+  }).catch(function(){ document.getElementById('sv-sales-body').innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#c00;">Error loading sales</td></tr>'; });
+
+  // Load leads
+  fetch('/api/surveying/leads').then(function(r){ return r.json(); }).then(function(leads) {
+    document.getElementById('sv-stat-leads-val').textContent = leads.length;
+
+    var tbody = document.getElementById('sv-leads-body');
+    if (!leads.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#6b7c8f;">No leads found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = leads.map(function(l) {
+      return '<tr class="sv-leads-row">'
+        + '<td><strong>' + (l.name || '—') + '</strong>' + (l.postcode ? '<br><span style="color:#6b7c8f;font-size:12px;">' + l.postcode + '</span>' : '') + '</td>'
+        + '<td>' + fmtDate(l.date) + '</td>'
+        + '<td>' + (l.seller || '—') + '</td>'
+        + '<td>' + (l.timeToCall || '—') + '</td>'
+        + '<td>' + statusBadge(l.status) + '</td>'
+        + '</tr>';
+    }).join('');
+  }).catch(function(){ document.getElementById('sv-leads-body').innerHTML = '<tr><td colspan="5" style="padding:24px;text-align:center;color:#c00;">Error loading leads</td></tr>'; });
+}
 
 // ── Newsletters ───────────────────────────────────────────────
 var _nlLoaded = false;

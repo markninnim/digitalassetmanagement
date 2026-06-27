@@ -117,6 +117,76 @@ app.post('/api/newsletters/upload', requireAuth, async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
+// ── Surveying Airtable ────────────────────────────────────────
+const SV_BASE = 'appTQIvpD5TBphlq4';
+const SV_LEADS_TABLE = 'tblhGuMyeR3zPBJXe';
+const SV_SALES_TABLE = 'tbl52e6VsmaJny9f3';
+
+async function svFetch(table, qs) {
+  const url = `https://api.airtable.com/v0/${SV_BASE}/${table}${qs}`;
+  const res = await fetch(url, {
+    headers: { 'Authorization': `Bearer ${AT_KEY}`, 'Content-Type': 'application/json' }
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error?.message || `Airtable ${res.status}`);
+  return body;
+}
+
+app.get('/api/surveying/leads', requireAuth, async (req, res) => {
+  try {
+    const user = req.session.user;
+    const name = [user.firstName, user.lastName].filter(Boolean).join(' ');
+    const formula = encodeURIComponent(`FIND("${name}", ARRAYJOIN({Seller}, ","))`);
+    const fieldQs = ['Customer Name','Postcode','Date','Seller','Time to call','Status','Quotation']
+      .map(f => `fields[]=${encodeURIComponent(f)}`).join('&');
+    const allRecords = [];
+    let offset = '';
+    do {
+      const qs = `?filterByFormula=${formula}&${fieldQs}&sort[0][field]=Date&sort[0][direction]=desc${offset ? '&offset=' + offset : ''}`;
+      const data = await svFetch(SV_LEADS_TABLE, qs);
+      for (const r of (data.records || [])) allRecords.push(r);
+      offset = data.offset || '';
+    } while (offset);
+    res.json(allRecords.map(r => ({
+      id: r.id,
+      name:       r.fields['Customer Name'] || '',
+      postcode:   r.fields['Postcode'] || '',
+      date:       r.fields['Date'] || '',
+      seller:     Array.isArray(r.fields['Seller']) ? r.fields['Seller'].map(s => s.name || s).join(', ') : (r.fields['Seller'] || ''),
+      timeToCall: r.fields['Time to call'] || '',
+      status:     r.fields['Status'] ? (r.fields['Status'].name || r.fields['Status']) : '',
+      quotation:  r.fields['Quotation'] || 0
+    })));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/surveying/sales', requireAuth, async (req, res) => {
+  try {
+    const user = req.session.user;
+    const name = [user.firstName, user.lastName].filter(Boolean).join(' ');
+    const formula = encodeURIComponent(`FIND("${name}", {Referred by name})`);
+    const fieldQs = ['Address','Date','Broker Status','Paid','Broker fee','Completed','Referred by name']
+      .map(f => `fields[]=${encodeURIComponent(f)}`).join('&');
+    const allRecords = [];
+    let offset = '';
+    do {
+      const qs = `?filterByFormula=${formula}&${fieldQs}&sort[0][field]=Date&sort[0][direction]=desc${offset ? '&offset=' + offset : ''}`;
+      const data = await svFetch(SV_SALES_TABLE, qs);
+      for (const r of (data.records || [])) allRecords.push(r);
+      offset = data.offset || '';
+    } while (offset);
+    res.json(allRecords.map(r => ({
+      id: r.id,
+      address:   r.fields['Address'] || '',
+      date:      r.fields['Date'] || '',
+      status:    r.fields['Broker Status'] ? (r.fields['Broker Status'].name || r.fields['Broker Status']) : '',
+      paid:      r.fields['Paid'] || '',
+      fee:       r.fields['Broker fee'] || 0,
+      completed: r.fields['Completed'] || ''
+    })));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // ── Newsletter list API ───────────────────────────────────────
 app.get('/api/newsletters', requireAuth, (req, res) => {
   const dir = path.join(__dirname, 'public/newsletters');
