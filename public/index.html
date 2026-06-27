@@ -4733,10 +4733,11 @@ function msStopAndLog() {
   var mins = Math.round(_msSeconds / 60);
   if (mins < 1) mins = 1;
   // Log as CPD: category "Mortgage", activity "Mortgage Strategy reading"
+  var today = new Date().toISOString().split('T')[0];
   fetch('/api/cpd', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ minutes: mins, category: 'Mortgage', activity: 'Mortgage Strategy reading (' + mins + ' min)' })
+    body: JSON.stringify({ minutes: mins, date: today, category: 'Mortgage', activity: 'Mortgage Strategy reading (' + mins + ' min)' })
   }).then(function() {
     document.getElementById('ms-state-reading').style.display = 'none';
     document.getElementById('ms-state-done').style.display    = '';
