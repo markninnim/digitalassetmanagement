@@ -5647,17 +5647,18 @@ function renderUserList(users) {
     if (u.sellsInvestments) products.push('<span style="background:#ede9fe;color:#6b21a8;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;">Investments</span>');
     if (u.sellsMortgages)   products.push('<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;">Mortgages</span>');
     if (u.sellsProtection)  products.push('<span style="background:#fef9c3;color:#854d0e;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;">Protection</span>');
-    var supInfo = u.supervisorEmail ? '<span style="color:#6b7c8f;font-size:11px;"> · Supervisor: ' + escHtml(u.supervisorEmail) + '</span>' : '';
+    var supInfo = u.supervisorEmail ? '<div style="color:#6b7c8f;font-size:11px;margin-top:2px;">Supervisor: ' + escHtml(u.supervisorEmail) + '</div>' : '';
     var actionBtns = isSupervisorOnly ? '' :
-      '<button onclick="impersonateUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#e8f4f8;color:#005f8a;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Guardian Mode</button>' +
-      '<button onclick="openUserForm(\'' + u.id + '\')" style="background:#f5f7fa;color:#003768;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Edit</button>' +
-      '<button onclick="deleteUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#fff0f0;color:#c00;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Delete</button>';
+      '<button onclick="impersonateUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#e8f4f8;color:#005f8a;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:110px;text-align:center;">Guardian Mode</button>' +
+      '<button onclick="openUserForm(\'' + u.id + '\')" style="background:#f5f7fa;color:#003768;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:52px;text-align:center;">Edit</button>' +
+      '<button onclick="deleteUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#fff0f0;color:#c00;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:62px;text-align:center;">Delete</button>';
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f2f5;">' +
       '<div>' +
         '<div style="font-size:14px;font-weight:600;color:#1a2a3a;">' + escHtml(name) + badge + supBadge + products.join('') + '</div>' +
-        '<div style="font-size:12px;color:#6b7c8f;margin-top:1px;">' + escHtml(u.email) + (u.jobTitle ? ' · ' + escHtml(u.jobTitle) : '') + supInfo + '</div>' +
+        '<div style="font-size:12px;color:#6b7c8f;margin-top:1px;">' + escHtml(u.email) + (u.jobTitle ? ' · ' + escHtml(u.jobTitle) : '') + '</div>' +
+        supInfo +
       '</div>' +
-      '<div style="display:flex;gap:8px;">' + actionBtns + '</div>' +
+      '<div style="display:flex;gap:8px;flex-shrink:0;">' + actionBtns + '</div>' +
     '</div>';
   }).join('');
   el.innerHTML = rows;
