@@ -1,8 +1,10 @@
 {
   "marketing": true,
   "compliance": true,
+  "adviceStandards": true,
   "learning": true,
   "surveying": true,
   "sellingZone": true,
-  "performanceZone": true
+  "performanceZone": true,
+  "supervisorZone": true
 }

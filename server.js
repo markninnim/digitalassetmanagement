@@ -38,8 +38,9 @@ const F_AVATAR         = 'fldiQ06FtP4BehJU7';
 // ── Feature flags ─────────────────────────────────────────────
 const FEATURES_PATH = path.join(__dirname, 'features.json');
 const FEATURES_DEFAULT = {
-  marketing: true, compliance: true, learning: true,
-  surveying: true, sellingZone: true, performanceZone: true
+  marketing: true, compliance: true, adviceStandards: true,
+  learning: true, surveying: true, sellingZone: true,
+  performanceZone: true, supervisorZone: true
 };
 let _features = { ...FEATURES_DEFAULT };
 try { _features = { ...FEATURES_DEFAULT, ...JSON.parse(fs.readFileSync(FEATURES_PATH, 'utf8')) }; } catch(_) {}
