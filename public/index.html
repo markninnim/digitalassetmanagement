@@ -147,6 +147,9 @@ html { height: 100%; }
     <button class="tab-btn"        id="tab-btn-supervisor-zone" onclick="switchTab('supervisor-zone')" style="display:none;">Supervisor Zone</button>
   </div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <button id="supervisor-btn" onclick="openAdminPanel()" style="display:none;background:#2e99d5;color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;gap:6px;align-items:center;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Supervisor
+    </button>
     <button id="admin-btn" onclick="openAdminPanel()" style="display:none;background:#003768;color:#fff;border:none;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;gap:6px;align-items:center;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Admin
     </button>
@@ -3139,16 +3142,26 @@ html { height: 100%; }
         <p style="color:#6b7c8f;font-size:13px;margin:0;">Manage who can access the FPG DAM tool.</p>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button onclick="downloadCsvTemplate()" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;">↓ Template</button>
-        <label style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;display:inline-flex;align-items:center;">
+        <label id="admin-modal-import-csv" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;display:inline-flex;align-items:center;">
           ↑ Import CSV<input type="file" accept=".csv" onchange="importCsv(this)" style="display:none;">
         </label>
-        <label style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;display:inline-flex;align-items:center;">
+        <label id="admin-modal-import-excel" style="background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;display:inline-flex;align-items:center;">
           ↑ Import Excel<input type="file" accept=".xlsx" onchange="importUsersExcel(this)" style="display:none;">
         </label>
-        <button onclick="openUserForm()" style="background:#003768;color:#fff;border:1.5px solid #003768;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;">+ Add User</button>
+        <button id="admin-modal-add-user" onclick="openUserForm()" style="background:#003768;color:#fff;border:1.5px solid #003768;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;height:36px;">+ Add User</button>
         <button onclick="closeAdminPanel()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7c8f;line-height:1;padding:0 4px;">&#x2715;</button>
       </div>
+    </div>
+
+    <!-- Feature toggles (admin only) -->
+    <div id="admin-features-panel" style="display:none;padding:20px 28px;border-bottom:1px solid #e8ecf0;background:#f9fafc;">
+      <div style="font-size:13px;font-weight:700;color:#003768;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
+        Feature Rollout Controls
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;" id="admin-feature-toggles"></div>
+      <button onclick="saveFeatures()" style="margin-top:14px;background:#003768;color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Save Changes</button>
+      <span id="admin-features-saved" style="display:none;margin-left:10px;font-size:12px;color:#2e7d32;font-weight:600;">✓ Saved</span>
     </div>
 
     <!-- Import preview -->
@@ -5343,6 +5356,10 @@ var _currentUser = null;
       var btn = document.getElementById('admin-btn');
       if (btn) btn.style.display = 'inline-flex';
     }
+    if (user && user.isSupervisor && !user.isAdmin) {
+      var svbtn = document.getElementById('supervisor-btn');
+      if (svbtn) svbtn.style.display = 'inline-flex';
+    }
     if (user && (user.isSupervisor || user.isAdmin)) {
       var sbtn = document.getElementById('tab-btn-supervisor-zone');
       if (sbtn) sbtn.style.display = '';
@@ -5353,6 +5370,8 @@ var _currentUser = null;
     }
     updateNavUser(user);
     initShareButtons();
+    // Apply feature flags to nav tabs
+    applyFeatureFlags();
     // Pre-load surveying so the tab button shows fees on arrival
     loadSurveying();
   }).catch(function(){});
@@ -5510,9 +5529,97 @@ function saveAccountDetails() {
 var _adminUsers = [];
 var _editingUserId = null;
 
+// ── Feature flags ────────────────────────────────────────────
+var _features = {};
+var FEATURE_LABELS = {
+  marketing:       { label: 'Marketing',        tab: 'tab-btn-marketing' },
+  compliance:      { label: 'Compliance',        tab: 'tab-btn-compliance' },
+  adviceStandards: { label: 'Advice Standards',  tab: null },
+  learning:        { label: 'Learning',          tab: 'tab-btn-learning' },
+  surveying:       { label: 'Surveying',         tab: 'tab-btn-surveying' },
+  sellingZone:     { label: 'Selling Zone',      tab: 'tab-btn-selling-zone' },
+  performanceZone: { label: 'Performance Zone',  tab: 'tab-btn-performance-zone' },
+  templates:       { label: 'Templates',         tab: null },
+  cpd:             { label: 'CPD',               tab: null },
+  industryReading: { label: 'Industry Reading',  tab: null },
+  dipCertificate:  { label: 'DIP Certificate',   tab: null }
+};
+
+function applyFeatureFlags() {
+  fetch('/api/admin/features').then(function(r){ return r.json(); }).then(function(f){
+    _features = f;
+    Object.keys(FEATURE_LABELS).forEach(function(key){
+      var tabId = FEATURE_LABELS[key].tab;
+      if (!tabId) return;
+      var btn = document.getElementById(tabId);
+      if (btn) btn.style.display = f[key] ? '' : 'none';
+    });
+  }).catch(function(){});
+}
+
+function renderFeatureToggles() {
+  var container = document.getElementById('admin-feature-toggles');
+  if (!container) return;
+  container.innerHTML = Object.keys(FEATURE_LABELS).map(function(key){
+    var checked = _features[key] !== false;
+    var label = FEATURE_LABELS[key].label;
+    return '<label style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #e8ecf0;border-radius:8px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:500;color:#1a2a3a;">' +
+      '<span style="position:relative;display:inline-block;width:38px;height:22px;flex-shrink:0;">' +
+        '<input type="checkbox" data-feature="' + key + '" ' + (checked ? 'checked' : '') + ' onchange="onFeatureToggle(this)" style="opacity:0;width:0;height:0;position:absolute;">' +
+        '<span class="feat-slider" style="position:absolute;inset:0;border-radius:22px;background:' + (checked ? '#003768' : '#cbd5e1') + ';transition:background .2s;"></span>' +
+        '<span style="position:absolute;top:3px;left:' + (checked ? '19px' : '3px') + ';width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);"></span>' +
+      '</span>' +
+      escHtml(label) +
+    '</label>';
+  }).join('');
+}
+
+function onFeatureToggle(input) {
+  var key = input.dataset.feature;
+  _features[key] = input.checked;
+  // Update toggle visuals
+  var span = input.nextElementSibling;
+  var dot   = span && span.nextElementSibling;
+  if (span) span.style.background = input.checked ? '#003768' : '#cbd5e1';
+  if (dot)  dot.style.left = input.checked ? '19px' : '3px';
+}
+
+function saveFeatures() {
+  fetch('/api/admin/features', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(_features)
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d.ok) {
+      applyFeatureFlags();
+      var saved = document.getElementById('admin-features-saved');
+      if (saved) { saved.style.display = 'inline'; setTimeout(function(){ saved.style.display='none'; }, 2000); }
+    }
+  });
+}
+
 function openAdminPanel() {
   var m = document.getElementById('admin-modal');
   m.style.display = 'flex';
+  var isSupervisorOnly = _currentUser && _currentUser.isSupervisor && !_currentUser.isAdmin;
+  // Header buttons — hide write actions for supervisors
+  ['admin-modal-add-user','admin-modal-import-csv','admin-modal-import-excel'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.style.display = isSupervisorOnly ? 'none' : '';
+  });
+  // Feature panel — only full admins
+  var fp = document.getElementById('admin-features-panel');
+  if (fp) {
+    if (!isSupervisorOnly) {
+      fp.style.display = 'block';
+      renderFeatureToggles();
+    } else {
+      fp.style.display = 'none';
+    }
+  }
+  // Modal title
+  var title = m.querySelector('h2');
+  if (title) title.textContent = isSupervisorOnly ? 'Team Overview' : 'User Management';
   loadAdminUsers();
   loadAdminLvList();
 }
@@ -5534,6 +5641,7 @@ function loadAdminUsers() {
 
 function renderUserList(users) {
   var el = document.getElementById('admin-user-list');
+  var isSupervisorOnly = _currentUser && _currentUser.isSupervisor && !_currentUser.isAdmin;
   if (!users || users.length === 0) {
     el.innerHTML = '<div style="color:#6b7c8f;font-size:13px;padding:24px 0;text-align:center;">No users yet. Click "+ Add User" to get started.</div>';
     return;
@@ -5547,16 +5655,16 @@ function renderUserList(users) {
     if (u.sellsMortgages)   products.push('<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;">Mortgages</span>');
     if (u.sellsProtection)  products.push('<span style="background:#fef9c3;color:#854d0e;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;">Protection</span>');
     var supInfo = u.supervisorEmail ? '<span style="color:#6b7c8f;font-size:11px;"> · Supervisor: ' + escHtml(u.supervisorEmail) + '</span>' : '';
+    var actionBtns = isSupervisorOnly ? '' :
+      '<button onclick="impersonateUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#e8f4f8;color:#005f8a;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Guardian Mode</button>' +
+      '<button onclick="openUserForm(\'' + u.id + '\')" style="background:#f5f7fa;color:#003768;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Edit</button>' +
+      '<button onclick="deleteUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#fff0f0;color:#c00;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Delete</button>';
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f2f5;">' +
       '<div>' +
         '<div style="font-size:14px;font-weight:600;color:#1a2a3a;">' + escHtml(name) + badge + supBadge + products.join('') + '</div>' +
         '<div style="font-size:12px;color:#6b7c8f;margin-top:1px;">' + escHtml(u.email) + (u.jobTitle ? ' · ' + escHtml(u.jobTitle) : '') + supInfo + '</div>' +
       '</div>' +
-      '<div style="display:flex;gap:8px;">' +
-        '<button onclick="impersonateUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#e8f4f8;color:#005f8a;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Guardian Mode</button>' +
-        '<button onclick="openUserForm(\'' + u.id + '\')" style="background:#f5f7fa;color:#003768;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Edit</button>' +
-        '<button onclick="deleteUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#fff0f0;color:#c00;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Delete</button>' +
-      '</div>' +
+      '<div style="display:flex;gap:8px;">' + actionBtns + '</div>' +
     '</div>';
   }).join('');
   el.innerHTML = rows;

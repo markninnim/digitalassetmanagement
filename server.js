@@ -35,6 +35,17 @@ const F_SUPERVISOR_EMAIL = 'fldvyCzxvpIEjD7PU';
 const F_CO_SUPERVISES  = 'fld2fG2C8sK9PQ3o2'; // "Co-supervises Email" — shares team view with
 const F_AVATAR         = 'fldiQ06FtP4BehJU7';
 
+// ── Feature flags ─────────────────────────────────────────────
+const FEATURES_PATH = path.join(__dirname, 'features.json');
+const FEATURES_DEFAULT = {
+  marketing: true, compliance: true, adviceStandards: true,
+  learning: true, surveying: true, sellingZone: true,
+  performanceZone: true, templates: true, cpd: true,
+  industryReading: true, dipCertificate: true
+};
+let _features = { ...FEATURES_DEFAULT };
+try { _features = { ...FEATURES_DEFAULT, ...JSON.parse(fs.readFileSync(FEATURES_PATH, 'utf8')) }; } catch(_) {}
+
 async function atFetch(endpoint, options = {}) {
   const url = `https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}${endpoint}`;
   const res = await fetch(url, {
@@ -1996,6 +2007,23 @@ app.get('/api/dip-certificate', requireAuth, async (req, res) => {
     res.send(Buffer.from(pdfBytes));
   } catch (err) {
     console.error('DIP cert error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Feature flags API ─────────────────────────────────────────
+app.get('/api/admin/features', (req, res) => {
+  res.json(_features);
+});
+
+app.post('/api/admin/features', requireAdmin, (req, res) => {
+  try {
+    const updates = req.body;
+    const allowed = Object.keys(FEATURES_DEFAULT);
+    allowed.forEach(k => { if (k in updates) _features[k] = !!updates[k]; });
+    fs.writeFileSync(FEATURES_PATH, JSON.stringify(_features, null, 2), 'utf8');
+    res.json({ ok: true, features: _features });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
