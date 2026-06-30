@@ -312,6 +312,41 @@ html { height: 100%; }
         </div>
       </div>
 
+      <!-- Latest Videos row (2 columns) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;align-items:start;">
+
+        <!-- Latest video -->
+        <div id="home-video-card" style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:20px;display:none;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Latest Video</div>
+          <div style="display:flex;gap:14px;align-items:center;">
+            <div style="width:52px;height:52px;background:#003768;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div style="min-width:0;">
+              <div id="home-video-title" style="font-size:13px;font-weight:700;color:#003768;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+              <div id="home-video-desc" style="font-size:12px;color:#6b7c8f;margin-bottom:8px;"></div>
+              <a id="home-video-link" href="#" onclick="homeOpenVideo(event)" style="font-size:12px;font-weight:600;color:#003768;text-decoration:none;">Watch now →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Latest newsletter -->
+        <div id="home-nl-card" style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:20px;display:none;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Latest Newsletter</div>
+          <div style="display:flex;gap:14px;align-items:center;">
+            <div style="width:52px;height:52px;background:#fcb034;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div id="home-nl-title" style="font-size:13px;font-weight:700;color:#003768;margin-bottom:4px;"></div>
+              <div style="font-size:12px;color:#6b7c8f;margin-bottom:8px;">Monthly industry update</div>
+              <a id="home-nl-link" href="#" onclick="homeOpenNewsletter(event)" style="font-size:12px;font-weight:600;color:#003768;text-decoration:none;">Read now →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- CPD Summary card -->
       <div id="home-cpd-card" style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:24px;margin-bottom:20px;display:none;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
@@ -369,62 +404,23 @@ html { height: 100%; }
         <div id="home-cd-list" style="display:none;flex-direction:column;gap:0;"></div>
       </div>
 
-      <!-- Bottom row: Feefo + Latest content -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
-
-        <!-- Feefo card -->
-        <div style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:24px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-            <img src="/public-feefo-logo" alt="Feefo" style="height:52px;width:auto;flex-shrink:0;object-fit:contain;">
-            <div>
-              <div style="font-size:14px;font-weight:700;color:#003768;">Your Feefo Reviews</div>
-              <div id="home-feefo-summary" style="font-size:12px;color:#6b7c8f;">Loading…</div>
-            </div>
-          </div>
-          <div id="home-feefo-stars" style="margin-bottom:16px;"></div>
-          <div id="home-feefo-reviews" style="display:flex;flex-direction:column;gap:0;">
-            <div style="color:#aaa;font-size:13px;">Loading reviews…</div>
-          </div>
-          <div id="home-feefo-pagination" style="display:none;display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid #f0f4f8;">
-            <button id="home-feefo-prev" onclick="feefoPage(-1)" style="background:#f5f7fa;border:1.5px solid #e8ecf0;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;color:#003768;cursor:pointer;font-family:inherit;">← Prev</button>
-            <span id="home-feefo-page-label" style="font-size:12px;color:#6b7c8f;"></span>
-            <button id="home-feefo-next" onclick="feefoPage(1)"  style="background:#f5f7fa;border:1.5px solid #e8ecf0;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;color:#003768;cursor:pointer;font-family:inherit;">Next →</button>
+      <!-- Feefo card (full width) -->
+      <div style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <img src="/public-feefo-logo" alt="Feefo" style="height:52px;width:auto;flex-shrink:0;object-fit:contain;">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#003768;">Your Feefo Reviews</div>
+            <div id="home-feefo-summary" style="font-size:12px;color:#6b7c8f;">Loading…</div>
           </div>
         </div>
-
-        <!-- Latest video + newsletter -->
-        <div style="display:flex;flex-direction:column;gap:16px;">
-
-          <!-- Latest video -->
-          <div id="home-video-card" style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:20px;display:none;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Latest Video</div>
-            <div style="display:flex;gap:14px;align-items:center;">
-              <div style="width:52px;height:52px;background:#003768;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              </div>
-              <div style="min-width:0;">
-                <div id="home-video-title" style="font-size:13px;font-weight:700;color:#003768;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
-                <div id="home-video-desc" style="font-size:12px;color:#6b7c8f;margin-bottom:8px;"></div>
-                <a id="home-video-link" href="#" onclick="homeOpenVideo(event)" style="font-size:12px;font-weight:600;color:#003768;text-decoration:none;">Watch now →</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Latest newsletter -->
-          <div id="home-nl-card" style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:20px;display:none;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Latest Newsletter</div>
-            <div style="display:flex;gap:14px;align-items:center;">
-              <div style="width:52px;height:52px;background:#fcb034;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </div>
-              <div>
-                <div id="home-nl-title" style="font-size:13px;font-weight:700;color:#003768;margin-bottom:4px;"></div>
-                <div style="font-size:12px;color:#6b7c8f;margin-bottom:8px;">Monthly industry update</div>
-                <a id="home-nl-link" href="#" onclick="homeOpenNewsletter(event)" style="font-size:12px;font-weight:600;color:#003768;text-decoration:none;">Read now →</a>
-              </div>
-            </div>
-          </div>
-
+        <div id="home-feefo-stars" style="margin-bottom:16px;"></div>
+        <div id="home-feefo-reviews" style="display:flex;flex-direction:column;gap:0;">
+          <div style="color:#aaa;font-size:13px;">Loading reviews…</div>
+        </div>
+        <div id="home-feefo-pagination" style="display:none;display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid #f0f4f8;">
+          <button id="home-feefo-prev" onclick="feefoPage(-1)" style="background:#f5f7fa;border:1.5px solid #e8ecf0;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;color:#003768;cursor:pointer;font-family:inherit;">← Prev</button>
+          <span id="home-feefo-page-label" style="font-size:12px;color:#6b7c8f;"></span>
+          <button id="home-feefo-next" onclick="feefoPage(1)"  style="background:#f5f7fa;border:1.5px solid #e8ecf0;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;color:#003768;cursor:pointer;font-family:inherit;">Next →</button>
         </div>
       </div>
 
