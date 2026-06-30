@@ -2052,6 +2052,62 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
 });
 
 
+// GET /api/download-broker-logo — personalised broker logo PDF for current user
+app.get('/api/download-broker-logo', requireAuth, async (req, res) => {
+  try {
+    const user      = req.session.user;
+    const firstName = (user.firstName || '').trim();
+    const lastName  = (user.lastName  || '').trim();
+    const fullName  = [firstName, lastName].filter(Boolean).join(' ') || user.email;
+
+    const { PDFDocument, rgb } = require('pdf-lib');
+
+    const pdfDoc = await PDFDocument.create();
+    pdfDoc.registerFontkit(fontkit);
+
+    const fontBoldBytes = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-ExtraBold.ttf'));
+    const fontBold = await pdfDoc.embedFont(fontBoldBytes);
+
+    // broker-branded.png is 2262×1029px
+    const brokerLogoBytes = fs.readFileSync(path.join(__dirname, 'public/assets/logos/individual broker branding/broker-branded.png'));
+    const brokerLogoImg   = await pdfDoc.embedPng(brokerLogoBytes);
+
+    const pageW = 756; // 10.5 inches
+    const sc    = pageW / 2262;
+    const pageH = Math.round(1029 * sc); // ~344pt
+
+    const page = pdfDoc.addPage([pageW, pageH]);
+    page.drawImage(brokerLogoImg, { x: 0, y: 0, width: pageW, height: pageH });
+
+    // White out the "Broker Name" text zone (image px: x=610–1662, y=226–382 from top)
+    const wnX = Math.round(610 * sc);
+    const wnY = Math.round((1029 - 382) * sc);
+    const wnW = Math.round(1052 * sc);
+    const wnH = Math.round(156 * sc) + 2;
+    page.drawRectangle({ x: wnX, y: wnY, width: wnW, height: wnH, color: rgb(1, 1, 1) });
+
+    // Draw personalised name — auto-scale if long
+    const darkBlue = rgb(0/255, 55/255, 104/255);
+    const maxNameW = wnW - 4;
+    let nameFontSize = 48;
+    const measuredW = fontBold.widthOfTextAtSize(fullName, nameFontSize);
+    if (measuredW > maxNameW) nameFontSize = Math.floor(nameFontSize * maxNameW / measuredW);
+    const textX = wnX + Math.round((wnW - Math.min(measuredW, maxNameW)) / 2);
+    const textY = wnY + Math.round((wnH - nameFontSize) / 2) + 4;
+    page.drawText(fullName, { x: textX, y: textY, size: nameFontSize, font: fontBold, color: darkBlue });
+
+    const modifiedBytes = await pdfDoc.save();
+    const safeName = fullName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="FPG-Broker-Logo-${safeName}.pdf"`);
+    res.send(Buffer.from(modifiedBytes));
+  } catch (err) {
+    console.error('Broker logo error:', err);
+    res.status(500).send('Could not generate broker logo: ' + err.message);
+  }
+});
+
+
 // GET /api/share/advisers — all advisers (supervisors only)
 app.get('/api/share/advisers', requireAuth, async (req, res) => {
   if (!req.session.user.isSupervisor && !req.session.user.isAdmin) {
