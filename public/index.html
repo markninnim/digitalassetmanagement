@@ -3243,9 +3243,15 @@ html { height: 100%; }
             <label style="display:block;font-size:12px;font-weight:600;color:#1a2a3a;margin-bottom:5px;">Website</label>
             <input id="uf-website" type="text" placeholder="https://…" style="width:100%;padding:9px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;" onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
           </div>
-          <div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;">
-            <input id="uf-admin" type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:#003768;">
-            <label for="uf-admin" style="font-size:13px;font-weight:600;color:#1a2a3a;cursor:pointer;">Admin access (can manage users)</label>
+          <div style="grid-column:1/-1;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input id="uf-admin" type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:#003768;">
+              <label for="uf-admin" style="font-size:13px;font-weight:600;color:#1a2a3a;cursor:pointer;">Admin access (can manage users)</label>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input id="uf-marketing" type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:#e8740c;">
+              <label for="uf-marketing" style="font-size:13px;font-weight:600;color:#1a2a3a;cursor:pointer;">Marketing access (can add featured posts)</label>
+            </div>
           </div>
           <div style="grid-column:1/-1;padding-top:4px;border-top:1px solid #f0f2f5;margin-top:4px;">
             <div style="font-size:12px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Products Sold</div>
@@ -5953,6 +5959,7 @@ function openUserForm(userId) {
     document.getElementById('uf-landline').value   = u.landline || '';
     document.getElementById('uf-website').value        = u.website || '';
     document.getElementById('uf-admin').checked        = u.isAdmin || false;
+    document.getElementById('uf-marketing').checked    = u.isMarketing || false;
     document.getElementById('uf-investments').checked      = u.sellsInvestments || false;
     document.getElementById('uf-mortgages').checked        = u.sellsMortgages   || false;
     document.getElementById('uf-protection').checked       = u.sellsProtection  || false;
@@ -5968,6 +5975,7 @@ function openUserForm(userId) {
       else el.value = '';
     });
     document.getElementById('uf-admin').checked           = false;
+    document.getElementById('uf-marketing').checked       = false;
     document.getElementById('uf-investments').checked     = false;
     document.getElementById('uf-mortgages').checked       = false;
     document.getElementById('uf-protection').checked      = false;
@@ -6000,6 +6008,7 @@ function saveUser() {
     landline:         document.getElementById('uf-landline').value.trim(),
     website:          document.getElementById('uf-website').value.trim(),
     isAdmin:          document.getElementById('uf-admin').checked,
+    isMarketing:      document.getElementById('uf-marketing').checked,
     sellsInvestments: document.getElementById('uf-investments').checked,
     sellsMortgages:   document.getElementById('uf-mortgages').checked,
     sellsProtection:  document.getElementById('uf-protection').checked,

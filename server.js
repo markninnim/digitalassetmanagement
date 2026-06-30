@@ -352,12 +352,13 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
 
 // ── Admin: create user ────────────────────────────────────────
 app.post('/api/admin/users', requireAdmin, async (req, res) => {
-  const { email, password, salutation, firstName, lastName, jobTitle, mobile, landline, website, isAdmin, sellsMortgages, sellsProtection, sellsInvestments, isSupervisor, supervisorEmail } = req.body;
+  const { email, password, salutation, firstName, lastName, jobTitle, mobile, landline, website, isAdmin, isMarketing, sellsMortgages, sellsProtection, sellsInvestments, isSupervisor, supervisorEmail } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
   try {
     const hash = bcrypt.hashSync(password, 10);
+    const normEmail = email.trim().toLowerCase();
     const fields = {
-      [F_EMAIL]:       email.trim().toLowerCase(),
+      [F_EMAIL]:       normEmail,
       [F_PASSWORD]:    hash,
       [F_SAL]:         salutation  || '',
       [F_FIRST]:       firstName   || '',
@@ -377,6 +378,11 @@ app.post('/api/admin/users', requireAdmin, async (req, res) => {
       method: 'POST',
       body: JSON.stringify({ records: [{ fields }], returnFieldsByFieldId: true })
     });
+    // Handle marketing role
+    const mktFlag = isMarketing === true || isMarketing === 'true';
+    if (mktFlag) _marketingUsers.add(normEmail);
+    else _marketingUsers.delete(normEmail);
+    fs.writeFileSync(MARKETING_USERS_PATH, JSON.stringify([..._marketingUsers], null, 2));
     res.json(recordToUser(data.records[0]));
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -444,7 +450,7 @@ app.post('/api/admin/users/bulk', requireAdmin, async (req, res) => {
 // ── Admin: update user ────────────────────────────────────────
 app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const { password, salutation, firstName, lastName, jobTitle, mobile, landline, website, isAdmin, sellsMortgages, sellsProtection, sellsInvestments, isSupervisor, supervisorEmail } = req.body;
+  const { password, salutation, firstName, lastName, jobTitle, mobile, landline, website, isAdmin, isMarketing, sellsMortgages, sellsProtection, sellsInvestments, isSupervisor, supervisorEmail, email } = req.body;
   try {
     const fields = {
       [F_SAL]:              salutation  || '',
@@ -466,6 +472,14 @@ app.put('/api/admin/users/:id', requireAdmin, async (req, res) => {
       method: 'PATCH',
       body: JSON.stringify({ fields, returnFieldsByFieldId: true })
     });
+    // Handle marketing role (keyed by email)
+    if (email !== undefined) {
+      const normEmail = email.trim().toLowerCase();
+      const mktFlag = isMarketing === true || isMarketing === 'true';
+      if (mktFlag) _marketingUsers.add(normEmail);
+      else _marketingUsers.delete(normEmail);
+      fs.writeFileSync(MARKETING_USERS_PATH, JSON.stringify([..._marketingUsers], null, 2));
+    }
     res.json(recordToUser(data));
   } catch (err) {
     res.status(500).json({ error: err.message });
