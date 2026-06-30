@@ -1021,6 +1021,19 @@ function lvRecordToVideo(record) {
 }
 
 // GET /api/learning — featured 8 + archive (auth required)
+// GET /api/learning/catch-up?type=Mortgage — 3 most recent videos of a CPD type
+app.get('/api/learning/catch-up', requireAuth, async (req, res) => {
+  const type = req.query.type;
+  if (!type) return res.status(400).json({ error: 'type required' });
+  try {
+    const formula = encodeURIComponent(`{${LV_CPD_TYPE}} = "${type}"`);
+    const data = await lvFetch(`?filterByFormula=${formula}&sort[0][field]=${LV_ADDED}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=3`);
+    res.json({ videos: (data.records || []).map(lvRecordToVideo) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/learning', requireAuth, async (req, res) => {
   try {
     const data = await lvFetch(`?sort[0][field]=${LV_ADDED}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=50`);
