@@ -4073,8 +4073,8 @@ function loadSocialContent() {
       wrapDiv.appendChild(createBtn);
       container.appendChild(wrapDiv);
     });
-  }).catch(function() {
-    document.getElementById('social-content-body').innerHTML = '<p style="color:#cc0000;">Could not load social content.</p>';
+  }).catch(function(err) {
+    document.getElementById('social-content-body').innerHTML = '<p style="color:#cc0000;">Could not load social content: ' + (err && err.message ? err.message : String(err)) + '</p>';
   });
 }
 function renderPdfThumb(url, container) {
