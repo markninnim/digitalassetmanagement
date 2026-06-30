@@ -4030,17 +4030,13 @@ function loadSocialContent() {
       var wrapDiv = document.createElement('div');
       wrapDiv.style.cssText = 'margin:12px 0 32px;width:100%;box-sizing:border-box;';
 
-      // Header row: label + Reset button
+      // Header row: label only
       var headerRow = document.createElement('div');
-      headerRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;';
+      headerRow.style.cssText = 'display:flex;align-items:center;margin-bottom:6px;';
       var label = document.createElement('div');
       label.textContent = 'Approved Post Wording';
       label.style.cssText = 'font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:1px;';
-      var resetBtn = document.createElement('button');
-      resetBtn.textContent = 'Reset to approved';
-      resetBtn.style.cssText = 'background:none;border:none;font-size:11px;color:#2e99d5;cursor:pointer;font-family:inherit;padding:0;text-decoration:underline;';
       headerRow.appendChild(label);
-      headerRow.appendChild(resetBtn);
 
       var ta = document.createElement('textarea');
       ta.value = taValue;
@@ -4057,12 +4053,12 @@ function loadSocialContent() {
       })(storageKey, baseKey, defaultVal, ta);
 
       var copyBtn = document.createElement('button');
-      copyBtn.textContent = '📋 Copy';
+      copyBtn.textContent = 'Copy';
       copyBtn.style.cssText = 'margin-top:10px;margin-right:8px;background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;';
       (function(t, btn){ copyBtn.onclick = function(){
         navigator.clipboard.writeText(t.value).then(function(){
           btn.textContent = '✓ Copied!'; btn.style.color = '#2e7d32';
-          setTimeout(function(){ btn.textContent = '📋 Copy'; btn.style.color = '#003768'; }, 2000);
+          setTimeout(function(){ btn.textContent = 'Copy'; btn.style.color = '#003768'; }, 2000);
         });
       }; })(ta, copyBtn);
 
