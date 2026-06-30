@@ -4085,10 +4085,16 @@ function loadSocialContent() {
       createBtn.style.cssText = 'margin-top:10px;background:#003768;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
       (function(pn, t){ createBtn.onclick = function(){ openCp(pn, t.value); }; })(post.name, ta);
 
+      var shareBtn = document.createElement('button');
+      shareBtn.textContent = '✉ Share';
+      shareBtn.style.cssText = 'margin-top:10px;margin-left:8px;background:#f0f7ff;color:#003768;border:1.5px solid #c3daf5;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;';
+      (function(pn, t, g){ shareBtn.onclick = function(){ openShareModal(pn, t.value, g); }; })(post.name, ta, grid);
+
       wrapDiv.appendChild(headerRow);
       wrapDiv.appendChild(ta);
       wrapDiv.appendChild(copyBtn);
       wrapDiv.appendChild(createBtn);
+      wrapDiv.appendChild(shareBtn);
       container.appendChild(wrapDiv);
     });
   }).catch(function(err) {
@@ -7786,6 +7792,100 @@ function pzFmt(n) {
     </div>
   </div>
 </div>
+
+<!-- Share Social Post modal -->
+<div id="share-post-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:480px;max-width:95vw;box-shadow:0 12px 40px rgba(0,0,0,.22);position:relative;max-height:90vh;overflow-y:auto;">
+    <button onclick="closeShareModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#6b7c8f;line-height:1;">✕</button>
+    <h3 style="margin:0 0 4px;font-size:17px;font-weight:800;color:#003768;">Share Post via Email</h3>
+    <p id="share-post-name" style="margin:0 0 20px;font-size:13px;color:#6b7c8f;"></p>
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:12px;font-weight:700;color:#1a2a3a;margin-bottom:5px;">Recipient Email Address</label>
+      <input id="share-to-email" type="email" placeholder="colleague@example.com"
+        style="width:100%;padding:9px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;"
+        onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'">
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <label style="display:block;font-size:12px;font-weight:700;color:#1a2a3a;margin-bottom:5px;">Post Copy (editable before sending)</label>
+      <textarea id="share-post-copy" rows="6"
+        style="width:100%;padding:9px 12px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;box-sizing:border-box;resize:vertical;outline:none;line-height:1.5;"
+        onfocus="this.style.borderColor='#2e99d5'" onblur="this.style.borderColor='#e8ecf0'"></textarea>
+    </div>
+
+    <div id="share-image-preview" style="margin-bottom:16px;display:none;">
+      <label style="display:block;font-size:12px;font-weight:700;color:#1a2a3a;margin-bottom:5px;">Image to include</label>
+      <img id="share-image-img" style="max-width:100%;max-height:140px;object-fit:contain;border-radius:7px;border:1px solid #e8ecf0;">
+    </div>
+
+    <p id="share-status" style="margin:0 0 12px;font-size:13px;min-height:18px;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="sendShareEmail()" style="flex:1;background:#003768;color:#fff;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Send Email</button>
+      <button onclick="closeShareModal()" style="background:#f5f7fa;color:#6b7c8f;border:1.5px solid #e8ecf0;padding:11px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var _shareImageDataUrl = null;
+var _sharePostName = '';
+
+function openShareModal(postName, copy, imageGrid) {
+  _sharePostName = postName;
+  _shareImageDataUrl = null;
+  document.getElementById('share-post-name').textContent = postName.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+  document.getElementById('share-to-email').value = '';
+  document.getElementById('share-post-copy').value = copy || '';
+  document.getElementById('share-status').textContent = '';
+  document.getElementById('share-status').style.color = '#6b7c8f';
+  // Try to grab the first image from the post's card grid
+  var preview = document.getElementById('share-image-preview');
+  var imgEl = document.getElementById('share-image-img');
+  preview.style.display = 'none';
+  if (imageGrid) {
+    var firstImg = imageGrid.querySelector('img');
+    if (firstImg && firstImg.src && firstImg.src.indexOf('data:') === 0) {
+      _shareImageDataUrl = firstImg.src;
+      imgEl.src = firstImg.src;
+      preview.style.display = 'block';
+    } else if (firstImg && firstImg.src) {
+      // Fetch and convert to dataURL so we can embed in email
+      fetch(firstImg.src).then(function(r){ return r.blob(); }).then(function(blob){
+        var reader = new FileReader();
+        reader.onload = function(e){
+          _shareImageDataUrl = e.target.result;
+          imgEl.src = _shareImageDataUrl;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(blob);
+      }).catch(function(){});
+    }
+  }
+  document.getElementById('share-post-modal').style.display = 'flex';
+}
+
+function closeShareModal() {
+  document.getElementById('share-post-modal').style.display = 'none';
+}
+
+function sendShareEmail() {
+  var to = document.getElementById('share-to-email').value.trim();
+  var copy = document.getElementById('share-post-copy').value;
+  var statusEl = document.getElementById('share-status');
+  if (!to) { statusEl.style.color = '#c00'; statusEl.textContent = 'Please enter a recipient email address.'; return; }
+  statusEl.style.color = '#6b7c8f'; statusEl.textContent = 'Sending…';
+  fetch('/api/share-social-post', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to: to, postName: _sharePostName, wording: copy, imageDataUrl: _shareImageDataUrl })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.error) { statusEl.style.color = '#c00'; statusEl.textContent = d.error; return; }
+    statusEl.style.color = '#2e7d32'; statusEl.textContent = '✓ Email sent to ' + to;
+    setTimeout(closeShareModal, 1500);
+  }).catch(function(){ statusEl.style.color = '#c00'; statusEl.textContent = 'Failed to send. Please try again.'; });
+}
+</script>
 
 </body>
 </html>

@@ -7,6 +7,18 @@ const bcrypt   = require('bcryptjs');
 const { PDFDocument, rgb, pushGraphicsState, popGraphicsState, moveTo, appendBezierCurve, closePath, clip, endPath } = require('pdf-lib');
 const fontkit = require('@pdf-lib/fontkit');
 const QRCode  = require('qrcode');
+const nodemailer = require('nodemailer');
+
+// ── Campaign Monitor SMTP transporter ────────────────────────
+// Set CM_API_KEY and CM_FROM_EMAIL in Railway environment variables
+const _mailer = nodemailer.createTransport({
+  host: 'smtp.createsend.com',
+  port: 587,
+  auth: {
+    user: process.env.CM_API_KEY || '',
+    pass: process.env.CM_API_KEY || ''
+  }
+});
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -1394,6 +1406,63 @@ app.put('/api/featured-social/:id', requireMarketingOrAdmin, (req, res) => {
     fs.writeFileSync(FEATURED_SOCIAL_PATH, JSON.stringify(_featuredSocial, null, 2));
     res.json({ ok: true, post });
   } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── Share social post via email ───────────────────────────────
+app.post('/api/share-social-post', requireAuth, async (req, res) => {
+  const { to, postName, wording, imageDataUrl } = req.body;
+  if (!to) return res.status(400).json({ error: 'Recipient email required' });
+  if (!process.env.CM_API_KEY) return res.status(503).json({ error: 'Email not configured (CM_API_KEY missing)' });
+
+  const sender = req.session.user;
+  const fromName = [sender.firstName, sender.lastName].filter(Boolean).join(' ') || 'Finance Planning Group';
+  const fromEmail = process.env.CM_FROM_EMAIL || 'noreply@financeplanning.co.uk';
+
+  // Build email body
+  const copyHtml = (wording || '').replace(/\n/g, '<br>');
+  const imgHtml = imageDataUrl
+    ? `<p><img src="${imageDataUrl}" alt="Social post image" style="max-width:560px;width:100%;border-radius:8px;"></p>`
+    : '';
+
+  const html = `
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);">
+        <tr><td style="background:#003768;padding:24px 32px;">
+          <p style="margin:0;color:#fff;font-size:20px;font-weight:700;">Finance Planning Group</p>
+        </td></tr>
+        <tr><td style="padding:32px;">
+          <p style="margin:0 0 8px;font-size:13px;color:#6b7c8f;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">SOCIAL POST</p>
+          <h2 style="margin:0 0 20px;font-size:22px;color:#003768;">${postName || 'Post'}</h2>
+          ${imgHtml}
+          <div style="background:#f9fafc;border-left:4px solid #003768;border-radius:0 8px 8px 0;padding:16px 20px;margin:20px 0;">
+            <p style="margin:0;font-size:15px;color:#1a2a3a;line-height:1.6;">${copyHtml}</p>
+          </div>
+          <p style="margin:24px 0 0;font-size:13px;color:#6b7c8f;">Shared by <strong>${fromName}</strong></p>
+        </td></tr>
+        <tr><td style="background:#f9fafc;padding:16px 32px;border-top:1px solid #e8ecf0;">
+          <p style="margin:0;font-size:11px;color:#9ca8b4;">Finance Planning Group Ltd &mdash; financeplanning.co.uk</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+
+  try {
+    await _mailer.sendMail({
+      from: `"${fromName}" <${fromEmail}>`,
+      to,
+      subject: `Social Post: ${postName || 'Shared post'} — from ${fromName}`,
+      html
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Share email error:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ── Social copy JSON ──────────────────────────────────────────
