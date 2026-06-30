@@ -107,13 +107,21 @@ function requireAuth(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  if (req.session.authenticated && req.session.user && req.session.user.isAdmin) return next();
+  if (!req.session.authenticated) return res.status(403).json({ error: 'Forbidden' });
+  // Allow if current user is admin, OR if impersonating and original user was admin
+  const u = req.session.user;
+  const orig = req.session.originalUser;
+  if (u && u.isAdmin) return next();
+  if (orig && orig.isAdmin) return next(); // admin in Guardian Mode
   res.status(403).json({ error: 'Forbidden' });
 }
 
 function requireMarketingOrAdmin(req, res, next) {
-  if (req.session.authenticated && req.session.user &&
-      (req.session.user.isAdmin || req.session.user.isMarketing)) return next();
+  if (!req.session.authenticated) return res.status(403).json({ error: 'Forbidden' });
+  const u = req.session.user;
+  const orig = req.session.originalUser;
+  if (u && (u.isAdmin || u.isMarketing)) return next();
+  if (orig && (orig.isAdmin || orig.isMarketing)) return next(); // impersonating
   res.status(403).json({ error: 'Forbidden' });
 }
 
