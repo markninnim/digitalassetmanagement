@@ -1026,7 +1026,11 @@ app.get('/api/learning/catch-up', requireAuth, async (req, res) => {
   const type = req.query.type;
   if (!type) return res.status(400).json({ error: 'type required' });
   try {
-    const formula = encodeURIComponent(`{${LV_CPD_TYPE}} = "${type}"`);
+    // Blank CPD type defaults to Mortgage, so include empty fields when filtering for Mortgage
+    const typeFilter = type === 'Mortgage'
+      ? `OR({${LV_CPD_TYPE}} = "Mortgage", {${LV_CPD_TYPE}} = "")`
+      : `{${LV_CPD_TYPE}} = "${type}"`;
+    const formula = encodeURIComponent(typeFilter);
     const data = await lvFetch(`?filterByFormula=${formula}&sort[0][field]=${LV_ADDED}&sort[0][direction]=desc&returnFieldsByFieldId=true&pageSize=3`);
     res.json({ videos: (data.records || []).map(lvRecordToVideo) });
   } catch (err) {
