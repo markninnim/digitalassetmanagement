@@ -338,6 +338,11 @@ app.get('/public-logo', (req, res) => {
   if (require('fs').existsSync(p)) res.sendFile(p);
   else res.status(404).send('Not found');
 });
+app.get('/public-feefo-logo', (req, res) => {
+  const p = path.join(__dirname, 'public/assets/graphics/feefo/Square 22/PNG/feefo_sq_platinum_service_2022_dark.png');
+  if (fs.existsSync(p)) res.sendFile(p);
+  else res.status(404).send('Not found');
+});
 
 // ── Login routes ─────────────────────────────────────────────
 app.get('/login', (req, res) => {
