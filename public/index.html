@@ -4044,14 +4044,6 @@ function loadSocialContent() {
       ta.addEventListener('input', function(){ localStorage.setItem(storageKey, ta.value); localStorage.setItem(baseKey, defaultVal); });
       ta.addEventListener('focus', function(){ ta.style.borderColor = '#003768'; });
       ta.addEventListener('blur',  function(){ ta.style.borderColor = '#e8ecf0'; });
-      (function(key, bkey, def, textarea) {
-        resetBtn.onclick = function() {
-          textarea.value = def;
-          localStorage.removeItem(key);
-          localStorage.removeItem(bkey);
-        };
-      })(storageKey, baseKey, defaultVal, ta);
-
       var copyBtn = document.createElement('button');
       copyBtn.textContent = 'Copy';
       copyBtn.style.cssText = 'margin-top:10px;margin-right:8px;background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;';
