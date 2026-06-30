@@ -1289,10 +1289,11 @@ app.get('/api/featured-social', requireAuth, (req, res) => {
   res.json(_featuredSocial);
 });
 app.post('/api/featured-social', requireMarketingOrAdmin, (req, res) => {
-  const { title, wording, image } = req.body;
+  const { title, wording, images, image } = req.body;
   if (!title) return res.status(400).json({ error: 'Title required' });
   if (_featuredSocial.length >= 4) return res.status(400).json({ error: 'Maximum 4 featured posts' });
-  const post = { id: Date.now().toString(), title, wording: wording || '', image: image || '', createdAt: new Date().toISOString() };
+  // Accept either `images` (new per-platform dict) or legacy `image` string
+  const post = { id: Date.now().toString(), title, wording: wording || '', images: images || (image ? { Facebook: image } : {}), createdAt: new Date().toISOString() };
   _featuredSocial.push(post);
   try {
     fs.writeFileSync(FEATURED_SOCIAL_PATH, JSON.stringify(_featuredSocial, null, 2));
@@ -1307,12 +1308,13 @@ app.delete('/api/featured-social/:id', requireMarketingOrAdmin, (req, res) => {
   } catch(err) { res.status(500).json({ error: err.message }); }
 });
 app.put('/api/featured-social/:id', requireMarketingOrAdmin, (req, res) => {
-  const { title, wording, image } = req.body;
+  const { title, wording, images, image } = req.body;
   const post = _featuredSocial.find(p => p.id === req.params.id);
   if (!post) return res.status(404).json({ error: 'Not found' });
   if (title)   post.title   = title;
   if (wording !== undefined) post.wording = wording;
-  if (image)   post.image   = image;
+  if (images)  post.images  = images;
+  else if (image) post.images = { Facebook: image }; // legacy compat
   try {
     fs.writeFileSync(FEATURED_SOCIAL_PATH, JSON.stringify(_featuredSocial, null, 2));
     res.json({ ok: true, post });

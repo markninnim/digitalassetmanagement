@@ -4110,11 +4110,16 @@ function renderFeaturedPosts(posts) {
   posts.forEach(function(post) {
     var card = document.createElement('div');
     card.style.cssText = 'background:#fff;border:1.5px solid #e8ecf0;border-radius:10px;overflow:hidden;position:relative;';
-    var img = post.image ? '<img src="' + post.image + '" style="width:100%;height:140px;object-fit:cover;display:block;">' : '<div style="width:100%;height:140px;background:#f5f7fa;display:flex;align-items:center;justify-content:center;color:#b0bec5;font-size:12px;">No image</div>';
+    var images = post.images || {};
+    var platforms = ['Facebook','Instagram','LinkedIn','Square','TikTok / Story'];
+    var firstImg = platforms.map(function(p){ return images[p]; }).find(Boolean);
+    var imgHtml = firstImg ? '<img src="' + firstImg + '" style="width:100%;height:140px;object-fit:cover;display:block;">' : '<div style="width:100%;height:140px;background:#f5f7fa;display:flex;align-items:center;justify-content:center;color:#b0bec5;font-size:12px;">No image</div>';
+    var platformDots = platforms.map(function(p){ return '<span title="' + p + '" style="width:8px;height:8px;border-radius:50%;display:inline-block;background:' + (images[p] ? '#003768' : '#e8ecf0') + ';"></span>'; }).join('');
     var wording = post.wording ? '<div style="font-size:12px;color:#4a5a6a;line-height:1.5;margin:6px 0;max-height:60px;overflow:hidden;">' + escHtml(post.wording.slice(0,120)) + (post.wording.length > 120 ? '…' : '') + '</div>' : '';
-    card.innerHTML = img +
+    card.innerHTML = imgHtml +
       '<div style="padding:10px 12px 12px;">' +
         '<div style="font-size:13px;font-weight:700;color:#003768;margin-bottom:4px;">' + escHtml(post.title) + '</div>' +
+        '<div style="display:flex;gap:4px;align-items:center;margin-bottom:4px;" title="Facebook · Instagram · LinkedIn · Square · TikTok">' + platformDots + '<span style="font-size:10px;color:#6b7c8f;margin-left:4px;">' + Object.keys(images).length + '/5 platforms</span></div>' +
         wording +
         '<div style="display:flex;gap:6px;margin-top:8px;">' +
           '<button onclick="editFeaturedPost(\'' + post.id + '\')" style="flex:1;background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:6px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Edit</button>' +
@@ -4125,29 +4130,59 @@ function renderFeaturedPosts(posts) {
   });
 }
 
+var MKU_PLATFORMS = [
+  { key: 'Facebook',       size: '630 × 1200px' },
+  { key: 'Instagram',      size: '1080 × 1350px' },
+  { key: 'LinkedIn',       size: '1200 × 630px' },
+  { key: 'Square',         size: '1200 × 1200px' },
+  { key: 'TikTok / Story', size: '1080 × 1920px' }
+];
+var _mku_images = {}; // platform -> dataURL
+
+function mkuRenderPlatforms(existing) {
+  _mku_images = existing || {};
+  var container = document.getElementById('mku-platforms');
+  container.innerHTML = '';
+  MKU_PLATFORMS.forEach(function(p) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;';
+    var label = document.createElement('div');
+    label.style.cssText = 'width:120px;flex-shrink:0;';
+    label.innerHTML = '<div style="font-size:12px;font-weight:700;color:#1a2a3a;">' + p.key + '</div><div style="font-size:10px;color:#6b7c8f;">' + p.size + '</div>';
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file'; fileInput.accept = 'image/*';
+    fileInput.style.cssText = 'flex:1;font-size:11px;font-family:inherit;';
+    fileInput.dataset.platform = p.key;
+    var thumb = document.createElement('div');
+    thumb.style.cssText = 'width:40px;height:40px;border-radius:5px;overflow:hidden;flex-shrink:0;background:#f5f7fa;border:1px solid #e8ecf0;';
+    if (_mku_images[p.key]) {
+      thumb.innerHTML = '<img src="' + _mku_images[p.key] + '" style="width:100%;height:100%;object-fit:cover;">';
+    }
+    fileInput.addEventListener('change', (function(platform, thumbEl) {
+      return function() {
+        var file = this.files[0]; if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          _mku_images[platform] = e.target.result;
+          thumbEl.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;">';
+        };
+        reader.readAsDataURL(file);
+      };
+    })(p.key, thumb));
+    row.appendChild(label); row.appendChild(fileInput); row.appendChild(thumb);
+    container.appendChild(row);
+  });
+}
+
 function openMarketingUpload() {
   if (!canManageFeatured()) return;
   document.getElementById('mku-edit-id').value = '';
   document.getElementById('mku-title').value = '';
   document.getElementById('mku-wording').value = '';
-  document.getElementById('mku-image').value = '';
   document.getElementById('mku-status').textContent = '';
-  document.getElementById('mku-image-preview').style.display = 'none';
   document.getElementById('mku-title-heading').textContent = 'Add Featured Post';
-  var modal = document.getElementById('marketing-upload-modal');
-  modal.style.display = 'flex';
-  // Image preview
-  document.getElementById('mku-image').onchange = function() {
-    var file = this.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var img = document.getElementById('mku-image-img');
-      img.src = e.target.result;
-      document.getElementById('mku-image-preview').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  };
+  mkuRenderPlatforms({});
+  document.getElementById('marketing-upload-modal').style.display = 'flex';
 }
 
 function closeMarketingUpload() {
@@ -4163,57 +4198,28 @@ function editFeaturedPost(id) {
     document.getElementById('mku-wording').value = post.wording || '';
     document.getElementById('mku-status').textContent = '';
     document.getElementById('mku-title-heading').textContent = 'Edit Featured Post';
-    if (post.image) {
-      document.getElementById('mku-image-img').src = post.image;
-      document.getElementById('mku-image-preview').style.display = 'block';
-    } else {
-      document.getElementById('mku-image-preview').style.display = 'none';
-    }
-    document.getElementById('mku-image').value = '';
-    document.getElementById('mku-image').onchange = function() {
-      var file = this.files[0];
-      if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('mku-image-img').src = e.target.result;
-        document.getElementById('mku-image-preview').style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    };
+    mkuRenderPlatforms(post.images || {});
     document.getElementById('marketing-upload-modal').style.display = 'flex';
   });
 }
 
 function saveFeaturedPost() {
-  var title   = document.getElementById('mku-title').value.trim();
-  var wording = document.getElementById('mku-wording').value.trim();
-  var editId  = document.getElementById('mku-edit-id').value;
+  var title    = document.getElementById('mku-title').value.trim();
+  var wording  = document.getElementById('mku-wording').value.trim();
+  var editId   = document.getElementById('mku-edit-id').value;
   var statusEl = document.getElementById('mku-status');
   if (!title) { statusEl.style.color = '#c00'; statusEl.textContent = 'Please enter a title.'; return; }
   statusEl.style.color = '#6b7c8f'; statusEl.textContent = 'Saving…';
-
-  var imageFile = document.getElementById('mku-image').files[0];
-  function doSave(imageData) {
-    var body = { title: title, wording: wording };
-    if (imageData) body.image = imageData;
-    var url    = editId ? '/api/featured-social/' + editId : '/api/featured-social';
-    var method = editId ? 'PUT' : 'POST';
-    fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-      .then(function(r){ return r.json(); })
-      .then(function(d) {
-        if (d.error) { statusEl.style.color = '#c00'; statusEl.textContent = d.error; return; }
-        closeMarketingUpload();
-        loadFeaturedSocial();
-      }).catch(function(){ statusEl.style.color = '#c00'; statusEl.textContent = 'Save failed.'; });
-  }
-
-  if (imageFile) {
-    var reader = new FileReader();
-    reader.onload = function(e) { doSave(e.target.result); };
-    reader.readAsDataURL(imageFile);
-  } else {
-    doSave(null);
-  }
+  var body = { title: title, wording: wording, images: _mku_images };
+  var url    = editId ? '/api/featured-social/' + editId : '/api/featured-social';
+  var method = editId ? 'PUT' : 'POST';
+  fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      if (d.error) { statusEl.style.color = '#c00'; statusEl.textContent = d.error; return; }
+      closeMarketingUpload();
+      loadFeaturedSocial();
+    }).catch(function(){ statusEl.style.color = '#c00'; statusEl.textContent = 'Save failed.'; });
 }
 
 function deleteFeaturedPost(id) {
@@ -7686,18 +7692,17 @@ function pzFmt(n) {
 
 <!-- Marketing upload modal — at body level to avoid stacking context issues -->
 <div id="marketing-upload-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:14px;padding:28px;width:440px;max-width:95vw;box-shadow:0 12px 40px rgba(0,0,0,.22);position:relative;max-height:90vh;overflow-y:auto;">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:500px;max-width:95vw;box-shadow:0 12px 40px rgba(0,0,0,.22);position:relative;max-height:90vh;overflow-y:auto;">
     <button onclick="closeMarketingUpload()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#6b7c8f;line-height:1;">✕</button>
     <h3 id="mku-title-heading" style="color:#003768;font-size:16px;font-weight:700;margin:0 0 20px;">Add Featured Post</h3>
     <input type="hidden" id="mku-edit-id" value="">
-    <div style="margin-bottom:12px;">
+    <div style="margin-bottom:14px;">
       <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">TITLE</label>
       <input id="mku-title" type="text" placeholder="e.g. Summer Campaign" style="width:100%;padding:9px 11px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
     </div>
-    <div style="margin-bottom:12px;">
-      <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">IMAGE</label>
-      <input id="mku-image" type="file" accept="image/*" style="width:100%;font-size:12px;font-family:inherit;">
-      <div id="mku-image-preview" style="margin-top:8px;display:none;"><img id="mku-image-img" style="max-width:100%;max-height:140px;border-radius:6px;object-fit:cover;" src=""></div>
+    <div style="margin-bottom:4px;font-size:11px;font-weight:700;color:#6b7c8f;">IMAGES — upload one per platform</div>
+    <div style="background:#f9fafc;border:1.5px solid #e8ecf0;border-radius:8px;padding:12px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px;">
+      <div id="mku-platforms"></div>
     </div>
     <div style="margin-bottom:16px;">
       <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">POST WORDING</label>
