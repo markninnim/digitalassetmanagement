@@ -344,17 +344,17 @@ html { height: 100%; }
         </div>
         <!-- Stat tiles -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
-          <div style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;">
+          <div id="cd-tile-full" onclick="filterCdList('full')" style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;" onmouseover="this.style.borderColor='#003768';this.style.boxShadow='0 2px 8px rgba(0,55,104,.08)'" onmouseout="this.style.borderColor=window._cdFilter==='full'?'#003768':'#e8ecf0';this.style.boxShadow=''">
             <div id="home-cd-full-count" style="font-size:28px;font-weight:800;color:#003768;line-height:1;margin-bottom:4px;"></div>
             <div style="font-size:12px;font-weight:600;color:#003768;">Full Understanding</div>
             <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">All questions answered correctly</div>
           </div>
-          <div style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;">
+          <div id="cd-tile-restored" onclick="filterCdList('restored')" style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;" onmouseover="this.style.borderColor='#003768';this.style.boxShadow='0 2px 8px rgba(0,55,104,.08)'" onmouseout="this.style.borderColor=window._cdFilter==='restored'?'#003768':'#e8ecf0';this.style.boxShadow=''">
             <div id="home-cd-restored-count" style="font-size:28px;font-weight:800;color:#003768;line-height:1;margin-bottom:4px;">0</div>
             <div style="font-size:12px;font-weight:600;color:#003768;">Understanding Restored</div>
             <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">Remedial action completed</div>
           </div>
-          <div style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;">
+          <div id="cd-tile-partial" onclick="filterCdList('partial')" style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s;" onmouseover="this.style.borderColor='#ef4444';this.style.boxShadow='0 2px 8px rgba(239,68,68,.08)'" onmouseout="this.style.borderColor=window._cdFilter==='partial'?'#ef4444':'#e8ecf0';this.style.boxShadow=''">
             <div id="home-cd-partial-count" style="font-size:28px;font-weight:800;color:#ef4444;line-height:1;margin-bottom:4px;"></div>
             <div style="font-size:12px;font-weight:600;color:#ef4444;">Partial Understanding</div>
             <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">Remedial follow-up required</div>
@@ -371,7 +371,7 @@ html { height: 100%; }
           </div>
         </div>
         <!-- Recent responses -->
-        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Recent Responses</div>
+        <div id="home-cd-list-label" style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Recent Responses</div>
         <div id="home-cd-list" style="display:flex;flex-direction:column;gap:0;"></div>
       </div>
 
@@ -5959,35 +5959,8 @@ function loadHomeData() {
     card.style.display = '';
     if (subEl) subEl.textContent = cd.total + ' total response' + (cd.total !== 1 ? 's' : '');
     updateCdSummaryTiles();
+    renderCdList();
 
-    var recent = window._cdRecords;
-    if (!listEl) return;
-    listEl.innerHTML = recent.map(function(r, i) {
-      var isLast    = i === recent.length - 1;
-      var isPerfect = r.perfect;
-      var badgeId   = 'cd-row-badge-' + r.id;
-      var badge     = isPerfect
-        ? '<span id="' + badgeId + '" style="display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;">✓ Full Understanding</span>'
-        : '<span id="' + badgeId + '" style="display:inline-flex;align-items:center;gap:4px;background:#fef2f2;color:#ef4444;border:1.5px solid #fecaca;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;">⚠ Partial Understanding</span>';
-      var issueHtml = '';
-      if (!isPerfect && r.issues && r.issues.length) {
-        issueHtml = '<div style="font-size:11px;color:#6b7c8f;margin-top:5px;">Concerns: ' + r.issues.join(' · ') + '</div>';
-      }
-      var npsHtml = r.nps ? '<span style="font-size:11px;color:#6b7c8f;margin-left:8px;">NPS ' + r.nps + '</span>' : '';
-      var d = r.date ? new Date(r.date).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '';
-      return '<div onclick="openCdDetail(window._cdRecords[' + i + '])" '
-        + 'style="padding:12px 8px;cursor:pointer;border-radius:8px;margin:0 -8px;transition:background .12s;' + (isLast ? '' : 'border-bottom:1px solid #f0f4f8;') + '" '
-        + 'onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'\'">'
-        + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
-        + '<div>'
-        + '<div style="font-size:13px;font-weight:600;color:#1a2a3a;">' + escHtml(r.consumer || 'Anonymous') + npsHtml + '</div>'
-        + '<div style="font-size:11px;color:#aaa;margin-top:2px;">' + d + '</div>'
-        + '</div>'
-        + badge
-        + '</div>'
-        + issueHtml
-        + '</div>';
-    }).join('');
   }).catch(function() {
     var card = document.getElementById('home-cd-card');
     if (card) card.style.display = 'none';
@@ -8489,40 +8462,83 @@ var CD_QUESTIONS = [
 ];
 
 var _cdCurrentRecord = null;
+var _cdFilter        = null; // null | 'full' | 'restored' | 'partial'
+
+function _cdRecordStatus(r) {
+  if (r.perfect) return 'full';
+  var ans         = r.answers || {};
+  var flaggedKeys = CD_QUESTIONS.filter(function(q) { return q.flagged(ans[q.key] || ''); }).map(function(q) { return q.key; });
+  if (!flaggedKeys.length) return 'full';
+  var ticked = _cdGetTicked(r.id);
+  return flaggedKeys.every(function(k) { return ticked.indexOf(k) !== -1; }) ? 'restored' : 'partial';
+}
+
+function filterCdList(type) {
+  _cdFilter = (_cdFilter === type) ? null : type;
+  ['full', 'restored', 'partial'].forEach(function(t) {
+    var tile = document.getElementById('cd-tile-' + t);
+    if (!tile) return;
+    var isActive = t === _cdFilter;
+    var col      = t === 'partial' ? '#ef4444' : '#003768';
+    tile.style.borderColor = isActive ? col : '#e8ecf0';
+    tile.style.boxShadow   = isActive ? '0 0 0 3px rgba(0,55,104,.1)' : '';
+  });
+  renderCdList();
+}
+
+function renderCdList() {
+  var listEl  = document.getElementById('home-cd-list');
+  var labelEl = document.getElementById('home-cd-list-label');
+  if (!listEl) return;
+  var records  = window._cdRecords || [];
+  var filtered = _cdFilter ? records.filter(function(r) { return _cdRecordStatus(r) === _cdFilter; }) : records;
+  if (labelEl) {
+    var labels = { full: 'Full Understanding', restored: 'Understanding Restored', partial: 'Partial Understanding' };
+    labelEl.textContent = _cdFilter ? labels[_cdFilter] : 'Recent Responses';
+  }
+  if (!filtered.length) {
+    listEl.innerHTML = '<p style="font-size:13px;color:#aaa;padding:12px 0;text-align:center;">No responses in this category.</p>';
+    return;
+  }
+  listEl.innerHTML = filtered.map(function(r, i) {
+    var isLast  = i === filtered.length - 1;
+    var status  = _cdRecordStatus(r);
+    var badge   = status === 'full'
+      ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;">✓ Full Understanding</span>'
+      : status === 'restored'
+      ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#2563eb;border:1.5px solid #bfdbfe;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;">✓ Understanding Restored</span>'
+      : '<span style="display:inline-flex;align-items:center;gap:4px;background:#fef2f2;color:#ef4444;border:1.5px solid #fecaca;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;">⚠ Partial Understanding</span>';
+    var issueHtml = '';
+    if (status === 'partial' && r.issues && r.issues.length) {
+      issueHtml = '<div style="font-size:11px;color:#6b7c8f;margin-top:5px;">Concerns: ' + r.issues.join(' · ') + '</div>';
+    }
+    var npsHtml = r.nps ? '<span style="font-size:11px;color:#6b7c8f;margin-left:8px;">NPS ' + r.nps + '</span>' : '';
+    var d       = r.date ? new Date(r.date).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '';
+    var recIdx  = (window._cdRecords || []).indexOf(r);
+    return '<div onclick="openCdDetail(window._cdRecords[' + recIdx + '])" '
+      + 'style="padding:12px 8px;cursor:pointer;border-radius:8px;margin:0 -8px;transition:background .12s;' + (isLast ? '' : 'border-bottom:1px solid #f0f4f8;') + '" '
+      + 'onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'\'">'
+      + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
+      + '<div style="min-width:0;">'
+      + '<div style="font-size:13px;font-weight:600;color:#1a2a3a;">' + escHtml(r.consumer || 'Anonymous') + npsHtml + '</div>'
+      + '<div style="font-size:11px;color:#aaa;margin-top:2px;">' + d + '</div>'
+      + '</div>'
+      + badge
+      + '</div>'
+      + issueHtml
+      + '</div>';
+  }).join('');
+}
 
 function updateCdSummaryTiles() {
   var cd      = window._cdServerData;
   var records = window._cdRecords || [];
   if (!cd) return;
-  var restoredCount = 0;
-  records.forEach(function(r) {
-    if (r.perfect) return;
-    var ans         = r.answers || {};
-    var flaggedKeys = CD_QUESTIONS.filter(function(q) { return q.flagged(ans[q.key] || ''); }).map(function(q) { return q.key; });
-    if (!flaggedKeys.length) return;
-    var ticked = _cdGetTicked(r.id);
-    var isRestored = flaggedKeys.every(function(k) { return ticked.indexOf(k) !== -1; });
-    if (isRestored) restoredCount++;
-    // update the row badge in the card list
-    var badgeEl = document.getElementById('cd-row-badge-' + r.id);
-    if (badgeEl) {
-      if (isRestored) {
-        badgeEl.style.background = '#eff6ff';
-        badgeEl.style.color      = '#2563eb';
-        badgeEl.style.borderColor= '#bfdbfe';
-        badgeEl.textContent      = '✓ Understanding Restored';
-      } else {
-        badgeEl.style.background = '#fef2f2';
-        badgeEl.style.color      = '#ef4444';
-        badgeEl.style.borderColor= '#fecaca';
-        badgeEl.textContent      = '⚠ Partial Understanding';
-      }
-    }
-  });
-  var fullCount    = cd.fullCount    || 0;
-  var partialCount = Math.max(0, (cd.partialCount || 0) - restoredCount);
-  var total        = cd.total        || 1;
-  var pct          = Math.round((fullCount + restoredCount) / total * 100);
+  var restoredCount = records.filter(function(r) { return _cdRecordStatus(r) === 'restored'; }).length;
+  var fullCount     = cd.fullCount    || 0;
+  var partialCount  = Math.max(0, (cd.partialCount || 0) - restoredCount);
+  var total         = cd.total        || 1;
+  var pct           = Math.round((fullCount + restoredCount) / total * 100);
   var fullEl     = document.getElementById('home-cd-full-count');
   var restoredEl = document.getElementById('home-cd-restored-count');
   var partEl     = document.getElementById('home-cd-partial-count');
@@ -8533,6 +8549,7 @@ function updateCdSummaryTiles() {
   if (partEl)     partEl.textContent     = partialCount;
   if (pctEl)      pctEl.textContent      = pct + '%';
   if (barEl)      barEl.style.width      = pct + '%';
+  renderCdList();
 }
 
 function _cdStorageKey(id) { return 'cd_resolved_' + id; }
