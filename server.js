@@ -1251,6 +1251,13 @@ app.get('/download-post/:post/:filename', requireAuth, (req, res) => {
   res.download(filePath, safeFile);
 });
 
+// ── Social copy JSON ──────────────────────────────────────────
+app.get('/social-copy.json', requireAuth, (req, res) => {
+  const p = path.join(__dirname, 'public/social-copy.json');
+  if (fs.existsSync(p)) res.sendFile(p);
+  else res.json({});
+});
+
 // ── Social content manifest ───────────────────────────────────
 app.get('/api/social-content', requireAuth, (req, res) => {
   const baseDir = path.join(__dirname, 'public/assets/social-content');
