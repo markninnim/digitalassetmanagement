@@ -344,20 +344,20 @@ html { height: 100%; }
         </div>
         <!-- Stat tiles -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
-          <div style="background:#003768;border-radius:9px;padding:14px 16px;">
-            <div id="home-cd-full-count" style="font-size:28px;font-weight:800;color:#fff;line-height:1;margin-bottom:4px;"></div>
-            <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);">Full Understanding</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;">All questions answered correctly</div>
+          <div style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;">
+            <div id="home-cd-full-count" style="font-size:28px;font-weight:800;color:#003768;line-height:1;margin-bottom:4px;"></div>
+            <div style="font-size:12px;font-weight:600;color:#003768;">Full Understanding</div>
+            <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">All questions answered correctly</div>
           </div>
-          <div style="background:#1d6fb8;border-radius:9px;padding:14px 16px;">
-            <div id="home-cd-restored-count" style="font-size:28px;font-weight:800;color:#fff;line-height:1;margin-bottom:4px;">0</div>
-            <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);">Understanding Restored</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;">Remedial action completed</div>
+          <div style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;">
+            <div id="home-cd-restored-count" style="font-size:28px;font-weight:800;color:#003768;line-height:1;margin-bottom:4px;">0</div>
+            <div style="font-size:12px;font-weight:600;color:#003768;">Understanding Restored</div>
+            <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">Remedial action completed</div>
           </div>
-          <div style="background:#ef4444;border-radius:9px;padding:14px 16px;">
-            <div id="home-cd-partial-count" style="font-size:28px;font-weight:800;color:#fff;line-height:1;margin-bottom:4px;"></div>
-            <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);">Partial Understanding</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;">Remedial follow-up required</div>
+          <div style="background:#f8fafc;border:1.5px solid #e8ecf0;border-radius:9px;padding:14px 16px;">
+            <div id="home-cd-partial-count" style="font-size:28px;font-weight:800;color:#ef4444;line-height:1;margin-bottom:4px;"></div>
+            <div style="font-size:12px;font-weight:600;color:#ef4444;">Partial Understanding</div>
+            <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">Remedial follow-up required</div>
           </div>
         </div>
         <!-- Understanding rate bar -->
@@ -5955,12 +5955,12 @@ function loadHomeData() {
     }
 
     window._cdServerData = cd;
+    window._cdRecords    = cd.recent || [];
     card.style.display = '';
     if (subEl) subEl.textContent = cd.total + ' total response' + (cd.total !== 1 ? 's' : '');
     updateCdSummaryTiles();
 
-    var recent = cd.recent || [];
-    window._cdRecords = recent;
+    var recent = window._cdRecords;
     if (!listEl) return;
     listEl.innerHTML = recent.map(function(r, i) {
       var isLast    = i === recent.length - 1;
