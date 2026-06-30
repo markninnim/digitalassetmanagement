@@ -269,7 +269,7 @@ html { height: 100%; }
 
   <!-- ── Home tab ──────────────────────────────────────────── -->
   <div id="tab-home" class="tab-pane active">
-    <div id="home-wrap">
+    <div id="home-wrap" style="max-width:1040px;margin:0 auto;padding:0 48px;">
 
       <!-- Greeting -->
       <div style="margin-bottom:28px;">
@@ -4619,6 +4619,14 @@ function switchTab(tab) {
     if (sidebar) sidebar.style.display = (t === tab) ? '' : 'none';
     if (btn)     btn.classList.toggle('active', t === tab);
   });
+  // Home: hide sidebar + tab nav, full-width centred layout
+  var isHome   = tab === 'home';
+  var sidebarEl = document.querySelector('.sidebar');
+  var tabNavEl  = document.querySelector('.tab-nav');
+  var mainEl    = document.querySelector('.main');
+  if (sidebarEl) sidebarEl.style.display = isHome ? 'none' : '';
+  if (tabNavEl)  tabNavEl.style.display  = isHome ? 'none' : '';
+  if (mainEl)    mainEl.style.marginLeft  = isHome ? '0'    : '220px';
   window.location.hash = tab;
   if (tab === 'home')             { loadHomeData(); }
   if (tab === 'surveying')        { loadSurveying(); }
@@ -5758,7 +5766,7 @@ function loadHomeData() {
     var h    = new Date().getHours();
     var tod  = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
     var name = _currentUser ? (_currentUser.firstName || _currentUser.email || '') : '';
-    greetEl.textContent = tod + (name ? ', ' + name : '') + ' 👋';
+    greetEl.textContent = tod + (name ? ', ' + name : '') + '.';
   }
   if (_homeLoaded) return;
   _homeLoaded = true;
@@ -5889,7 +5897,8 @@ var _currentUser = null;
     initShareButtons();
     // Apply feature flags to nav tabs
     applyFeatureFlags();
-    // Load home page data (default tab)
+    // Load home page data (default tab) — also apply home layout
+    switchTab('home');
     loadHomeData();
     // Pre-load surveying so the tab button shows fees on arrival
     loadSurveying();
