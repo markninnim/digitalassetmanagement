@@ -5955,7 +5955,7 @@ function loadHomeData() {
     }
 
     window._cdServerData = cd;
-    window._cdRecords    = cd.recent || [];
+    window._cdRecords    = cd.records || cd.recent || [];
     card.style.display = '';
     if (subEl) subEl.textContent = cd.total + ' total response' + (cd.total !== 1 ? 's' : '');
     updateCdSummaryTiles();
@@ -8506,7 +8506,7 @@ function renderCdList() {
     var badge   = status === 'full'
       ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;">✓ Full Understanding</span>'
       : status === 'restored'
-      ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#eff6ff;color:#2563eb;border:1.5px solid #bfdbfe;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;">✓ Understanding Restored</span>'
+      ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;">✓ Understanding Restored</span>'
       : '<span style="display:inline-flex;align-items:center;gap:4px;background:#fef2f2;color:#ef4444;border:1.5px solid #fecaca;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;white-space:nowrap;">⚠ Partial Understanding</span>';
     var issueHtml = '';
     if (status === 'partial' && r.issues && r.issues.length) {
@@ -8534,10 +8534,10 @@ function updateCdSummaryTiles() {
   var cd      = window._cdServerData;
   var records = window._cdRecords || [];
   if (!cd) return;
+  var fullCount     = records.filter(function(r) { return _cdRecordStatus(r) === 'full';     }).length;
   var restoredCount = records.filter(function(r) { return _cdRecordStatus(r) === 'restored'; }).length;
-  var fullCount     = cd.fullCount    || 0;
-  var partialCount  = Math.max(0, (cd.partialCount || 0) - restoredCount);
-  var total         = cd.total        || 1;
+  var partialCount  = records.filter(function(r) { return _cdRecordStatus(r) === 'partial';  }).length;
+  var total         = records.length || 1;
   var pct           = Math.round((fullCount + restoredCount) / total * 100);
   var fullEl     = document.getElementById('home-cd-full-count');
   var restoredEl = document.getElementById('home-cd-restored-count');

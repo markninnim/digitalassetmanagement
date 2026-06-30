@@ -2275,11 +2275,10 @@ app.get('/api/consumer-duty', requireAuth, async (req, res) => {
     } while (offset);
 
     let fullCount = 0, partialCount = 0;
-    const recent = allRecords.slice(0, 10).map(rec => {
+    const records = allRecords.map(rec => {
       const f      = rec.cellValuesByFieldId || rec.fields || {};
       const issues = cdIsPerfect(f);
       const perfect = issues.length === 0;
-      if (perfect) fullCount++; else partialCount++;
       return {
         id:       rec.id,
         consumer: f[CD_NAME]    || 'Unknown',
@@ -2302,13 +2301,8 @@ app.get('/api/consumer-duty', requireAuth, async (req, res) => {
         }
       };
     });
-    // Count remaining records
-    allRecords.slice(10).forEach(rec => {
-      const f = rec.cellValuesByFieldId || rec.fields || {};
-      if (cdIsPerfect(f).length === 0) fullCount++; else partialCount++;
-    });
 
-    res.json({ total: allRecords.length, fullCount, partialCount, recent });
+    res.json({ total: allRecords.length, records });
   } catch (err) {
     console.error('consumer-duty error:', err);
     res.status(500).json({ error: err.message });
