@@ -2052,55 +2052,67 @@ app.post('/generate-moving-card', requireAuth, async (req, res) => {
 });
 
 
-// GET /api/download-broker-logo — personalised broker logo PDF for current user
-app.get('/api/download-broker-logo', requireAuth, async (req, res) => {
+// GET /api/download-broker-logo — personalised broker logo PNG (transparent) for current user
+app.get('/api/download-broker-logo', requireAuth, (req, res) => {
   try {
     const user      = req.session.user;
     const firstName = (user.firstName || '').trim();
     const lastName  = (user.lastName  || '').trim();
     const fullName  = [firstName, lastName].filter(Boolean).join(' ') || user.email;
+    const safeName  = fullName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
 
-    const { PDFDocument, rgb } = require('pdf-lib');
+    const imgPath  = path.join(__dirname, 'public/assets/logos/individual broker branding/broker-branded.png');
+    const fontPath = path.join(__dirname, 'public/static/fonts/PlusJakartaSans-ExtraBold.ttf');
 
-    const pdfDoc = await PDFDocument.create();
-    pdfDoc.registerFontkit(fontkit);
+    const script = `
+import sys, json
+from PIL import Image, ImageDraw, ImageFont
 
-    const fontBoldBytes = fs.readFileSync(path.join(__dirname, 'public/static/fonts/PlusJakartaSans-ExtraBold.ttf'));
-    const fontBold = await pdfDoc.embedFont(fontBoldBytes);
+name      = sys.argv[1]
+img_path  = sys.argv[2]
+font_path = sys.argv[3]
 
-    // broker-branded.png is 2262×1029px
-    const brokerLogoBytes = fs.readFileSync(path.join(__dirname, 'public/assets/logos/individual broker branding/broker-branded.png'));
-    const brokerLogoImg   = await pdfDoc.embedPng(brokerLogoBytes);
+img  = Image.open(img_path).convert('RGBA')
+draw = ImageDraw.Draw(img)
 
-    const pageW = 756; // 10.5 inches
-    const sc    = pageW / 2262;
-    const pageH = Math.round(1029 * sc); // ~344pt
+# White-fill the "Broker Name" zone with padding for antialiasing
+draw.rectangle([610, 220, 1662, 385], fill=(255, 255, 255, 255))
 
-    const page = pdfDoc.addPage([pageW, pageH]);
-    page.drawImage(brokerLogoImg, { x: 0, y: 0, width: pageW, height: pageH });
+# Draw name — start at size 156 (matches original design), shrink if name is long
+max_w     = 1040
+font_size = 156
+while font_size >= 60:
+    f    = ImageFont.truetype(font_path, font_size)
+    bbox = draw.textbbox((0, 0), name, font=f)
+    if (bbox[2] - bbox[0]) <= max_w:
+        break
+    font_size -= 4
 
-    // White out the "Broker Name" text zone (image px: x=610–1662, y=226–382 from top)
-    const wnX = Math.round(610 * sc);
-    const wnY = Math.round((1029 - 382) * sc);
-    const wnW = Math.round(1052 * sc);
-    const wnH = Math.round(156 * sc) + 2;
-    page.drawRectangle({ x: wnX, y: wnY, width: wnW, height: wnH, color: rgb(1, 1, 1) });
+# Centre vertically at y=307 (original template text centre)
+text_y = round(307 - (bbox[1] + bbox[3]) / 2)
+draw.text((627, text_y), name, fill=(0, 55, 104, 255), font=f)
 
-    // Draw personalised name — auto-scale if long
-    const darkBlue = rgb(0/255, 55/255, 104/255);
-    const maxNameW = wnW - 4;
-    let nameFontSize = 48;
-    const measuredW = fontBold.widthOfTextAtSize(fullName, nameFontSize);
-    if (measuredW > maxNameW) nameFontSize = Math.floor(nameFontSize * maxNameW / measuredW);
-    const textX = Math.round(627 * sc);
-    const textY = wnY + Math.round((wnH - nameFontSize) / 2) + 4;
-    page.drawText(fullName, { x: textX, y: textY, size: nameFontSize, font: fontBold, color: darkBlue });
+import io
+buf = io.BytesIO()
+img.save(buf, 'PNG')
+sys.stdout.buffer.write(buf.getvalue())
+`;
 
-    const modifiedBytes = await pdfDoc.save();
-    const safeName = fullName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="FPG-Broker-Logo-${safeName}.pdf"`);
-    res.send(Buffer.from(modifiedBytes));
+    const { spawnSync } = require('child_process');
+    const result = spawnSync('python3', ['-c', script, fullName, imgPath, fontPath], {
+      encoding: 'buffer',
+      maxBuffer: 10 * 1024 * 1024
+    });
+
+    if (result.status !== 0) {
+      const err = result.stderr ? result.stderr.toString() : 'unknown error';
+      console.error('Broker logo python error:', err);
+      return res.status(500).send('Could not generate broker logo');
+    }
+
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Disposition', `attachment; filename="FPG-Broker-Logo-${safeName}.png"`);
+    res.send(result.stdout);
   } catch (err) {
     console.error('Broker logo error:', err);
     res.status(500).send('Could not generate broker logo: ' + err.message);
