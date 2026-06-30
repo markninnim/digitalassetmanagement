@@ -63,6 +63,8 @@ html { height: 100%; }
 .btn:hover { border-color:#003768; color:#003768; }
 .btn.off { background: #f5f7fa; color: #ccc; border-color:#e8ecf0; pointer-events: none; }
 .btn-view { display: none !important; }
+.home-ql-btn { background:#fff;border:1.5px solid #e8ecf0;border-radius:10px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;color:#003768;font-family:inherit;transition:border-color .15s,box-shadow .15s;text-align:center;line-height:1.3; }
+.home-ql-btn:hover { border-color:#003768;box-shadow:0 4px 12px rgba(0,55,104,.1); }
 #preview-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000; align-items:center; justify-content:center; }
 #preview-modal.open { display:flex; }
 #cp-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:1000; align-items:center; justify-content:center; }
@@ -139,7 +141,8 @@ html { height: 100%; }
 <div class="topbar">
   <img src="/public-logo" alt="Finance Planning Group">
   <div class="tab-nav">
-    <button class="tab-btn active" id="tab-btn-marketing"     onclick="switchTab('marketing')">Marketing</button>
+    <button class="tab-btn active" id="tab-btn-home"          onclick="switchTab('home')">Home</button>
+    <button class="tab-btn"        id="tab-btn-marketing"     onclick="switchTab('marketing')">Marketing</button>
     <button class="tab-btn"        id="tab-btn-compliance"    onclick="switchTab('compliance')">Compliance</button>
     <button class="tab-btn"        id="tab-btn-sales-process" onclick="switchTab('sales-process')">Advice Standards</button>
     <button class="tab-btn"        id="tab-btn-learning"      onclick="switchTab('learning')">Learning</button>
@@ -166,8 +169,17 @@ html { height: 100%; }
   </div>
 </div>
 <div class="sidebar">
+  <!-- Home sidebar -->
+  <div id="sidebar-home">
+    <h2 style="margin-top:8px;">Knowledge Hub</h2>
+    <a href="#" onclick="switchTab('marketing');return false;">Marketing</a>
+    <a href="#" onclick="switchTab('compliance');return false;">Compliance</a>
+    <a href="#" onclick="switchTab('sales-process');return false;">Advice Standards</a>
+    <a href="#" onclick="switchTab('learning');return false;">Learning</a>
+    <a href="#" onclick="switchTab('surveying');return false;">Surveying</a>
+  </div>
   <!-- Marketing sidebar -->
-  <div id="sidebar-marketing">
+  <div id="sidebar-marketing" style="display:none">
     <h2 style="margin-top: 8px;">Assets</h2>
     <a href="#" onclick="show('brochures',this);loadBrochureDates()">Brochures</a>
     <a href="#" onclick="show('graphics',this)">Graphics</a>
@@ -255,8 +267,116 @@ html { height: 100%; }
 
 <div class="main" style="position:relative;z-index:1;">
 
+  <!-- ── Home tab ──────────────────────────────────────────── -->
+  <div id="tab-home" class="tab-pane active">
+    <div id="home-wrap">
+
+      <!-- Greeting -->
+      <div style="margin-bottom:28px;">
+        <div id="home-greeting" style="font-size:26px;font-weight:800;color:#003768;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:4px;"></div>
+        <div style="font-size:14px;color:#6b7c8f;">Here's your Knowledge Hub overview for today.</div>
+      </div>
+
+      <!-- Quick links -->
+      <div style="margin-bottom:32px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:12px;">Quick Links</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;">
+          <button onclick="switchTab('marketing')" class="home-ql-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span>Marketing</span>
+          </button>
+          <button onclick="switchTab('marketing');setTimeout(()=>show('logos',null),50)" class="home-ql-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/></svg>
+            <span>Logos</span>
+          </button>
+          <button onclick="switchTab('marketing');setTimeout(()=>show('templates',null),50)" class="home-ql-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Templates</span>
+          </button>
+          <button onclick="switchTab('marketing');setTimeout(()=>show('brochures',null),50)" class="home-ql-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Brochures</span>
+          </button>
+          <button onclick="switchTab('learning')" class="home-ql-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            <span>Learning</span>
+          </button>
+          <button onclick="switchTab('compliance')" class="home-ql-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Compliance</span>
+          </button>
+          <button onclick="switchTab('sales-process')" class="home-ql-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <span>Advice Standards</span>
+          </button>
+          <button onclick="switchTab('learning');setTimeout(()=>showLvSection('monthly-newsletters',document.getElementById('lv-nav-newsletters')),100)" class="home-ql-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#003768" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>Newsletters</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom row: Feefo + Latest content -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
+
+        <!-- Feefo card -->
+        <div style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="width:36px;height:36px;background:#003768;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#fcb034"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#003768;">Your Feefo Reviews</div>
+              <div id="home-feefo-summary" style="font-size:12px;color:#6b7c8f;">Loading…</div>
+            </div>
+          </div>
+          <div id="home-feefo-stars" style="margin-bottom:16px;"></div>
+          <div id="home-feefo-reviews" style="display:flex;flex-direction:column;gap:12px;">
+            <div style="color:#aaa;font-size:13px;">Loading reviews…</div>
+          </div>
+        </div>
+
+        <!-- Latest video + newsletter -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <!-- Latest video -->
+          <div id="home-video-card" style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:20px;display:none;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Latest Video</div>
+            <div style="display:flex;gap:14px;align-items:center;">
+              <div style="width:52px;height:52px;background:#003768;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <div style="min-width:0;">
+                <div id="home-video-title" style="font-size:13px;font-weight:700;color:#003768;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+                <div id="home-video-desc" style="font-size:12px;color:#6b7c8f;margin-bottom:8px;"></div>
+                <a id="home-video-link" href="#" onclick="homeOpenVideo(event)" style="font-size:12px;font-weight:600;color:#003768;text-decoration:none;">Watch now →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Latest newsletter -->
+          <div id="home-nl-card" style="background:#fff;border:1px solid #e8ecf0;border-radius:10px;padding:20px;display:none;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Latest Newsletter</div>
+            <div style="display:flex;gap:14px;align-items:center;">
+              <div style="width:52px;height:52px;background:#fcb034;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <div id="home-nl-title" style="font-size:13px;font-weight:700;color:#003768;margin-bottom:4px;"></div>
+                <div style="font-size:12px;color:#6b7c8f;margin-bottom:8px;">Monthly industry update</div>
+                <a id="home-nl-link" href="#" onclick="homeOpenNewsletter(event)" style="font-size:12px;font-weight:600;color:#003768;text-decoration:none;">Read now →</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /home-wrap -->
+  </div><!-- /tab-home -->
+
   <!-- ── Marketing tab ─────────────────────────────────────── -->
-  <div id="tab-marketing" class="tab-pane active">
+  <div id="tab-marketing" class="tab-pane">
   <div id="logos" class="section active">
     <h2 style="color: #003768; margin-bottom: 16px;">Logo Files</h2>
 
@@ -4486,7 +4606,7 @@ function generateBrokerBrand() {
 }
 
 // ── Tab switching ─────────────────────────────────────────────
-var TAB_IDS = ['marketing','compliance','learning','surveying','sales-process','selling-zone','supervisor-zone','performance-zone'];
+var TAB_IDS = ['home','marketing','compliance','learning','surveying','sales-process','selling-zone','supervisor-zone','performance-zone'];
 function switchTab(tab) {
   TAB_IDS.forEach(function(t) {
     var pane    = document.getElementById('tab-' + t);
@@ -4497,6 +4617,7 @@ function switchTab(tab) {
     if (btn)     btn.classList.toggle('active', t === tab);
   });
   window.location.hash = tab;
+  if (tab === 'home')             { loadHomeData(); }
   if (tab === 'surveying')        { loadSurveying(); }
   if (tab === 'learning')         { showLvSection('weekly-recordings', document.getElementById('lv-nav-weekly')); loadLearningZone(); }
   if (tab === 'compliance')       { if (!_cpdLoaded) loadCpd(); }
@@ -5578,6 +5699,111 @@ function toggleLvArchive() {
   }
 }
 
+// ── Home page ──────────────────────────────────────────────────
+var _homeLoaded = false;
+function loadHomeData() {
+  // Greeting
+  var greetEl = document.getElementById('home-greeting');
+  if (greetEl) {
+    var h    = new Date().getHours();
+    var tod  = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    var name = _currentUser ? (_currentUser.firstName || _currentUser.email || '') : '';
+    greetEl.textContent = tod + (name ? ', ' + name : '') + ' 👋';
+  }
+  if (_homeLoaded) return;
+  _homeLoaded = true;
+
+  fetch('/api/home-data').then(r => r.json()).then(function(data) {
+    // ── Feefo ───────────────────────────────────────────────
+    var summaryEl = document.getElementById('home-feefo-summary');
+    var starsEl   = document.getElementById('home-feefo-stars');
+    var reviewsEl = document.getElementById('home-feefo-reviews');
+
+    if (data.feefo && data.feefo.count > 0) {
+      var avg   = parseFloat(data.feefo.avg) || 0;
+      var count = data.feefo.count;
+      if (summaryEl) summaryEl.textContent = avg + ' average · ' + count + ' review' + (count !== 1 ? 's' : '');
+
+      // Star bar
+      if (starsEl) {
+        var pct  = Math.round((avg / 5) * 100);
+        starsEl.innerHTML =
+          '<div style="display:flex;align-items:center;gap:8px;">'
+          + '<div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden;">'
+          + '<div style="width:' + pct + '%;height:100%;background:#fcb034;border-radius:4px;"></div></div>'
+          + '<span style="font-size:13px;font-weight:700;color:#fcb034;">' + avg + '</span>'
+          + '<span style="font-size:12px;color:#aaa;">/ 5</span></div>';
+      }
+
+      // Reviews
+      if (reviewsEl && data.feefo.reviews && data.feefo.reviews.length) {
+        reviewsEl.innerHTML = data.feefo.reviews.map(function(r) {
+          var stars = '';
+          for (var i = 1; i <= 5; i++) stars += '<span style="color:' + (i <= (r.rating||0) ? '#fcb034' : '#e0e0e0') + ';font-size:12px;">★</span>';
+          var snippet = r.review.length > 140 ? r.review.substring(0, 140) + '…' : r.review;
+          return '<div style="border-top:1px solid #f0f4f8;padding-top:10px;">'
+            + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+            + '<span style="font-size:12px;font-weight:600;color:#003768;">' + (r.customer || 'Customer') + '</span>'
+            + '<span>' + stars + '</span></div>'
+            + '<p style="font-size:12px;color:#6b7c8f;margin:0;line-height:1.6;">' + snippet + '</p>'
+            + '</div>';
+        }).join('');
+      } else if (reviewsEl) {
+        reviewsEl.innerHTML = '<p style="font-size:13px;color:#aaa;">No reviews yet.</p>';
+      }
+    } else {
+      if (summaryEl) summaryEl.textContent = 'No reviews found';
+      if (reviewsEl) reviewsEl.innerHTML = '<p style="font-size:13px;color:#aaa;">Reviews will appear here once your Feefo data is loaded.</p>';
+    }
+
+    // ── Latest video ────────────────────────────────────────
+    var videoCard = document.getElementById('home-video-card');
+    if (data.latestVideo && videoCard) {
+      document.getElementById('home-video-title').textContent = data.latestVideo.title;
+      document.getElementById('home-video-desc').textContent  = data.latestVideo.description || data.latestVideo.cpdType;
+      videoCard._videoUrl = data.latestVideo.url;
+      videoCard.style.display = '';
+    }
+
+    // ── Latest newsletter ────────────────────────────────────
+    var nlCard = document.getElementById('home-nl-card');
+    if (data.latestNewsletter && nlCard) {
+      var months = {jan:'January',feb:'February',mar:'March',apr:'April',may:'May',jun:'June',
+                    jul:'July',aug:'August',sep:'September',oct:'October',nov:'November',dec:'December'};
+      var nlMatch = data.latestNewsletter.match(/^([a-z]+)-(\d{4})\.pdf$/i);
+      var nlLabel = nlMatch ? (months[nlMatch[1].toLowerCase()] || nlMatch[1]) + ' ' + nlMatch[2] : data.latestNewsletter;
+      document.getElementById('home-nl-title').textContent = nlLabel + ' Newsletter';
+      nlCard._nlFile = data.latestNewsletter;
+      nlCard.style.display = '';
+    }
+  }).catch(function(e) {
+    console.error('home-data error', e);
+  });
+}
+
+function homeOpenVideo(e) {
+  e.preventDefault();
+  var card = document.getElementById('home-video-card');
+  if (card && card._videoUrl) {
+    switchTab('learning');
+    setTimeout(function() {
+      showLvSection('weekly-recordings', document.getElementById('lv-nav-weekly'));
+      // Open the video in the existing video modal if available
+    }, 100);
+  }
+}
+
+function homeOpenNewsletter(e) {
+  e.preventDefault();
+  var card = document.getElementById('home-nl-card');
+  if (card && card._nlFile) {
+    switchTab('learning');
+    setTimeout(function() {
+      showLvSection('monthly-newsletters', document.getElementById('lv-nav-newsletters'));
+    }, 150);
+  }
+}
+
 // ── Init: load current user, show admin button if admin ──────
 var _currentUser = null;
 (function initUser() {
@@ -5617,6 +5843,8 @@ var _currentUser = null;
     initShareButtons();
     // Apply feature flags to nav tabs
     applyFeatureFlags();
+    // Load home page data (default tab)
+    loadHomeData();
     // Pre-load surveying so the tab button shows fees on arrival
     loadSurveying();
   }).catch(function(){});
