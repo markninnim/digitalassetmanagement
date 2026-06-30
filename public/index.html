@@ -147,6 +147,9 @@ html { height: 100%; }
     <button class="tab-btn"        id="tab-btn-supervisor-zone" onclick="switchTab('supervisor-zone')" style="display:none;">Supervisor Zone</button>
   </div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+    <button id="marketing-btn" onclick="openMarketingUpload()" style="display:none;background:#e8740c;color:#fff;border:1.5px solid transparent;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;align-items:center;gap:6px;box-sizing:border-box;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Marketing
+    </button>
     <button id="supervisor-btn" onclick="openAdminPanel()" style="display:none;background:#2e99d5;color:#fff;border:1.5px solid transparent;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;align-items:center;gap:6px;box-sizing:border-box;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Supervisor
     </button>
@@ -389,6 +392,43 @@ html { height: 100%; }
     <p style="font-size:13px;color:#4a5a6a;line-height:1.75;margin:0 0 10px;">If you do choose to create your own content, <strong style="color:#003768;">it must be submitted for approval before being posted</strong>. This protects the brand and ensures everything going out under the FPG name is consistent and compliant. Please also be mindful of image rights, only use images you have permission to use. If a licenced image is detected online, you will be liable for a fine for unauthorised use. When in doubt, stick to approved assets in this library, your own photography, or images from a platform you hold an active licence for. Any questions, speak to <strong style="color:#003768;">Mark Ninnim</strong> -<a href="mailto:mark.ninnim@financeplanning.co.uk" style="color:#003768;text-decoration:none;">mark.ninnim@financeplanning.co.uk</a> or <a href="tel:07525932299" style="color:#003768;text-decoration:none;">07525 932 299</a></p>
     <p id="social-coverage-msg" style="display:none;font-size:13px;color:#4a5a6a;line-height:1.75;margin:0 0 10px;"></p>
     <div style="border-bottom:1px solid #e8ecf0;margin-bottom:24px;"></div>
+
+    <!-- Featured Posts (admin/marketing only) -->
+    <div id="featured-social-wrap" style="display:none;margin-bottom:32px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:13px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:1px;">Featured Posts</div>
+        <button id="featured-add-btn" onclick="openMarketingUpload()" style="display:flex;align-items:center;gap:7px;background:#e8740c;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add New
+        </button>
+      </div>
+      <div id="featured-social-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;"></div>
+    </div>
+    <!-- Marketing upload modal -->
+    <div id="marketing-upload-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:14px;padding:28px;width:420px;max-width:95vw;box-shadow:0 12px 40px rgba(0,0,0,.18);position:relative;max-height:90vh;overflow-y:auto;">
+        <button onclick="closeMarketingUpload()" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:20px;cursor:pointer;color:#6b7c8f;line-height:1;">✕</button>
+        <h3 style="color:#003768;font-size:16px;font-weight:700;margin:0 0 20px;" id="mku-title-heading">Add Featured Post</h3>
+        <input type="hidden" id="mku-edit-id" value="">
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">TITLE</label>
+          <input id="mku-title" type="text" placeholder="e.g. Summer Campaign" style="width:100%;padding:9px 11px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">IMAGE</label>
+          <input id="mku-image" type="file" accept="image/*" style="width:100%;font-size:12px;font-family:inherit;">
+          <div id="mku-image-preview" style="margin-top:8px;display:none;"><img id="mku-image-img" style="max-width:100%;max-height:140px;border-radius:6px;object-fit:cover;" src=""></div>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="font-size:11px;font-weight:700;color:#6b7c8f;display:block;margin-bottom:4px;">POST WORDING</label>
+          <textarea id="mku-wording" rows="5" placeholder="Enter the approved post wording here..." style="width:100%;padding:9px 11px;border:1.5px solid #e8ecf0;border-radius:7px;font-size:13px;font-family:sans-serif;resize:vertical;outline:none;box-sizing:border-box;"></textarea>
+        </div>
+        <div id="mku-status" style="font-size:12px;color:#6b7c8f;margin-bottom:10px;min-height:16px;"></div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="saveFeaturedPost()" style="flex:1;background:#e8740c;color:#fff;border:none;padding:10px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Save Post</button>
+          <button onclick="closeMarketingUpload()" style="background:#f5f7fa;color:#6b7c8f;border:1.5px solid #e8ecf0;padding:10px 16px;border-radius:7px;font-size:13px;cursor:pointer;font-family:inherit;">Cancel</button>
+        </div>
+      </div>
+    </div>
 
     <div id="sc-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
       <button class="sc-filter active" onclick="filterSocial('all',this)">All</button>
@@ -3973,6 +4013,7 @@ function buildDefaultCopy(postName, approvedCopy) {
 var _socialCopyDb = {};
 
 function loadSocialContent() {
+  loadFeaturedSocial();
   Promise.all([
     fetch('/api/social-content').then(function(r){ return r.json(); }),
     fetch('/social-copy.json').then(function(r){ return r.json(); }).catch(function(){ return {}; })
@@ -4069,6 +4110,147 @@ function loadSocialContent() {
     document.getElementById('social-content-body').innerHTML = '<p style="color:#cc0000;">Could not load social content: ' + (err && err.message ? err.message : String(err)) + '</p>';
   });
 }
+// ── Featured Social Posts (admin/marketing) ───────────────────
+function canManageFeatured() {
+  return _currentUser && (_currentUser.isAdmin || _currentUser.isMarketing);
+}
+
+function loadFeaturedSocial() {
+  if (!canManageFeatured()) return;
+  var wrap = document.getElementById('featured-social-wrap');
+  if (wrap) wrap.style.display = 'block';
+  fetch('/api/featured-social').then(function(r){ return r.json(); }).then(function(posts) {
+    renderFeaturedPosts(posts);
+  }).catch(function(){});
+}
+
+function renderFeaturedPosts(posts) {
+  var grid = document.getElementById('featured-social-grid');
+  var addBtn = document.getElementById('featured-add-btn');
+  if (!grid) return;
+  grid.innerHTML = '';
+  if (addBtn) addBtn.style.display = posts.length >= 4 ? 'none' : 'flex';
+  if (!posts.length) {
+    grid.innerHTML = '<div style="color:#6b7c8f;font-size:13px;padding:12px 0;">No featured posts yet. Click Add New to get started.</div>';
+    return;
+  }
+  posts.forEach(function(post) {
+    var card = document.createElement('div');
+    card.style.cssText = 'background:#fff;border:1.5px solid #e8ecf0;border-radius:10px;overflow:hidden;position:relative;';
+    var img = post.image ? '<img src="' + post.image + '" style="width:100%;height:140px;object-fit:cover;display:block;">' : '<div style="width:100%;height:140px;background:#f5f7fa;display:flex;align-items:center;justify-content:center;color:#b0bec5;font-size:12px;">No image</div>';
+    var wording = post.wording ? '<div style="font-size:12px;color:#4a5a6a;line-height:1.5;margin:6px 0;max-height:60px;overflow:hidden;">' + escHtml(post.wording.slice(0,120)) + (post.wording.length > 120 ? '…' : '') + '</div>' : '';
+    card.innerHTML = img +
+      '<div style="padding:10px 12px 12px;">' +
+        '<div style="font-size:13px;font-weight:700;color:#003768;margin-bottom:4px;">' + escHtml(post.title) + '</div>' +
+        wording +
+        '<div style="display:flex;gap:6px;margin-top:8px;">' +
+          '<button onclick="editFeaturedPost(\'' + post.id + '\')" style="flex:1;background:#f5f7fa;color:#003768;border:1.5px solid #e8ecf0;padding:6px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Edit</button>' +
+          '<button onclick="deleteFeaturedPost(\'' + post.id + '\')" style="background:#fff0f0;color:#c0392b;border:1.5px solid #ffd0d0;padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;">✕</button>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+}
+
+function openMarketingUpload() {
+  if (!canManageFeatured()) return;
+  document.getElementById('mku-edit-id').value = '';
+  document.getElementById('mku-title').value = '';
+  document.getElementById('mku-wording').value = '';
+  document.getElementById('mku-image').value = '';
+  document.getElementById('mku-status').textContent = '';
+  document.getElementById('mku-image-preview').style.display = 'none';
+  document.getElementById('mku-title-heading').textContent = 'Add Featured Post';
+  var modal = document.getElementById('marketing-upload-modal');
+  modal.style.display = 'flex';
+  // Image preview
+  document.getElementById('mku-image').onchange = function() {
+    var file = this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = document.getElementById('mku-image-img');
+      img.src = e.target.result;
+      document.getElementById('mku-image-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  };
+}
+
+function closeMarketingUpload() {
+  document.getElementById('marketing-upload-modal').style.display = 'none';
+}
+
+function editFeaturedPost(id) {
+  fetch('/api/featured-social').then(function(r){ return r.json(); }).then(function(posts) {
+    var post = posts.find(function(p){ return p.id === id; });
+    if (!post) return;
+    document.getElementById('mku-edit-id').value = post.id;
+    document.getElementById('mku-title').value = post.title;
+    document.getElementById('mku-wording').value = post.wording || '';
+    document.getElementById('mku-status').textContent = '';
+    document.getElementById('mku-title-heading').textContent = 'Edit Featured Post';
+    if (post.image) {
+      document.getElementById('mku-image-img').src = post.image;
+      document.getElementById('mku-image-preview').style.display = 'block';
+    } else {
+      document.getElementById('mku-image-preview').style.display = 'none';
+    }
+    document.getElementById('mku-image').value = '';
+    document.getElementById('mku-image').onchange = function() {
+      var file = this.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('mku-image-img').src = e.target.result;
+        document.getElementById('mku-image-preview').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    };
+    document.getElementById('marketing-upload-modal').style.display = 'flex';
+  });
+}
+
+function saveFeaturedPost() {
+  var title   = document.getElementById('mku-title').value.trim();
+  var wording = document.getElementById('mku-wording').value.trim();
+  var editId  = document.getElementById('mku-edit-id').value;
+  var statusEl = document.getElementById('mku-status');
+  if (!title) { statusEl.style.color = '#c00'; statusEl.textContent = 'Please enter a title.'; return; }
+  statusEl.style.color = '#6b7c8f'; statusEl.textContent = 'Saving…';
+
+  var imageFile = document.getElementById('mku-image').files[0];
+  function doSave(imageData) {
+    var body = { title: title, wording: wording };
+    if (imageData) body.image = imageData;
+    var url    = editId ? '/api/featured-social/' + editId : '/api/featured-social';
+    var method = editId ? 'PUT' : 'POST';
+    fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function(r){ return r.json(); })
+      .then(function(d) {
+        if (d.error) { statusEl.style.color = '#c00'; statusEl.textContent = d.error; return; }
+        closeMarketingUpload();
+        loadFeaturedSocial();
+      }).catch(function(){ statusEl.style.color = '#c00'; statusEl.textContent = 'Save failed.'; });
+  }
+
+  if (imageFile) {
+    var reader = new FileReader();
+    reader.onload = function(e) { doSave(e.target.result); };
+    reader.readAsDataURL(imageFile);
+  } else {
+    doSave(null);
+  }
+}
+
+function deleteFeaturedPost(id) {
+  if (!confirm('Remove this featured post?')) return;
+  fetch('/api/featured-social/' + id, { method: 'DELETE' })
+    .then(function(r){ return r.json(); })
+    .then(function(){ loadFeaturedSocial(); })
+    .catch(function(){});
+}
+
 function renderPdfThumb(url, container) {
   pdfjsLib.getDocument(url).promise.then(function(pdf) {
     pdf.getPage(1).then(function(page) {
@@ -5418,6 +5600,10 @@ var _currentUser = null;
       var svbtn = document.getElementById('supervisor-btn');
       if (svbtn) svbtn.style.display = 'inline-flex';
     }
+    if (user && user.isMarketing && !user.isAdmin) {
+      var mkbtn = document.getElementById('marketing-btn');
+      if (mkbtn) mkbtn.style.display = 'inline-flex';
+    }
     if (user && (user.isSupervisor || user.isAdmin)) {
       var sbtn = document.getElementById('tab-btn-supervisor-zone');
       if (sbtn) sbtn.style.display = '';
@@ -5714,18 +5900,21 @@ function renderUserList(users) {
     var name = [u.salutation, u.firstName, u.lastName].filter(Boolean).join(' ') || '—';
     var badge = u.isAdmin ? '<span style="background:#003768;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;">Admin</span>' : '';
     var supBadge = u.isSupervisor ? '<span style="background:#2e99d5;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px;">Supervisor</span>' : '';
+    var mktBadge = u.isMarketing ? '<span style="background:#e8740c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:4px;">Marketing</span>' : '';
     var products = [];
     if (u.sellsInvestments) products.push('<span style="background:#ede9fe;color:#6b21a8;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;">Investments</span>');
     if (u.sellsMortgages)   products.push('<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;">Mortgages</span>');
     if (u.sellsProtection)  products.push('<span style="background:#fef9c3;color:#854d0e;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;margin-left:4px;">Protection</span>');
     var supInfo = u.supervisorEmail ? '<div style="color:#6b7c8f;font-size:11px;margin-top:2px;">Supervisor: ' + escHtml(u.supervisorEmail) + '</div>' : '';
+    var mktToggle = !isSupervisorOnly ? '<button onclick="toggleMarketingRole(\'' + escHtml(u.email) + '\',' + (u.isMarketing ? 'true' : 'false') + ')" style="background:' + (u.isMarketing ? '#fff5ee' : '#f5f7fa') + ';color:' + (u.isMarketing ? '#e8740c' : '#6b7c8f') + ';border:1.5px solid ' + (u.isMarketing ? '#f5c0a0' : '#e8ecf0') + ';padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:80px;text-align:center;">' + (u.isMarketing ? 'Mkt ✓' : 'Mkt') + '</button>' : '';
     var actionBtns = isSupervisorOnly ? '' :
       '<button onclick="impersonateUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#e8f4f8;color:#005f8a;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:110px;text-align:center;">Guardian Mode</button>' +
       '<button onclick="openUserForm(\'' + u.id + '\')" style="background:#f5f7fa;color:#003768;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:52px;text-align:center;">Edit</button>' +
-      '<button onclick="deleteUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#fff0f0;color:#c00;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:62px;text-align:center;">Delete</button>';
+      '<button onclick="deleteUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#fff0f0;color:#c00;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:62px;text-align:center;">Delete</button>' +
+      mktToggle;
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f2f5;">' +
       '<div>' +
-        '<div style="font-size:14px;font-weight:600;color:#1a2a3a;">' + escHtml(name) + badge + supBadge + products.join('') + '</div>' +
+        '<div style="font-size:14px;font-weight:600;color:#1a2a3a;">' + escHtml(name) + badge + supBadge + mktBadge + products.join('') + '</div>' +
         '<div style="font-size:12px;color:#6b7c8f;margin-top:1px;">' + escHtml(u.email) + (u.jobTitle ? ' · ' + escHtml(u.jobTitle) : '') + '</div>' +
         supInfo +
       '</div>' +
@@ -5749,6 +5938,16 @@ function impersonateUser(id, name) {
 function stopImpersonation() {
   fetch('/api/admin/impersonate/stop', { method:'POST' })
     .then(function(){ window.location.reload(); });
+}
+
+function toggleMarketingRole(email, currentlyMarketing) {
+  fetch('/api/marketing-users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, remove: currentlyMarketing })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.ok) loadAdminUsers();
+  }).catch(function(){});
 }
 
 function escHtml(s) {

@@ -35,6 +35,16 @@ const F_SUPERVISOR_EMAIL = 'fldvyCzxvpIEjD7PU';
 const F_CO_SUPERVISES  = 'fld2fG2C8sK9PQ3o2'; // "Co-supervises Email" — shares team view with
 const F_AVATAR         = 'fldiQ06FtP4BehJU7';
 
+// ── Marketing users (local, no Airtable field needed) ─────────
+const MARKETING_USERS_PATH = path.join(__dirname, 'marketing-users.json');
+let _marketingUsers = new Set();
+try { _marketingUsers = new Set(JSON.parse(fs.readFileSync(MARKETING_USERS_PATH, 'utf8'))); } catch(_) {}
+
+// ── Featured social posts ──────────────────────────────────────
+const FEATURED_SOCIAL_PATH = path.join(__dirname, 'featured-social.json');
+let _featuredSocial = [];
+try { _featuredSocial = JSON.parse(fs.readFileSync(FEATURED_SOCIAL_PATH, 'utf8')); } catch(_) {}
+
 // ── Feature flags ─────────────────────────────────────────────
 const FEATURES_PATH = path.join(__dirname, 'features.json');
 const FEATURES_DEFAULT = {
@@ -74,7 +84,8 @@ function recordToUser(record) {
     sellsInvestments: f[F_INVESTMENTS]      || false,
     isSupervisor:     f[F_IS_SUPERVISOR]    || false,
     supervisorEmail:  f[F_SUPERVISOR_EMAIL] || '',
-    avatarUrl:        f[F_AVATAR]           || ''
+    avatarUrl:        f[F_AVATAR]           || '',
+    isMarketing:      _marketingUsers.has((f[F_EMAIL] || '').toLowerCase())
   };
 }
 
@@ -97,6 +108,12 @@ function requireAuth(req, res, next) {
 
 function requireAdmin(req, res, next) {
   if (req.session.authenticated && req.session.user && req.session.user.isAdmin) return next();
+  res.status(403).json({ error: 'Forbidden' });
+}
+
+function requireMarketingOrAdmin(req, res, next) {
+  if (req.session.authenticated && req.session.user &&
+      (req.session.user.isAdmin || req.session.user.isMarketing)) return next();
   res.status(403).json({ error: 'Forbidden' });
 }
 
@@ -1249,6 +1266,57 @@ app.get('/download-post/:post/:filename', requireAuth, (req, res) => {
   const filePath = path.join(__dirname, 'public/assets/social-content', safePost, safeFile);
   if (!fs.existsSync(filePath)) return res.status(404).send('Not found');
   res.download(filePath, safeFile);
+});
+
+// ── Marketing users management (admin only) ───────────────────
+app.get('/api/marketing-users', requireAdmin, (req, res) => {
+  res.json([..._marketingUsers]);
+});
+app.post('/api/marketing-users', requireAdmin, (req, res) => {
+  const { email, remove } = req.body;
+  if (!email) return res.status(400).json({ error: 'Missing email' });
+  const e = email.toLowerCase();
+  if (remove) _marketingUsers.delete(e); else _marketingUsers.add(e);
+  try {
+    fs.writeFileSync(MARKETING_USERS_PATH, JSON.stringify([..._marketingUsers], null, 2));
+    // refresh session if this user is logged in
+    res.json({ ok: true, marketingUsers: [..._marketingUsers] });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+// ── Featured social posts ──────────────────────────────────────
+app.get('/api/featured-social', requireAuth, (req, res) => {
+  res.json(_featuredSocial);
+});
+app.post('/api/featured-social', requireMarketingOrAdmin, (req, res) => {
+  const { title, wording, image } = req.body;
+  if (!title) return res.status(400).json({ error: 'Title required' });
+  if (_featuredSocial.length >= 4) return res.status(400).json({ error: 'Maximum 4 featured posts' });
+  const post = { id: Date.now().toString(), title, wording: wording || '', image: image || '', createdAt: new Date().toISOString() };
+  _featuredSocial.push(post);
+  try {
+    fs.writeFileSync(FEATURED_SOCIAL_PATH, JSON.stringify(_featuredSocial, null, 2));
+    res.json({ ok: true, post });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+app.delete('/api/featured-social/:id', requireMarketingOrAdmin, (req, res) => {
+  _featuredSocial = _featuredSocial.filter(p => p.id !== req.params.id);
+  try {
+    fs.writeFileSync(FEATURED_SOCIAL_PATH, JSON.stringify(_featuredSocial, null, 2));
+    res.json({ ok: true });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+app.put('/api/featured-social/:id', requireMarketingOrAdmin, (req, res) => {
+  const { title, wording, image } = req.body;
+  const post = _featuredSocial.find(p => p.id === req.params.id);
+  if (!post) return res.status(404).json({ error: 'Not found' });
+  if (title)   post.title   = title;
+  if (wording !== undefined) post.wording = wording;
+  if (image)   post.image   = image;
+  try {
+    fs.writeFileSync(FEATURED_SOCIAL_PATH, JSON.stringify(_featuredSocial, null, 2));
+    res.json({ ok: true, post });
+  } catch(err) { res.status(500).json({ error: err.message }); }
 });
 
 // ── Social copy JSON ──────────────────────────────────────────
