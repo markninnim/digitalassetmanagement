@@ -341,6 +341,10 @@ html { height: 100%; }
               <div id="home-cd-subtitle" style="font-size:12px;color:#6b7c8f;"></div>
             </div>
           </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;font-weight:600;color:#6b7c8f;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Consumer Duty Score</div>
+            <div id="home-cd-pct" style="font-size:28px;font-weight:800;color:#003768;line-height:1;"></div>
+          </div>
         </div>
         <!-- Stat tiles -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
@@ -360,19 +364,9 @@ html { height: 100%; }
             <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">Remedial follow-up required</div>
           </div>
         </div>
-        <!-- Understanding rate bar -->
-        <div style="margin-bottom:20px;">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-            <span style="font-size:12px;font-weight:600;color:#6b7c8f;">Understanding Rate</span>
-            <span id="home-cd-pct" style="font-size:13px;font-weight:700;color:#003768;"></span>
-          </div>
-          <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
-            <div id="home-cd-pct-bar" style="height:100%;background:linear-gradient(90deg,#003768,#1d6fb8);border-radius:4px;transition:width .4s;width:0%;"></div>
-          </div>
-        </div>
         <!-- Recent responses -->
-        <div id="home-cd-list-label" style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Recent Responses</div>
-        <div id="home-cd-list" style="display:flex;flex-direction:column;gap:0;"></div>
+        <div id="home-cd-list-label" style="display:none;font-size:11px;font-weight:700;letter-spacing:.08em;color:#6b7c8f;text-transform:uppercase;margin-bottom:10px;">Recent Responses</div>
+        <div id="home-cd-list" style="display:none;flex-direction:column;gap:0;"></div>
       </div>
 
       <!-- Bottom row: Feefo + Latest content -->
@@ -8490,12 +8484,22 @@ function renderCdList() {
   var listEl  = document.getElementById('home-cd-list');
   var labelEl = document.getElementById('home-cd-list-label');
   if (!listEl) return;
-  var records  = window._cdRecords || [];
-  var filtered = _cdFilter ? records.filter(function(r) { return _cdRecordStatus(r) === _cdFilter; }) : records;
-  if (labelEl) {
-    var labels = { full: 'Full Understanding', restored: 'Understanding Restored', partial: 'Partial Understanding' };
-    labelEl.textContent = _cdFilter ? labels[_cdFilter] : 'Recent Responses';
+
+  // Hide list when no filter selected
+  if (!_cdFilter) {
+    listEl.style.display   = 'none';
+    if (labelEl) labelEl.style.display = 'none';
+    return;
   }
+
+  var records  = window._cdRecords || [];
+  var filtered = records.filter(function(r) { return _cdRecordStatus(r) === _cdFilter; });
+  var labels   = { full: 'Full Understanding', restored: 'Understanding Restored', partial: 'Partial Understanding' };
+  if (labelEl) {
+    labelEl.style.display = '';
+    labelEl.textContent   = labels[_cdFilter];
+  }
+  listEl.style.display = 'flex';
   if (!filtered.length) {
     listEl.innerHTML = '<p style="font-size:13px;color:#aaa;padding:12px 0;text-align:center;">No responses in this category.</p>';
     return;
