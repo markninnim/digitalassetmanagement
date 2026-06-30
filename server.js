@@ -2280,14 +2280,25 @@ app.get('/api/consumer-duty', requireAuth, async (req, res) => {
       const issues = cdIsPerfect(f);
       const perfect = issues.length === 0;
       if (perfect) fullCount++; else partialCount++;
-      // count for all records beyond the slice
       return {
         consumer: f[CD_NAME]    || 'Unknown',
         date:     f[CD_DATE]    || rec.createdTime,
         nps:      f[CD_NPS]     || null,
         comment:  f[CD_COMMENT] || '',
         perfect,
-        issues
+        issues,
+        answers: {
+          q1:  f[CD_Q1]  || '',
+          q2:  f[CD_Q2]  || '',
+          q3:  f[CD_Q3]  || '',
+          q4:  f[CD_Q4]  || '',
+          q5:  f[CD_Q5]  || '',
+          q6:  f[CD_Q6]  || '',
+          q7:  f[CD_Q7]  || '',
+          q8:  f[CD_Q8]  || '',
+          q9:  f[CD_Q9]  || '',
+          q10: f[CD_Q10] || ''
+        }
       };
     });
     // Count remaining records

@@ -5947,26 +5947,27 @@ function loadHomeData() {
     if (subEl)   subEl.textContent   = cd.total + ' total response' + (cd.total !== 1 ? 's' : '');
 
     var recent = cd.recent || [];
+    window._cdRecords = recent;
     if (!listEl) return;
     listEl.innerHTML = recent.map(function(r, i) {
-      var isLast   = i === recent.length - 1;
+      var isLast    = i === recent.length - 1;
       var isPerfect = r.perfect;
-      var badge    = isPerfect
+      var badge     = isPerfect
         ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;">✓ Full Understanding</span>'
         : '<span style="display:inline-flex;align-items:center;gap:4px;background:#fff7ed;color:#ea580c;border:1.5px solid #fed7aa;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;">⚠ Partial Understanding</span>';
       var issueHtml = '';
       if (!isPerfect && r.issues && r.issues.length) {
-        issueHtml = '<div style="font-size:11px;color:#6b7c8f;margin-top:5px;">Concerns: '
-          + r.issues.join(' · ') + '</div>';
+        issueHtml = '<div style="font-size:11px;color:#6b7c8f;margin-top:5px;">Concerns: ' + r.issues.join(' · ') + '</div>';
       }
-      var npsHtml = r.nps
-        ? '<span style="font-size:11px;color:#6b7c8f;margin-left:8px;">NPS ' + r.nps + '</span>'
-        : '';
-      return '<div style="padding:12px 0;' + (isLast ? '' : 'border-bottom:1px solid #f0f4f8;') + '">'
+      var npsHtml = r.nps ? '<span style="font-size:11px;color:#6b7c8f;margin-left:8px;">NPS ' + r.nps + '</span>' : '';
+      var d = r.date ? new Date(r.date).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'}) : '';
+      return '<div onclick="openCdDetail(window._cdRecords[' + i + '])" '
+        + 'style="padding:12px 8px;cursor:pointer;border-radius:8px;margin:0 -8px;transition:background .12s;' + (isLast ? '' : 'border-bottom:1px solid #f0f4f8;') + '" '
+        + 'onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'\'">'
         + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
         + '<div>'
         + '<div style="font-size:13px;font-weight:600;color:#1a2a3a;">' + escHtml(r.consumer || 'Anonymous') + npsHtml + '</div>'
-        + '<div style="font-size:11px;color:#aaa;margin-top:2px;">' + escHtml(r.date || '') + '</div>'
+        + '<div style="font-size:11px;color:#aaa;margin-top:2px;">' + d + '</div>'
         + '</div>'
         + badge
         + '</div>'
@@ -8419,5 +8420,93 @@ function sendShareEmail() {
 }
 </script>
 
+<!-- Consumer Duty Detail Modal -->
+<div id="cd-modal-overlay" onclick="closeCdModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;"></div>
+<div id="cd-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(680px,94vw);max-height:85vh;overflow-y:auto;background:#fff;border-radius:14px;z-index:9001;box-shadow:0 20px 60px rgba(0,0,0,.25);">
+  <div style="position:sticky;top:0;background:#fff;border-bottom:1px solid #e8ecf0;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-radius:14px 14px 0 0;">
+    <div>
+      <div id="cd-modal-name" style="font-size:16px;font-weight:700;color:#003768;"></div>
+      <div id="cd-modal-meta" style="font-size:12px;color:#6b7c8f;margin-top:2px;"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div id="cd-modal-badge"></div>
+      <button onclick="closeCdModal()" style="background:none;border:none;cursor:pointer;padding:4px;color:#6b7c8f;font-size:20px;line-height:1;">✕</button>
+    </div>
+  </div>
+  <div style="padding:24px;">
+    <div id="cd-modal-nps" style="margin-bottom:20px;"></div>
+    <div id="cd-modal-questions" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <div id="cd-modal-comment" style="margin-top:20px;"></div>
+  </div>
+</div>
+
+<script>
+var CD_QUESTIONS = [
+  { key:'q1',  label:'Adviser Knowledge',      flagged: function(a){ return !a.toLowerCase().startsWith('yes'); } },
+  { key:'q2',  label:'Report Accuracy',        flagged: function(){ return false; } },
+  { key:'q3',  label:'Walkthrough Request',    flagged: function(a){ return a.toLowerCase().includes("i'd like") || a.toLowerCase().includes('call me'); } },
+  { key:'q4',  label:'Rate Type Understanding',flagged: function(a){ return a.toLowerCase() === 'unsure'; } },
+  { key:'q5',  label:'Future Review Awareness',flagged: function(a){ return a.toLowerCase() === 'no'; } },
+  { key:'q6',  label:'Home at Risk Warning',   flagged: function(a){ return a.toLowerCase() === 'no'; } },
+  { key:'q7',  label:'Protection Importance',  flagged: function(a){ return a.toLowerCase() === 'no'; } },
+  { key:'q8',  label:'Protection Status',      flagged: function(a){ return a.toLowerCase().includes('would like to discuss'); } },
+  { key:'q9',  label:'Literature Clarity',     flagged: function(a){ return a.toLowerCase() === 'unclear'; } },
+  { key:'q10', label:'Support Received',       flagged: function(a){ return a.toLowerCase().includes('did not receive adequate'); } }
+];
+
+function openCdDetail(r) {
+  document.getElementById('cd-modal-name').textContent = r.consumer || 'Unknown';
+  var d = r.date ? new Date(r.date).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}) : '';
+  document.getElementById('cd-modal-meta').textContent = d;
+  document.getElementById('cd-modal-badge').innerHTML = r.perfect
+    ? '<span style="background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:12px;font-weight:700;padding:4px 12px;">✓ Full Understanding</span>'
+    : '<span style="background:#fff7ed;color:#ea580c;border:1.5px solid #fed7aa;border-radius:20px;font-size:12px;font-weight:700;padding:4px 12px;">⚠ Partial Understanding</span>';
+
+  // NPS
+  var npsEl = document.getElementById('cd-modal-nps');
+  if (r.nps) {
+    var npsColor = r.nps >= 9 ? '#16a34a' : r.nps >= 7 ? '#d97706' : '#ef4444';
+    npsEl.innerHTML = '<div style="background:#f8fafc;border:1px solid #e8ecf0;border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">'
+      + '<span style="font-size:13px;font-weight:600;color:#1a2a3a;">NPS Score</span>'
+      + '<span style="font-size:24px;font-weight:800;color:' + npsColor + ';">' + r.nps + '<span style="font-size:13px;font-weight:400;color:#6b7c8f;"> / 10</span></span>'
+      + '</div>';
+  } else { npsEl.innerHTML = ''; }
+
+  // Questions
+  var ans = r.answers || {};
+  var qHtml = CD_QUESTIONS.map(function(q) {
+    var answer = ans[q.key] || '—';
+    var isFlagged = q.flagged(answer);
+    var bg    = isFlagged ? '#fff7ed' : '#f8fafc';
+    var border= isFlagged ? '#fed7aa' : '#e8ecf0';
+    var dot   = isFlagged ? '#ea580c' : '#22c55e';
+    return '<div style="background:' + bg + ';border:1.5px solid ' + border + ';border-radius:9px;padding:12px 14px;">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">'
+      + '<div style="width:7px;height:7px;border-radius:50%;background:' + dot + ';flex-shrink:0;"></div>'
+      + '<span style="font-size:11px;font-weight:700;color:#6b7c8f;text-transform:uppercase;letter-spacing:.06em;">' + escHtml(q.label) + '</span>'
+      + '</div>'
+      + '<div style="font-size:13px;color:#1a2a3a;line-height:1.5;">' + escHtml(answer) + '</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('cd-modal-questions').innerHTML = qHtml;
+
+  // Comment
+  var commentEl = document.getElementById('cd-modal-comment');
+  if (r.comment) {
+    commentEl.innerHTML = '<div style="border-left:3px solid #003768;padding:10px 14px;background:#f0f6ff;border-radius:0 8px 8px 0;">'
+      + '<div style="font-size:11px;font-weight:700;color:#003768;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Additional Comments</div>'
+      + '<div style="font-size:13px;color:#1a2a3a;line-height:1.5;">' + escHtml(r.comment) + '</div>'
+      + '</div>';
+  } else { commentEl.innerHTML = ''; }
+
+  document.getElementById('cd-modal-overlay').style.display = '';
+  document.getElementById('cd-modal').style.display = '';
+}
+
+function closeCdModal() {
+  document.getElementById('cd-modal-overlay').style.display = 'none';
+  document.getElementById('cd-modal').style.display = 'none';
+}
+</script>
 </body>
 </html>
