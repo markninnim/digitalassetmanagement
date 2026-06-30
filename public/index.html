@@ -7815,8 +7815,8 @@ function pzFmt(n) {
     </div>
 
     <div id="share-image-preview" style="margin-bottom:16px;display:none;">
-      <label style="display:block;font-size:12px;font-weight:700;color:#1a2a3a;margin-bottom:5px;">Image to include</label>
-      <img id="share-image-img" style="max-width:100%;max-height:140px;object-fit:contain;border-radius:7px;border:1px solid #e8ecf0;">
+      <label style="display:block;font-size:12px;font-weight:700;color:#1a2a3a;margin-bottom:6px;">Attachments <span id="share-attach-count" style="font-weight:400;color:#6b7c8f;"></span></label>
+      <div id="share-thumbs" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
     </div>
 
     <p id="share-status" style="margin:0 0 12px;font-size:13px;min-height:18px;"></p>
@@ -7828,39 +7828,63 @@ function pzFmt(n) {
 </div>
 
 <script>
-var _shareImageDataUrl = null;
+var _shareImages = []; // [{filename, dataUrl}]
 var _sharePostName = '';
 
 function openShareModal(postName, copy, imageGrid) {
   _sharePostName = postName;
-  _shareImageDataUrl = null;
+  _shareImages = [];
   document.getElementById('share-post-name').textContent = postName.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
   document.getElementById('share-to-email').value = '';
   document.getElementById('share-post-copy').value = copy || '';
   document.getElementById('share-status').textContent = '';
   document.getElementById('share-status').style.color = '#6b7c8f';
-  // Try to grab the first image from the post's card grid
+
   var preview = document.getElementById('share-image-preview');
-  var imgEl = document.getElementById('share-image-img');
+  var thumbsEl = document.getElementById('share-thumbs');
+  var countEl = document.getElementById('share-attach-count');
   preview.style.display = 'none';
+  thumbsEl.innerHTML = '';
+
   if (imageGrid) {
-    var firstImg = imageGrid.querySelector('img');
-    if (firstImg && firstImg.src && firstImg.src.indexOf('data:') === 0) {
-      _shareImageDataUrl = firstImg.src;
-      imgEl.src = firstImg.src;
-      preview.style.display = 'block';
-    } else if (firstImg && firstImg.src) {
-      // Fetch and convert to dataURL so we can embed in email
-      fetch(firstImg.src).then(function(r){ return r.blob(); }).then(function(blob){
-        var reader = new FileReader();
-        reader.onload = function(e){
-          _shareImageDataUrl = e.target.result;
-          imgEl.src = _shareImageDataUrl;
-          preview.style.display = 'block';
-        };
-        reader.readAsDataURL(blob);
-      }).catch(function(){});
+    var imgs = imageGrid.querySelectorAll('img');
+    var imgArr = Array.prototype.slice.call(imgs).filter(function(i){ return i.src && !i.src.endsWith('#'); });
+    if (imgArr.length === 0) {
+      document.getElementById('share-post-modal').style.display = 'flex';
+      return;
     }
+    preview.style.display = 'block';
+    countEl.textContent = '(loading…)';
+    var loaded = 0;
+    imgArr.forEach(function(imgEl) {
+      var src = imgEl.src;
+      var filename = src.split('/').pop().split('?')[0] || 'image.jpg';
+      function done(dataUrl) {
+        _shareImages.push({ filename: filename, dataUrl: dataUrl });
+        // thumbnail
+        var thumb = document.createElement('div');
+        thumb.style.cssText = 'position:relative;width:60px;height:60px;border-radius:6px;overflow:hidden;border:1px solid #e8ecf0;background:#f5f7fa;flex-shrink:0;';
+        var ti = document.createElement('img');
+        ti.src = dataUrl;
+        ti.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        var lbl = document.createElement('div');
+        lbl.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(0,55,104,.75);color:#fff;font-size:8px;text-align:center;padding:2px;line-height:1.2;';
+        lbl.textContent = filename.replace(/fpg-|-\d+x\d+|\.jpg|\.png/gi,'').replace(/-/g,' ').trim();
+        thumb.appendChild(ti); thumb.appendChild(lbl);
+        thumbsEl.appendChild(thumb);
+        loaded++;
+        countEl.textContent = '(' + loaded + ' of ' + imgArr.length + ' images)';
+      }
+      if (src.indexOf('data:') === 0) {
+        done(src);
+      } else {
+        fetch(src).then(function(r){ return r.blob(); }).then(function(blob){
+          var reader = new FileReader();
+          reader.onload = function(e){ done(e.target.result); };
+          reader.readAsDataURL(blob);
+        }).catch(function(){ loaded++; }); // skip failed
+      }
+    });
   }
   document.getElementById('share-post-modal').style.display = 'flex';
 }
@@ -7878,7 +7902,7 @@ function sendShareEmail() {
   fetch('/api/share-social-post', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ to: to, postName: _sharePostName, wording: copy, imageDataUrl: _shareImageDataUrl })
+    body: JSON.stringify({ to: to, postName: _sharePostName, wording: copy, images: _shareImages })
   }).then(function(r){ return r.json(); }).then(function(d) {
     if (d.error) { statusEl.style.color = '#c00'; statusEl.textContent = d.error; return; }
     statusEl.style.color = '#2e7d32'; statusEl.textContent = '✓ Email sent to ' + to;

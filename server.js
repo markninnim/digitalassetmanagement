@@ -1410,7 +1410,7 @@ app.put('/api/featured-social/:id', requireMarketingOrAdmin, (req, res) => {
 
 // ── Share social post via email ───────────────────────────────
 app.post('/api/share-social-post', requireAuth, async (req, res) => {
-  const { to, postName, wording, imageDataUrl } = req.body;
+  const { to, postName, wording, images } = req.body;
   if (!to) return res.status(400).json({ error: 'Recipient email required' });
   if (!process.env.CM_API_KEY) return res.status(503).json({ error: 'Email not configured (CM_API_KEY missing)' });
 
@@ -1418,10 +1418,16 @@ app.post('/api/share-social-post', requireAuth, async (req, res) => {
   const fromName = [sender.firstName, sender.lastName].filter(Boolean).join(' ') || 'Finance Planning Group';
   const fromEmail = process.env.CM_FROM_EMAIL || 'noreply@financeplanning.co.uk';
 
-  // Build email body
+  // Build attachments from images array [{filename, dataUrl}]
+  const attachments = (images || []).map(function(img) {
+    const match = (img.dataUrl || '').match(/^data:([^;]+);base64,(.+)$/);
+    if (!match) return null;
+    return { filename: img.filename || 'image.jpg', content: Buffer.from(match[2], 'base64'), contentType: match[1] };
+  }).filter(Boolean);
+
   const copyHtml = (wording || '').replace(/\n/g, '<br>');
-  const imgHtml = imageDataUrl
-    ? `<p><img src="${imageDataUrl}" alt="Social post image" style="max-width:560px;width:100%;border-radius:8px;"></p>`
+  const attachNote = attachments.length
+    ? `<p style="margin:16px 0 0;font-size:13px;color:#6b7c8f;">📎 ${attachments.length} image${attachments.length > 1 ? 's' : ''} attached (${attachments.map(function(a){ return a.filename; }).join(', ')})</p>`
     : '';
 
   const html = `
@@ -1437,10 +1443,10 @@ app.post('/api/share-social-post', requireAuth, async (req, res) => {
         <tr><td style="padding:32px;">
           <p style="margin:0 0 8px;font-size:13px;color:#6b7c8f;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">SOCIAL POST</p>
           <h2 style="margin:0 0 20px;font-size:22px;color:#003768;">${postName || 'Post'}</h2>
-          ${imgHtml}
-          <div style="background:#f9fafc;border-left:4px solid #003768;border-radius:0 8px 8px 0;padding:16px 20px;margin:20px 0;">
+          <div style="background:#f9fafc;border-left:4px solid #003768;border-radius:0 8px 8px 0;padding:16px 20px;margin:0 0 20px;">
             <p style="margin:0;font-size:15px;color:#1a2a3a;line-height:1.6;">${copyHtml}</p>
           </div>
+          ${attachNote}
           <p style="margin:24px 0 0;font-size:13px;color:#6b7c8f;">Shared by <strong>${fromName}</strong></p>
         </td></tr>
         <tr><td style="background:#f9fafc;padding:16px 32px;border-top:1px solid #e8ecf0;">
@@ -1456,7 +1462,8 @@ app.post('/api/share-social-post', requireAuth, async (req, res) => {
       from: `"${fromName}" <${fromEmail}>`,
       to,
       subject: `Social Post: ${postName || 'Shared post'} — from ${fromName}`,
-      html
+      html,
+      attachments
     });
     res.json({ ok: true });
   } catch (err) {
