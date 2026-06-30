@@ -5572,8 +5572,8 @@ var _currentUser = null;
       banner.id = 'impersonate-banner';
       banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#2e99d5;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:16px;';
       var name = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email;
-      banner.innerHTML = 'Guardian Mode — viewing as <strong>' + name + '</strong> &nbsp;'
-        + '<button onclick="stopImpersonation()" style="background:#fff;color:#2e99d5;border:none;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">↩ Exit Guardian Mode</button>';
+      banner.innerHTML = 'Impersonating — viewing as <strong>' + name + '</strong> &nbsp;'
+        + '<button onclick="stopImpersonation()" style="background:#fff;color:#2e99d5;border:none;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">↩ Exit Impersonation</button>';
       document.body.appendChild(banner);
       document.body.style.paddingBottom = '48px';
     }
@@ -5905,7 +5905,7 @@ function renderUserList(users) {
       // Supervisors cannot edit/delete admin users
       var canEditThis = isAdmin || !u.isAdmin;
       actionBtns =
-        '<button onclick="impersonateUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#e8f4f8;color:#005f8a;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:110px;text-align:center;">Guardian Mode</button>' +
+        '<button onclick="impersonateUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#e8f4f8;color:#005f8a;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:100px;text-align:center;">Impersonate</button>' +
         (canEditThis ? '<button onclick="openUserForm(\'' + u.id + '\')" style="background:#f5f7fa;color:#003768;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:52px;text-align:center;">Edit</button>' : '') +
         (canEditThis ? '<button onclick="deleteUser(\'' + u.id + '\',\'' + escHtml(name).replace(/'/g,"\\'") + '\')" style="background:#fff0f0;color:#c00;border:none;padding:6px 0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:62px;text-align:center;">Delete</button>' : '');
     }
@@ -5922,7 +5922,7 @@ function renderUserList(users) {
 }
 
 function impersonateUser(id, name) {
-  if (!confirm('Log in as ' + name + '?\n\nYou will see the platform exactly as they do. A banner will appear so you can switch back.')) return;
+  if (!confirm('Impersonate ' + name + '?\n\nYou will see the platform exactly as they do. A banner will appear so you can switch back.')) return;
   _surveyingLoaded = false;
   fetch('/api/admin/impersonate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id }) })
     .then(function(r){ return r.json(); })
