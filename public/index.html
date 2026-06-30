@@ -343,21 +343,31 @@ html { height: 100%; }
           </div>
         </div>
         <!-- Stat tiles -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
-          <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:9px;padding:14px 16px;">
-            <div id="home-cd-full-count" style="font-size:28px;font-weight:800;color:#16a34a;line-height:1;margin-bottom:4px;"></div>
-            <div style="font-size:12px;font-weight:600;color:#16a34a;">Full Understanding</div>
-            <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">All questions answered correctly</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+          <div style="background:#003768;border-radius:9px;padding:14px 16px;">
+            <div id="home-cd-full-count" style="font-size:28px;font-weight:800;color:#fff;line-height:1;margin-bottom:4px;"></div>
+            <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);">Full Understanding</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;">All questions answered correctly</div>
           </div>
-          <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:9px;padding:14px 16px;">
-            <div id="home-cd-restored-count" style="font-size:28px;font-weight:800;color:#2563eb;line-height:1;margin-bottom:4px;">0</div>
-            <div style="font-size:12px;font-weight:600;color:#2563eb;">Understanding Restored</div>
-            <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">Remedial action completed</div>
+          <div style="background:#1d6fb8;border-radius:9px;padding:14px 16px;">
+            <div id="home-cd-restored-count" style="font-size:28px;font-weight:800;color:#fff;line-height:1;margin-bottom:4px;">0</div>
+            <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);">Understanding Restored</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;">Remedial action completed</div>
           </div>
-          <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:9px;padding:14px 16px;">
-            <div id="home-cd-partial-count" style="font-size:28px;font-weight:800;color:#ea580c;line-height:1;margin-bottom:4px;"></div>
-            <div style="font-size:12px;font-weight:600;color:#ea580c;">Partial Understanding</div>
-            <div style="font-size:11px;color:#6b7c8f;margin-top:2px;">Remedial follow-up may be required</div>
+          <div style="background:#ef4444;border-radius:9px;padding:14px 16px;">
+            <div id="home-cd-partial-count" style="font-size:28px;font-weight:800;color:#fff;line-height:1;margin-bottom:4px;"></div>
+            <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);">Partial Understanding</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;">Remedial follow-up required</div>
+          </div>
+        </div>
+        <!-- Understanding rate bar -->
+        <div style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+            <span style="font-size:12px;font-weight:600;color:#6b7c8f;">Understanding Rate</span>
+            <span id="home-cd-pct" style="font-size:13px;font-weight:700;color:#003768;"></span>
+          </div>
+          <div style="height:8px;background:#f0f4f8;border-radius:4px;overflow:hidden;">
+            <div id="home-cd-pct-bar" style="height:100%;background:linear-gradient(90deg,#003768,#1d6fb8);border-radius:4px;transition:width .4s;width:0%;"></div>
           </div>
         </div>
         <!-- Recent responses -->
@@ -5955,9 +5965,10 @@ function loadHomeData() {
     listEl.innerHTML = recent.map(function(r, i) {
       var isLast    = i === recent.length - 1;
       var isPerfect = r.perfect;
+      var badgeId   = 'cd-row-badge-' + r.id;
       var badge     = isPerfect
-        ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;">✓ Full Understanding</span>'
-        : '<span style="display:inline-flex;align-items:center;gap:4px;background:#fff7ed;color:#ea580c;border:1.5px solid #fed7aa;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;">⚠ Partial Understanding</span>';
+        ? '<span id="' + badgeId + '" style="display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;">✓ Full Understanding</span>'
+        : '<span id="' + badgeId + '" style="display:inline-flex;align-items:center;gap:4px;background:#fef2f2;color:#ef4444;border:1.5px solid #fecaca;border-radius:20px;font-size:11px;font-weight:700;padding:2px 9px;">⚠ Partial Understanding</span>';
       var issueHtml = '';
       if (!isPerfect && r.issues && r.issues.length) {
         issueHtml = '<div style="font-size:11px;color:#6b7c8f;margin-top:5px;">Concerns: ' + r.issues.join(' · ') + '</div>';
@@ -8483,22 +8494,45 @@ function updateCdSummaryTiles() {
   var cd      = window._cdServerData;
   var records = window._cdRecords || [];
   if (!cd) return;
-  // Count how many recent partial records have been fully resolved locally
   var restoredCount = 0;
   records.forEach(function(r) {
     if (r.perfect) return;
     var ans         = r.answers || {};
     var flaggedKeys = CD_QUESTIONS.filter(function(q) { return q.flagged(ans[q.key] || ''); }).map(function(q) { return q.key; });
     if (!flaggedKeys.length) return;
-    var ticked      = _cdGetTicked(r.id);
-    if (flaggedKeys.every(function(k) { return ticked.indexOf(k) !== -1; })) restoredCount++;
+    var ticked = _cdGetTicked(r.id);
+    var isRestored = flaggedKeys.every(function(k) { return ticked.indexOf(k) !== -1; });
+    if (isRestored) restoredCount++;
+    // update the row badge in the card list
+    var badgeEl = document.getElementById('cd-row-badge-' + r.id);
+    if (badgeEl) {
+      if (isRestored) {
+        badgeEl.style.background = '#eff6ff';
+        badgeEl.style.color      = '#2563eb';
+        badgeEl.style.borderColor= '#bfdbfe';
+        badgeEl.textContent      = '✓ Understanding Restored';
+      } else {
+        badgeEl.style.background = '#fef2f2';
+        badgeEl.style.color      = '#ef4444';
+        badgeEl.style.borderColor= '#fecaca';
+        badgeEl.textContent      = '⚠ Partial Understanding';
+      }
+    }
   });
+  var fullCount    = cd.fullCount    || 0;
+  var partialCount = Math.max(0, (cd.partialCount || 0) - restoredCount);
+  var total        = cd.total        || 1;
+  var pct          = Math.round((fullCount + restoredCount) / total * 100);
   var fullEl     = document.getElementById('home-cd-full-count');
   var restoredEl = document.getElementById('home-cd-restored-count');
   var partEl     = document.getElementById('home-cd-partial-count');
-  if (fullEl)     fullEl.textContent     = cd.fullCount || 0;
+  var pctEl      = document.getElementById('home-cd-pct');
+  var barEl      = document.getElementById('home-cd-pct-bar');
+  if (fullEl)     fullEl.textContent     = fullCount;
   if (restoredEl) restoredEl.textContent = restoredCount;
-  if (partEl)     partEl.textContent     = Math.max(0, (cd.partialCount || 0) - restoredCount);
+  if (partEl)     partEl.textContent     = partialCount;
+  if (pctEl)      pctEl.textContent      = pct + '%';
+  if (barEl)      barEl.style.width      = pct + '%';
 }
 
 function _cdStorageKey(id) { return 'cd_resolved_' + id; }
@@ -8525,7 +8559,7 @@ function _cdUpdateBadge() {
   } else if (allResolved) {
     badgeEl.innerHTML = '<span style="background:#f0fdf4;color:#16a34a;border:1.5px solid #bbf7d0;border-radius:20px;font-size:12px;font-weight:700;padding:4px 12px;">✓ Understanding Restored</span>';
   } else {
-    badgeEl.innerHTML = '<span style="background:#fff7ed;color:#ea580c;border:1.5px solid #fed7aa;border-radius:20px;font-size:12px;font-weight:700;padding:4px 12px;">⚠ Partial Understanding</span>';
+    badgeEl.innerHTML = '<span style="background:#fef2f2;color:#ef4444;border:1.5px solid #fecaca;border-radius:20px;font-size:12px;font-weight:700;padding:4px 12px;">⚠ Partial Understanding</span>';
   }
 }
 
