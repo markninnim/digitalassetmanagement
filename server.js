@@ -2092,7 +2092,7 @@ app.get('/api/download-broker-logo', requireAuth, async (req, res) => {
     let nameFontSize = 48;
     const measuredW = fontBold.widthOfTextAtSize(fullName, nameFontSize);
     if (measuredW > maxNameW) nameFontSize = Math.floor(nameFontSize * maxNameW / measuredW);
-    const textX = wnX + Math.round((wnW - Math.min(measuredW, maxNameW)) / 2);
+    const textX = Math.round(627 * sc);
     const textY = wnY + Math.round((wnH - nameFontSize) / 2) + 4;
     page.drawText(fullName, { x: textX, y: textY, size: nameFontSize, font: fontBold, color: darkBlue });
 
