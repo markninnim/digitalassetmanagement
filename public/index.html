@@ -396,8 +396,8 @@ html { height: 100%; }
             </div>
             <div style="font-size:14px;font-weight:700;color:#003768;">News Bulletins</div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-height:460px;overflow-y:auto;padding-right:4px;" id="home-bulletins-grid">
-            <div style="color:#aaa;font-size:13px;grid-column:1/-1;text-align:center;padding:20px 0;">No bulletins yet.</div>
+          <div style="display:flex;flex-direction:column;gap:12px;max-height:320px;overflow-y:auto;padding-right:6px;" id="home-bulletins-grid">
+            <div style="color:#aaa;font-size:13px;text-align:center;padding:20px 0;">No bulletins yet.</div>
           </div>
         </div>
 
@@ -6018,7 +6018,7 @@ function loadHomeData() {
     grid.innerHTML = '';
     bulletins.forEach(function(b) {
       var card = document.createElement('div');
-      card.style.cssText = 'background:#f8fafc;border:1px solid #e8ecf0;border-radius:8px;padding:14px 16px;';
+      card.style.cssText = 'background:#f8fafc;border:1px solid #e8ecf0;border-radius:8px;padding:14px 16px;flex-shrink:0;';
       var titleEl = document.createElement('div');
       titleEl.style.cssText = 'font-size:13px;font-weight:700;color:#003768;margin-bottom:6px;line-height:1.35;';
       titleEl.textContent = b.title;
