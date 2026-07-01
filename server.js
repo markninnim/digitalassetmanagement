@@ -2460,6 +2460,40 @@ app.get('/api/acre-stats', requireAuth, async (req, res) => {
   }
 });
 
+// ── News Bulletins ────────────────────────────────────────────
+const NEWS_TBL        = 'tbltfeViC5SfCniWt';
+const NEWS_TITLE      = 'fldvFmS9h4SIX3KjL'; // Name
+const NEWS_BODY       = 'fldflwv29d6J4evSg'; // Notes
+const NEWS_STATUS     = 'fldxaOk1OBldIt3sY'; // Status (singleSelect)
+const NEWS_ATTACH     = 'fld8CRM6Fv3syLSX2'; // Attachments
+
+app.get('/api/news-bulletins', requireAuth, async (req, res) => {
+  try {
+    const formula = encodeURIComponent(`{Status}="Published"`);
+    const fields  = [NEWS_TITLE, NEWS_BODY, NEWS_STATUS, NEWS_ATTACH]
+      .map(f => `fields[]=${f}`).join('&');
+    const url = `https://api.airtable.com/v0/${AT_BASE}/${NEWS_TBL}?filterByFormula=${formula}&${fields}&returnFieldsByFieldId=true&sort[0][field]=${NEWS_TITLE}&sort[0][direction]=desc&pageSize=20`;
+    const r   = await fetch(url, { headers: { Authorization: `Bearer ${AT_KEY}` } });
+    const body = await r.json();
+    if (!r.ok) throw new Error(JSON.stringify(body));
+    const bulletins = (body.records || []).map(rec => {
+      const f = rec.cellValuesByFieldId || {};
+      const attach = (f[NEWS_ATTACH] || [])[0];
+      return {
+        id:        rec.id,
+        title:     f[NEWS_TITLE] || '',
+        body:      f[NEWS_BODY]  || '',
+        imageUrl:  attach ? attach.thumbnails?.large?.url || attach.url : null,
+        createdAt: rec.createdTime
+      };
+    });
+    res.json(bulletins);
+  } catch (err) {
+    console.error('news-bulletins error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/share/advisers — all advisers (supervisors only)
 app.get('/api/share/advisers', requireAuth, async (req, res) => {
   if (!req.session.user.isSupervisor && !req.session.user.isAdmin) {

@@ -6010,6 +6010,27 @@ function loadHomeData() {
     if (el('acre-comm-rank')  && d.commRank)  el('acre-comm-rank').textContent  = '#' + d.commRank;
   }).catch(function() {});
 
+  // News Bulletins
+  fetch('/api/news-bulletins').then(function(r) { return r.json(); }).then(function(bulletins) {
+    var grid = document.getElementById('home-bulletins-grid');
+    if (!grid) return;
+    if (!bulletins || !bulletins.length) return; // keep placeholder
+    grid.innerHTML = '';
+    bulletins.forEach(function(b) {
+      var card = document.createElement('div');
+      card.style.cssText = 'background:#f8fafc;border:1px solid #e8ecf0;border-radius:8px;padding:14px 16px;';
+      var titleEl = document.createElement('div');
+      titleEl.style.cssText = 'font-size:13px;font-weight:700;color:#003768;margin-bottom:6px;line-height:1.35;';
+      titleEl.textContent = b.title;
+      var bodyEl = document.createElement('div');
+      bodyEl.style.cssText = 'font-size:12px;color:#6b7c8f;line-height:1.55;white-space:pre-wrap;';
+      bodyEl.textContent = b.body;
+      card.appendChild(titleEl);
+      if (b.body) card.appendChild(bodyEl);
+      grid.appendChild(card);
+    });
+  }).catch(function() {});
+
   // Consumer Duty summary
   fetch('/api/consumer-duty').then(function(r) { return r.json(); }).then(function(cd) {
     var card    = document.getElementById('home-cd-card');
