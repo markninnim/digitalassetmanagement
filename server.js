@@ -2323,7 +2323,7 @@ async function acreFetchAll(table, formula, fields) {
   let records = [], offset = '';
   const fieldQs = fields.map(f => `fields[]=${f}`).join('&');
   do {
-    const qs = `?filterByFormula=${formula}&${fieldQs}&pageSize=100${offset ? '&offset=' + offset : ''}`;
+    const qs = `?filterByFormula=${formula}&${fieldQs}&returnFieldsByFieldId=true&pageSize=100${offset ? '&offset=' + offset : ''}`;
     const r  = await fetch(`https://api.airtable.com/v0/${ACRE_BASE}/${table}${qs}`, {
       headers: { Authorization: `Bearer ${AT_KEY}` }
     });
@@ -2367,7 +2367,7 @@ app.get('/api/acre-stats', requireAuth, async (req, res) => {
     ]);
 
     const salesValue = sales.reduce((sum, rec) => {
-      const f = rec.fields || rec.cellValuesByFieldId || {};
+      const f = rec.cellValuesByFieldId || rec.fields || {};
       return sum + (parseFloat(f[ACRE_BROKER_FEE] || 0) || 0);
     }, 0);
 
