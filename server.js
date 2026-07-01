@@ -2310,6 +2310,63 @@ app.get('/api/consumer-duty', requireAuth, async (req, res) => {
 });
 
 
+// ── ACRE Surveying Stats ───────────────────────────────────────
+const ACRE_BASE        = 'appTQIvpD5TBphlq4';
+const ACRE_LEADS_TBL   = 'tblhGuMyeR3zPBJXe';
+const ACRE_LEADS_DATE  = 'fldrzUfjSTvxd1cLT';   // Date (dateTime)
+const ACRE_SALES_TBL   = 'tbl52e6VsmaJny9f3';
+const ACRE_SALES_DATE  = 'fldHbxQKe9DMItj7a';   // Date (date)
+const ACRE_SALES_TOT   = 'fld9KJ7Wz9dVl9kqi';   // Total (formula)
+
+async function acreFetchAll(table, formula, fields) {
+  let records = [], offset = '';
+  const fieldQs = fields.map(f => `fields[]=${f}`).join('&');
+  do {
+    const qs = `?filterByFormula=${formula}&${fieldQs}&pageSize=100${offset ? '&offset=' + offset : ''}`;
+    const r  = await fetch(`https://api.airtable.com/v0/${ACRE_BASE}/${table}${qs}`, {
+      headers: { Authorization: `Bearer ${AT_KEY}` }
+    });
+    const body = await r.json();
+    if (!r.ok) throw new Error(JSON.stringify(body));
+    records = records.concat(body.records || []);
+    offset = body.offset || '';
+  } while (offset);
+  return records;
+}
+
+app.get('/api/acre-stats', requireAuth, async (req, res) => {
+  try {
+    const now   = new Date();
+    const year  = now.getFullYear();
+    const month = now.getMonth() + 1;
+
+    const fLeadMonth = encodeURIComponent(`AND(YEAR({Date})=${year},MONTH({Date})=${month})`);
+    const fLeadYear  = encodeURIComponent(`YEAR({Date})=${year}`);
+    const fSaleYear  = encodeURIComponent(`YEAR({Date})=${year}`);
+
+    const [leadsMonth, leadsYear, sales] = await Promise.all([
+      acreFetchAll(ACRE_LEADS_TBL, fLeadMonth, [ACRE_LEADS_DATE]),
+      acreFetchAll(ACRE_LEADS_TBL, fLeadYear,  [ACRE_LEADS_DATE]),
+      acreFetchAll(ACRE_SALES_TBL, fSaleYear,  [ACRE_SALES_DATE, ACRE_SALES_TOT])
+    ]);
+
+    const salesValue = sales.reduce((sum, rec) => {
+      const f = rec.fields || {};
+      return sum + (parseFloat(f[ACRE_SALES_TOT] || f.Total || 0) || 0);
+    }, 0);
+
+    res.json({
+      leadsThisMonth: leadsMonth.length,
+      leadsThisYear:  leadsYear.length,
+      salesThisYear:  sales.length,
+      salesValue:     salesValue
+    });
+  } catch (err) {
+    console.error('acre-stats error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/share/advisers — all advisers (supervisors only)
 app.get('/api/share/advisers', requireAuth, async (req, res) => {
   if (!req.session.user.isSupervisor && !req.session.user.isAdmin) {
