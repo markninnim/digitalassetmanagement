@@ -2360,34 +2360,55 @@ app.get('/api/acre-stats', requireAuth, async (req, res) => {
       : `FIND(LOWER("${safeName}"),LOWER(TRIM({Referred by name})))>0`;
     const fSaleYear = encodeURIComponent(`AND(YEAR({Date})=${year},${saleMatch})`);
 
-    // All FPG sales this year (for rank — FPG brokers only)
-    const fAllSales = encodeURIComponent(`AND(YEAR({Date})=${year},FIND("@financeplanning.co.uk",LOWER({Broker Email}))>0)`);
+    // All sales this year + all users — fetch in parallel
+    const fAllSales  = encodeURIComponent(`YEAR({Date})=${year}`);
+    const usersUrl   = `https://api.airtable.com/v0/appqQv0Xog8yZMwI9/tbltcinwWF3FXDGre?fields[]=flde9n3BkKQsJFoYB&fields[]=flduFe3YHfQB7f7LQ&pageSize=100`;
 
-    const [leadsMonth, leadsYear, sales, allSales] = await Promise.all([
+    // Fetch all user pages
+    async function fetchAllUsers() {
+      let users = [], offset = '';
+      do {
+        const r    = await fetch(usersUrl + (offset ? `&offset=${offset}` : ''), { headers: { Authorization: `Bearer ${AT_KEY}` } });
+        const body = await r.json();
+        users  = users.concat(body.records || []);
+        offset = body.offset || '';
+      } while (offset);
+      return users;
+    }
+
+    const [leadsMonth, leadsYear, sales, allSales, allUsers] = await Promise.all([
       acreFetchAll(ACRE_LEADS_TBL, fLeadMonth, [ACRE_LEADS_DATE]),
       acreFetchAll(ACRE_LEADS_TBL, fLeadYear,  [ACRE_LEADS_DATE]),
       acreFetchAll(ACRE_SALES_TBL, fSaleYear,  [ACRE_SALES_DATE, ACRE_BROKER_FEE]),
-      acreFetchAll(ACRE_SALES_TBL, fAllSales,  [ACRE_SALES_DATE, ACRE_BROKER_FEE, ACRE_SALES_NAME])
+      acreFetchAll(ACRE_SALES_TBL, fAllSales,  [ACRE_SALES_DATE, ACRE_BROKER_FEE, ACRE_SALES_NAME]),
+      fetchAllUsers()
     ]);
+
+    // Build set of known adviser full names (lowercase)
+    const adviserNames = new Set(allUsers.map(u => {
+      const f = u.fields || {};
+      return `${f['First Name'] || ''} ${f['Last Name'] || ''}`.trim().toLowerCase();
+    }).filter(Boolean));
 
     const salesValue = sales.reduce((sum, rec) => {
       const f = rec.cellValuesByFieldId || rec.fields || {};
       return sum + (parseFloat(f[ACRE_BROKER_FEE] || 0) || 0);
     }, 0);
 
-    // Rank: group all sales by broker name, sum fees, sort descending
+    // Rank: group all sales by broker name, only include known advisers
     const brokerFees = {};
+    // Seed every adviser with 0 so those with no sales still count in pool
+    adviserNames.forEach(n => { brokerFees[n] = 0; });
     allSales.forEach(rec => {
       const f    = rec.cellValuesByFieldId || rec.fields || {};
       const name = (f[ACRE_SALES_NAME] || '').trim().toLowerCase();
-      if (!name) return;
+      if (!adviserNames.has(name)) return;
       brokerFees[name] = (brokerFees[name] || 0) + (parseFloat(f[ACRE_BROKER_FEE] || 0) || 0);
     });
     const sorted       = Object.values(brokerFees).sort((a, b) => b - a);
-    const userFeeKey   = safeName;
-    const userFeeTotal = brokerFees[userFeeKey] || 0;
+    const userFeeTotal = brokerFees[safeName] || 0;
     const rank         = sorted.findIndex(v => v <= userFeeTotal) + 1;
-    const totalBrokers = Object.keys(brokerFees).length;
+    const totalBrokers = adviserNames.size;
 
     res.json({
       leadsThisMonth: leadsMonth.length,
