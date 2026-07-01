@@ -2376,11 +2376,14 @@ app.get('/api/acre-stats', requireAuth, async (req, res) => {
       return users;
     }
 
-    const [leadsMonth, leadsYear, sales, allSales, allUsers] = await Promise.all([
-      acreFetchAll(ACRE_LEADS_TBL, fLeadMonth, [ACRE_LEADS_DATE]),
-      acreFetchAll(ACRE_LEADS_TBL, fLeadYear,  [ACRE_LEADS_DATE]),
-      acreFetchAll(ACRE_SALES_TBL, fSaleYear,  [ACRE_SALES_DATE, ACRE_BROKER_FEE]),
-      acreFetchAll(ACRE_SALES_TBL, fAllSales,  [ACRE_SALES_DATE, ACRE_BROKER_FEE, ACRE_SALES_NAME]),
+    // All-time sales for this broker (no year filter)
+    const fSaleAllTime = encodeURIComponent(saleMatch);
+
+    const [leadsMonth, leadsYear, salesAllTime, allSales, allUsers] = await Promise.all([
+      acreFetchAll(ACRE_LEADS_TBL, fLeadMonth,    [ACRE_LEADS_DATE]),
+      acreFetchAll(ACRE_LEADS_TBL, fLeadYear,     [ACRE_LEADS_DATE]),
+      acreFetchAll(ACRE_SALES_TBL, fSaleAllTime,  [ACRE_SALES_DATE, ACRE_BROKER_FEE]),
+      acreFetchAll(ACRE_SALES_TBL, fAllSales,     [ACRE_SALES_DATE, ACRE_BROKER_FEE, ACRE_SALES_NAME]),
       fetchAllUsers()
     ]);
 
@@ -2390,7 +2393,7 @@ app.get('/api/acre-stats', requireAuth, async (req, res) => {
       return `${f['First Name'] || ''} ${f['Last Name'] || ''}`.trim().toLowerCase();
     }).filter(Boolean));
 
-    const salesValue = sales.reduce((sum, rec) => {
+    const salesValue = salesAllTime.reduce((sum, rec) => {
       const f = rec.cellValuesByFieldId || rec.fields || {};
       return sum + (parseFloat(f[ACRE_BROKER_FEE] || 0) || 0);
     }, 0);
@@ -2413,7 +2416,7 @@ app.get('/api/acre-stats', requireAuth, async (req, res) => {
     res.json({
       leadsThisMonth: leadsMonth.length,
       leadsThisYear:  leadsYear.length,
-      salesThisYear:  sales.length,
+      salesThisYear:  salesAllTime.length,
       salesValue:     salesValue,
       rank:           rank || null,
       totalBrokers:   totalBrokers
