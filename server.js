@@ -2334,15 +2334,30 @@ async function acreFetchAll(table, formula, fields) {
   return records;
 }
 
+const ACRE_LEADS_INTRO = 'fldfTJD2U9thQ04L7';   // Introducer (singleLineText)
+const ACRE_SALES_NAME  = 'fldnFGO1dwvDhbAXP';   // Referred by name (singleLineText)
+const ACRE_SALES_EMAIL = 'fldqOLa7fxtmdBwB7';   // Broker Email (email)
+
 app.get('/api/acre-stats', requireAuth, async (req, res) => {
   try {
-    const now   = new Date();
-    const year  = now.getFullYear();
-    const month = now.getMonth() + 1;
+    const now      = new Date();
+    const year     = now.getFullYear();
+    const month    = now.getMonth() + 1;
+    const user     = req.session.user;
+    const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
+    const safeName = fullName.toLowerCase().trim().replace(/"/g, '\\"');
+    const email    = (user.email || '').toLowerCase().trim();
 
-    const fLeadMonth = encodeURIComponent(`AND(YEAR({Date})=${year},MONTH({Date})=${month})`);
-    const fLeadYear  = encodeURIComponent(`YEAR({Date})=${year}`);
-    const fSaleYear  = encodeURIComponent(`YEAR({Date})=${year}`);
+    // Leads: filter by Introducer containing the user's name
+    const nameFind   = `FIND(LOWER("${safeName}"),LOWER(TRIM({Introducer})))>0`;
+    const fLeadMonth = encodeURIComponent(`AND(YEAR({Date})=${year},MONTH({Date})=${month},${nameFind})`);
+    const fLeadYear  = encodeURIComponent(`AND(YEAR({Date})=${year},${nameFind})`);
+
+    // Sales: match by broker email OR referred-by-name
+    const saleMatch = email
+      ? `OR(LOWER(TRIM({Broker Email}))="${email}",FIND(LOWER("${safeName}"),LOWER(TRIM({Referred by name})))>0)`
+      : `FIND(LOWER("${safeName}"),LOWER(TRIM({Referred by name})))>0`;
+    const fSaleYear = encodeURIComponent(`AND(YEAR({Date})=${year},${saleMatch})`);
 
     const [leadsMonth, leadsYear, sales] = await Promise.all([
       acreFetchAll(ACRE_LEADS_TBL, fLeadMonth, [ACRE_LEADS_DATE]),
