@@ -2379,11 +2379,17 @@ app.get('/api/acre-stats', requireAuth, async (req, res) => {
     // All-time sales for this broker (no year filter)
     const fSaleAllTime = encodeURIComponent(saleMatch);
 
-    const [leadsMonth, leadsYear, salesAllTime, allSales, allUsers] = await Promise.all([
-      acreFetchAll(ACRE_LEADS_TBL, fLeadMonth,    [ACRE_LEADS_DATE]),
-      acreFetchAll(ACRE_LEADS_TBL, fLeadYear,     [ACRE_LEADS_DATE]),
-      acreFetchAll(ACRE_SALES_TBL, fSaleAllTime,  [ACRE_SALES_DATE, ACRE_BROKER_FEE]),
-      acreFetchAll(ACRE_SALES_TBL, fAllSales,     [ACRE_SALES_DATE, ACRE_BROKER_FEE, ACRE_SALES_NAME]),
+    // All leads this month/year (no broker filter) for rank calculation
+    const fAllLeadsMonth = encodeURIComponent(`AND(YEAR({Date})=${year},MONTH({Date})=${month})`);
+    const fAllLeadsYear  = encodeURIComponent(`YEAR({Date})=${year}`);
+
+    const [leadsMonth, leadsYear, salesAllTime, allSales, allLeadsMonth, allLeadsYear, allUsers] = await Promise.all([
+      acreFetchAll(ACRE_LEADS_TBL, fLeadMonth,      [ACRE_LEADS_DATE]),
+      acreFetchAll(ACRE_LEADS_TBL, fLeadYear,       [ACRE_LEADS_DATE]),
+      acreFetchAll(ACRE_SALES_TBL, fSaleAllTime,    [ACRE_SALES_DATE, ACRE_BROKER_FEE]),
+      acreFetchAll(ACRE_SALES_TBL, fAllSales,       [ACRE_SALES_DATE, ACRE_BROKER_FEE, ACRE_SALES_NAME]),
+      acreFetchAll(ACRE_LEADS_TBL, fAllLeadsMonth,  [ACRE_LEADS_INTRO]),
+      acreFetchAll(ACRE_LEADS_TBL, fAllLeadsYear,   [ACRE_LEADS_INTRO]),
       fetchAllUsers()
     ]);
 
@@ -2417,14 +2423,36 @@ app.get('/api/acre-stats', requireAuth, async (req, res) => {
     const commRank     = sortedFees.findIndex(v => v <= userFee)     + 1;
     const salesRank    = sortedCounts.findIndex(v => v <= userCount) + 1;
 
+    // Leads rank — group by Introducer (first word match on adviser name)
+    function leadsRank(allLeads) {
+      const counts = {};
+      adviserNames.forEach(n => { counts[n] = 0; });
+      allLeads.forEach(rec => {
+        const f    = rec.cellValuesByFieldId || rec.fields || {};
+        const raw  = (f[ACRE_LEADS_INTRO] || '').trim().toLowerCase();
+        // Match adviser name against start of Introducer field
+        const match = [...adviserNames].find(n => raw.startsWith(n));
+        if (!match) return;
+        counts[match] = (counts[match] || 0) + 1;
+      });
+      const sorted   = Object.values(counts).sort((a, b) => b - a);
+      const userVal  = counts[safeName] || 0;
+      return sorted.findIndex(v => v <= userVal) + 1;
+    }
+
+    const leadsMonthRank = leadsRank(allLeadsMonth);
+    const leadsYearRank  = leadsRank(allLeadsYear);
+
     res.json({
-      leadsThisMonth: leadsMonth.length,
-      leadsThisYear:  leadsYear.length,
-      salesAllTime:   salesAllTime.length,
-      salesValue:     salesValue,
-      commRank:       commRank  || null,
-      salesRank:      salesRank || null,
-      totalBrokers:   adviserNames.size
+      leadsThisMonth:  leadsMonth.length,
+      leadsThisYear:   leadsYear.length,
+      salesAllTime:    salesAllTime.length,
+      salesValue:      salesValue,
+      commRank:        commRank        || null,
+      salesRank:       salesRank       || null,
+      leadsMonthRank:  leadsMonthRank  || null,
+      leadsYearRank:   leadsYearRank   || null,
+      totalBrokers:    adviserNames.size
     });
   } catch (err) {
     console.error('acre-stats error:', err);

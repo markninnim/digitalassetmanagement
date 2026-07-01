@@ -353,13 +353,19 @@ html { height: 100%; }
             <div style="font-size:14px;font-weight:700;color:#003768;">ACRE Surveying</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:12px;">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:10px;border-bottom:1px solid #f0f4f8;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #f0f4f8;">
               <span style="font-size:12px;color:#6b7c8f;font-weight:500;">Leads this month</span>
-              <span id="acre-leads-month" style="font-size:22px;font-weight:800;color:#003768;">—</span>
+              <div style="display:flex;align-items:baseline;gap:6px;">
+                <span id="acre-leads-month" style="font-size:22px;font-weight:800;color:#003768;">—</span>
+                <span id="acre-leads-month-rank" style="font-size:11px;font-weight:700;color:#fcb034;"></span>
+              </div>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:10px;border-bottom:1px solid #f0f4f8;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #f0f4f8;">
               <span style="font-size:12px;color:#6b7c8f;font-weight:500;">Leads this year</span>
-              <span id="acre-leads-year" style="font-size:22px;font-weight:800;color:#003768;">—</span>
+              <div style="display:flex;align-items:baseline;gap:6px;">
+                <span id="acre-leads-year" style="font-size:22px;font-weight:800;color:#003768;">—</span>
+                <span id="acre-leads-year-rank" style="font-size:11px;font-weight:700;color:#fcb034;"></span>
+              </div>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #f0f4f8;">
               <span style="font-size:12px;color:#6b7c8f;font-weight:500;">Sales</span>
@@ -5981,6 +5987,8 @@ function loadHomeData() {
     if (el('acre-leads-year'))  el('acre-leads-year').textContent  = fmt(d.leadsThisYear);
     if (el('acre-sales-year'))  el('acre-sales-year').textContent  = fmt(d.salesAllTime);
     if (el('acre-sales-value')) el('acre-sales-value').textContent = fmtGbp(d.salesValue);
+    if (el('acre-leads-month-rank') && d.leadsMonthRank) el('acre-leads-month-rank').textContent = '#' + d.leadsMonthRank;
+    if (el('acre-leads-year-rank')  && d.leadsYearRank)  el('acre-leads-year-rank').textContent  = '#' + d.leadsYearRank;
     if (el('acre-sales-rank') && d.salesRank) el('acre-sales-rank').textContent = '#' + d.salesRank;
     if (el('acre-comm-rank')  && d.commRank)  el('acre-comm-rank').textContent  = '#' + d.commRank;
   }).catch(function() {});
